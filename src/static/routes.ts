@@ -1,0 +1,53 @@
+export const ROUTES = {
+  HOME: '/',
+  LOGIN: '/login',
+
+  ADMIN_ROOT: '/admin',
+  ADMIN_USERS: '/admin/users',
+  ADMIN_CARRIER: '/admin/carrier',
+  ADMIN_CARRIERS: '/admin/carriers',
+  ADMIN_CARRIERS_NEW: '/admin/carriers/new',
+  ADMIN_COVERAGE_CODES: '/admin/coverage-codes',
+  ADMIN_COVERAGE_CODES_NEW: '/admin/coverage-codes/new',
+  ADMIN_PARENT_COMPANIES: '/admin/parent-companies',
+  ADMIN_PARENT_COMPANIES_NEW: '/admin/parent-companies/new',
+  ADMIN_TERMINATION_CODES: '/admin/termination-codes',
+  ADMIN_EMPLOYERS: '/admin/employers',
+  ADMIN_PLANS: '/admin/plans',
+  ADMIN_MEMBER_SEARCH: '/admin/member-search',
+  ADMIN_LIFE_INSURANCE: '/admin/life-insurance',
+  ADMIN_EMPLOYER_CONTACTS: '/admin/employers/contacts',
+  ADMIN_EMPLOYER_PLANS: '/admin/employers/plans',
+  ADMIN_COBRA_NOTIFICATION: '/admin/cobra-notification',
+  ADMIN_ENROLLMENT_EVENTS: '/admin/open-enrollment/events',
+  ADMIN_ENROLLMENT_SETUP: '/admin/open-enrollment/setup',
+  ADMIN_ENROLLMENT_REVIEW: '/admin/open-enrollment/review',
+  ADMIN_ENROLLMENT_PENDING_REQUESTS:
+    '/admin/open-enrollment/pending-requests',
+  ADMIN_EMPLOYER_GROUPS: '/admin/employer-groups',
+  ADMIN_EMPLOYER_GROUP_MEMBERS: '/admin/employer-groups/members',
+  ADMIN_EMPLOYER_GROUP_BENEFITS: '/admin/employer-groups/benefits',
+  ADMIN_EMPLOYER_GROUP_EMPLOYEE_TYPES:
+    '/admin/employer-groups/employee-types',
+  ADMIN_EMPLOYER_GROUP_MEMBER_SEARCH:
+    '/admin/employer-groups/member-search',
+  ADMIN_BILLING_INVOICES: '/admin/billing/invoices',
+  ADMIN_BILLING_PAYMENTS: '/admin/billing/payments',
+  ADMIN_BILLING_ADJUSTMENTS: '/admin/billing/adjustments',
+  ADMIN_BILLING_UPLOAD_PAYMENTS: '/admin/billing/upload-payments',
+  ADMIN_REPORTS: '/admin/reports',
+  ADMIN_REPORTS_ELIGIBILITY: '/admin/reports/eligibility',
+  ADMIN_REPORTS_BILLING: '/admin/reports/billing',
+  ADMIN_REPORTS_ENROLLMENT: '/admin/reports/enrollment',
+
+  EMPLOYEE_ROOT: '/employer',
+  EMPLOYEE_GROUP_MEMBERS: '/employer/employer-groups/members',
+  EMPLOYEE_GROUP_BENEFITS: '/employer/employer-groups/benefits',
+  EMPLOYEE_BILLING_INVOICES: '/employer/billing/invoices',
+  EMPLOYEE_BILLING_PAYMENTS: '/employer/billing/payments',
+  EMPLOYEE_BILLING_PAYMENT_METHODS: '/employer/billing/payment-methods',
+  EMPLOYEE_REPORTS_ELIGIBILITY: '/employer/reports/eligibility',
+  EMPLOYEE_REPORTS_BILLING: '/employer/reports/billing',
+} as const
+
+export type AppRoute = (typeof ROUTES)[keyof typeof ROUTES]
