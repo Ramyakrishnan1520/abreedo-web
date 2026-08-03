@@ -479,7 +479,7 @@ export function CoverageCodeForm({
                     'after:content-["*"] after:ml-0.5 after:text-destructive',
                   )}
                 >
-                  Coverage Type
+                  {copy.labels.coverageType}
                 </FormLabel>
                 <div className="space-y-1">
                   <FormControl>
@@ -514,7 +514,7 @@ export function CoverageCodeForm({
                   </FormControl>
                   {typesError && (
                     <p className="text-xs text-destructive font-medium">
-                      Failed to load coverage types. Please refresh.
+                      {copy.coverageTypesLoadError}
                     </p>
                   )}
                   <FormMessage />
@@ -535,7 +535,7 @@ export function CoverageCodeForm({
                     'after:content-["*"] after:ml-0.5 after:text-destructive',
                   )}
                 >
-                  Invoice Group
+                  {copy.labels.invoiceGroup}
                 </FormLabel>
                 <div className="space-y-1">
                   <FormControl>

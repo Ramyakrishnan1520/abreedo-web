@@ -51,6 +51,7 @@ export const carrierSchema = z.object({
     .max(254, v.emailMax)
     .optional()
     .or(z.literal('')),
+  allowFlexibleDates: z.boolean().optional(),
 })
 
 export type CarrierFormValues = z.infer<typeof carrierSchema>

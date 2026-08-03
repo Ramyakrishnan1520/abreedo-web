@@ -424,7 +424,7 @@ export function CarrierForm({
             render={({ field }) => (
               <FormItem className="grid grid-cols-1 sm:grid-cols-[200px_1fr] items-center gap-x-4 gap-y-1 py-3 border-b border-slate-100 last:border-0">
                 <FormLabel className="sm:text-right text-left text-sm font-semibold text-slate-700">
-                  Allow Flexible Dates
+                  {copy.labels.allowFlexibleDates}
                 </FormLabel>
                 <div className="flex items-center h-9">
                   <FormControl>

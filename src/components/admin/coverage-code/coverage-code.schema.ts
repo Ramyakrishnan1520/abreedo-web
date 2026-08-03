@@ -30,6 +30,14 @@ export const coverageCodeSchema = z.object({
     .min(1, v.shortDescriptionRequired)
     .max(100, v.shortDescriptionMax)
     .trim(),
+  
+    remittanceTypeId: z.string().min(1, 'Coverage Type is required').trim(),
+
+  invoiceGroup: z
+    .string()
+    .min(1, 'Invoice Group is required')
+    .max(100, 'Invoice Group must be 100 characters or fewer')
+    .trim(),
 })
 
 export type CoverageCodeFormValues = z.infer<typeof coverageCodeSchema>

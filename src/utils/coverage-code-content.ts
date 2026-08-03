@@ -36,6 +36,8 @@ export const COVERAGE_CODE_CONTENT = {
       combinationForReports: 'Combination for Reports',
       description: 'Description',
       shortDescription: 'Short description',
+      coverageType: 'Coverage Type',
+      invoiceGroup: 'Invoice Group',
     },
     placeholders: {
       code: 'Enter coverage code',
@@ -51,6 +53,7 @@ export const COVERAGE_CODE_CONTENT = {
     },
     carriersLoadError: 'Failed to load carriers. Please refresh.',
     coverageClassesLoadError: 'Failed to load coverage classes. Please refresh.',
+    coverageTypesLoadError: 'Failed to load coverage types. Please refresh.',
     loadingMoreCarriers: 'Loading more carriers...',
     validationSummary: 'Please fix the highlighted fields before saving.',
     actions: {

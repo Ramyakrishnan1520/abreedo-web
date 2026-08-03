@@ -40,6 +40,7 @@ export const CARRIER_CONTENT = {
       phone: 'Phone',
       fax: 'Fax',
       email: 'Email',
+      allowFlexibleDates:'Allow Flexible Dates',
     },
     placeholders: {
       name: 'Enter carrier name',
