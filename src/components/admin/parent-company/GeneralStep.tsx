@@ -71,12 +71,12 @@ export function GeneralStep() {
         render={({ field }) => (
           <FormItem className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-start sm:gap-4">
             <FormLabel className={REQUIRED_LABEL_CLASS}>
-              Full Name
+              {copy.fullnameLabel}
             </FormLabel>
             <div className="space-y-1">
               <FormControl>
                 <Input
-                  placeholder="Enter full name"
+                  placeholder={copy.fullnamePlaceholder}
                   className={FORM_INPUT_CLASS}
                   {...field}
                 />

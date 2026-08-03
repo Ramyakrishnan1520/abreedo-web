@@ -21,6 +21,7 @@ export interface ParentCompanyApiItem {
   parentCompanyId?: string
   id?: string
   name: string
+  fullName: string
   contactFirst?: string
   contactLast?: string
   address1?: string
@@ -32,6 +33,7 @@ export interface ParentCompanyApiItem {
   phone?: string
   alternatePhone?: string
   notes?: string
+  allowCobra: boolean
   email?: string
   fax?: string
   website?: string

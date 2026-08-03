@@ -22,6 +22,7 @@ export function mapParentCompanyDetailToFormValues(
 
   return {
     name: detail.name ?? '',
+    fullName:detail.fullName ?? '',
     address1: detail.address1 ?? '',
     address2: detail.address2 ?? '',
     city: detail.city ?? '',
@@ -40,5 +41,6 @@ export function mapParentCompanyDetailToFormValues(
     carrierIds,
     linkedCarriers: linkedCarriers.length > 0 ? linkedCarriers : undefined,
     notes: detail.notes ?? '',
+    allowCobra:detail.allowCobra ?? '',
   }
 }

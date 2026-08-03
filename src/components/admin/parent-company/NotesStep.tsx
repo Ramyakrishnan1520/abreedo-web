@@ -34,7 +34,7 @@ export function NotesStep() {
         render={({ field }) => (
           <FormItem className="flex items-center gap-3 space-y-0 pt-2">
             <FormLabel className="text-base font-bold text-slate-900 cursor-pointer">
-              Allow Cobra
+              {copy.allowCobraLabel}
             </FormLabel>
             <FormControl>
               <Checkbox

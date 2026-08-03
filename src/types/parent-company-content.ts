@@ -58,6 +58,7 @@ export interface ParentCompanyContent {
     }
     fields: {
       name: string
+      fullName:String
       address1: string
       address2: string
       city: string

@@ -69,6 +69,8 @@ export const PARENT_COMPANY_CONTENT = {
   generalStep: {
     nameLabel: 'Parent Company Name',
     namePlaceholder: 'Enter parent company name',
+    fullnameLabel: 'Full Name',
+    fullnamePlaceholder: 'Enter full name',
     additionalDetailsHeading: 'Additional Details',
     primaryAddressHeading: 'Primary Address',
     address1Label: 'Address 1',
@@ -126,6 +128,7 @@ export const PARENT_COMPANY_CONTENT = {
     description:
       'Add any additional information that should be recorded for this parent company.',
     placeholder: 'Paragraph describing any additional information needed',
+    allowCobraLabel: 'Allow Cobra',
   },
   reviewStep: {
     heading: 'Review & Save',
@@ -140,6 +143,7 @@ export const PARENT_COMPANY_CONTENT = {
     },
     fields: {
       name: 'Parent Company Name',
+      fullName: 'Full Name',
       address1: 'Address 1',
       address2: 'Address 2',
       city: 'City',

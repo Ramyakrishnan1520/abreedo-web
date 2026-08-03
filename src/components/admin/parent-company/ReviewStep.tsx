@@ -81,6 +81,7 @@ export function ReviewStep() {
 
       <ReviewSection title={sections.general}>
         <ReviewField label={fields.name} value={values.name} />
+        <ReviewField label={fields.fullName} value={values.fullName}/>
       </ReviewSection>
 
       <ReviewSection title={sections.primaryAddress}>

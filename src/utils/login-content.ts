@@ -1,6 +1,6 @@
 export const LOGIN_CONTENT = {
   branding: {
-    title: 'AMCA Portal',
+    title: 'ABREEDO Portal',
     subtitle: 'Client Administration & Member Management System',
   },
   fields: {
