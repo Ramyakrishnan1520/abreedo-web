@@ -27,11 +27,15 @@ export const PARENT_COMPANY_CONTENT = {
       description:
         'Select a parent company to load its details, then update using the same guided steps as new setup.',
       selectLabel: 'Select Parent Company',
+      selectCardDescription:
+        'Search the list below and choose a company to load its profile for editing.',
       selectPlaceholder: 'Choose a parent company',
       selectLoadingPlaceholder: 'Loading parent companies...',
       selectSearchPlaceholder: 'Search parent companies...',
       selectNoResults: 'No parent companies match your search.',
-      selectPrompt: 'Select a parent company above to begin editing.',
+      selectPrompt: 'Choose a parent company from the dropdown to continue.',
+      emptyStateTitle: 'Ready when you are',
+      editingLabel: 'Editing:',
       loadingDetails: 'Loading parent company details...',
       errors: {
         listLoad: 'Failed to load parent companies. Please try again.',

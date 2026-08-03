@@ -17,11 +17,14 @@ export interface ParentCompanyContent {
       title: string
       description: string
       selectLabel: string
+      selectCardDescription: string
       selectPlaceholder: string
       selectLoadingPlaceholder: string
       selectSearchPlaceholder: string
       selectNoResults: string
       selectPrompt: string
+      emptyStateTitle: string
+      editingLabel: string
       loadingDetails: string
       errors: {
         listLoad: string
