@@ -7,7 +7,7 @@ export function useGetStates() {
   return useQuery<GetStatesResponse, Error>({
     queryKey: ['states'],
     queryFn: getStatesApi,
-    staleTime: Infinity, // states list rarely changes — cache indefinitely per session
+    staleTime: Infinity, 
     gcTime: 5 * 60 * 1000,
   })
 }

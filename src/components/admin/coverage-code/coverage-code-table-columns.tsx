@@ -1,6 +1,7 @@
 import { Pencil, Trash2 } from 'lucide-react'
 
 import { Button } from '#/components/ui/button.tsx'
+import { COVERAGE_CODE_CONTENT } from '#/utils/coverage-code-content.ts'
 
 import type { ColumnDef } from '@tanstack/react-table'
 import type { CoverageCode } from '#/types/coverage-code.ts'
@@ -10,8 +11,10 @@ interface CoverageCodeTableColumnActions {
   onDelete: (coverageCode: CoverageCode) => void
 }
 
+const { table: tableCopy } = COVERAGE_CODE_CONTENT
+
 function displayValue(value: string) {
-  return value.trim() || '-'
+  return value.trim() || tableCopy.emptyValue
 }
 
 export function getCoverageCodeTableColumns({
@@ -21,23 +24,23 @@ export function getCoverageCodeTableColumns({
   return [
     {
       accessorKey: 'code',
-      header: 'Code',
+      header: tableCopy.columns.code,
       cell: ({ row }) => displayValue(row.original.code),
     },
     {
       accessorKey: 'description',
-      header: 'Description',
+      header: tableCopy.columns.description,
       cell: ({ row }) => displayValue(row.original.description),
     },
     {
       id: 'edit',
-      header: 'Edit',
+      header: tableCopy.columns.edit,
       cell: ({ row }) => (
         <Button
           type="button"
           variant="outline"
           size="icon-sm"
-          aria-label={`Edit ${row.original.code}`}
+          aria-label={tableCopy.editAria(row.original.code)}
           onClick={() => onEdit(row.original)}
         >
           <Pencil className="size-4" />
@@ -46,13 +49,13 @@ export function getCoverageCodeTableColumns({
     },
     {
       id: 'delete',
-      header: 'Delete',
+      header: tableCopy.columns.delete,
       cell: ({ row }) => (
         <Button
           type="button"
           variant="destructive"
           size="icon-sm"
-          aria-label={`Delete ${row.original.code}`}
+          aria-label={tableCopy.deleteAria(row.original.code)}
           onClick={() => onDelete(row.original)}
         >
           <Trash2 className="size-4" />

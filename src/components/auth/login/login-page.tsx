@@ -17,14 +17,17 @@ import { useLogin } from '#/hooks/auth/useLogin'
 import { Button } from '#/components/ui/button.tsx'
 import { Input } from '#/components/ui/input.tsx'
 import { Label } from '#/components/ui/label.tsx'
+import { LOGIN_CONTENT } from '#/utils/login-content.ts'
 import { cn } from '#/lib/utils.ts'
 
 const loginSchema = z.object({
-  username: z.string().min(1, 'Username is required').trim(),
-  password: z.string().min(1, 'Password is required'),
+  username: z.string().min(1, LOGIN_CONTENT.validation.usernameRequired).trim(),
+  password: z.string().min(1, LOGIN_CONTENT.validation.passwordRequired),
 })
 
 type LoginFormValues = z.infer<typeof loginSchema>
+
+const copy = LOGIN_CONTENT
 
 export function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
@@ -44,7 +47,6 @@ export function LoginPage() {
     submitLogin(data)
   }
 
-  // Derive a display-friendly server error message
   const serverError = error?.message ?? null
 
   return (
@@ -58,10 +60,10 @@ export function LoginPage() {
             <Building2 className="size-8 text-tan-dark" />
           </div>
           <h1 className="text-3xl font-bold tracking-tight display-title text-slate-900 mb-1">
-           ABREEDO Portal
+            {copy.branding.title}
           </h1>
           <p className="text-sm text-slate-600 max-w-[340px] mx-auto">
-            Client Administration &amp; Member Management System
+            {copy.branding.subtitle}
           </p>
         </div>
 
@@ -75,14 +77,14 @@ export function LoginPage() {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
           <div className="space-y-1.5">
             <Label htmlFor="username" className="text-xs font-semibold text-slate-900">
-              Username
+              {copy.fields.usernameLabel}
             </Label>
             <div className="relative">
               <User className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400 pointer-events-none" />
               <Input
                 id="username"
                 type="text"
-                placeholder="Enter username"
+                placeholder={copy.fields.usernamePlaceholder}
                 autoComplete="username"
                 {...register('username')}
                 className={cn(
@@ -102,14 +104,14 @@ export function LoginPage() {
 
           <div className="space-y-1.5">
             <Label htmlFor="password" className="text-xs font-semibold text-slate-900">
-              Password
+              {copy.fields.passwordLabel}
             </Label>
             <div className="relative">
               <Lock className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-slate-400 pointer-events-none" />
               <Input
                 id="password"
                 type={showPassword ? 'text' : 'password'}
-                placeholder="************"
+                placeholder={copy.fields.passwordPlaceholder}
                 autoComplete="current-password"
                 {...register('password')}
                 className={cn(
@@ -122,7 +124,9 @@ export function LoginPage() {
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 cursor-pointer focus:outline-hidden"
-                title={showPassword ? 'Hide password' : 'Show password'}
+                title={
+                  showPassword ? copy.actions.hidePassword : copy.actions.showPassword
+                }
                 tabIndex={-1}
               >
                 {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
@@ -146,7 +150,7 @@ export function LoginPage() {
                 <Loader2 className="size-4 animate-spin" />
               ) : (
                 <>
-                  Sign In
+                  {copy.actions.signIn}
                   <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
                 </>
               )}

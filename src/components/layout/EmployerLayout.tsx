@@ -1,4 +1,4 @@
-import { Layout } from '#/components/layout/Layout.tsx'
+import { Layout } from '#/components/Layout.tsx'
 
 export function EmployerLayout() {
   return <Layout role="EMPLOYEE" />

@@ -9,7 +9,8 @@ import {
   CardTitle,
 } from '#/components/ui/card.tsx'
 import { Separator } from '#/components/ui/separator.tsx'
-import { PARENT_COMPANY_CONTENT } from '#/content/admin/parent-company-content.ts'
+import { PARENT_COMPANY_CONTENT } from '#/utils/parent-company-content.ts'
+import { resolveSelectedCarrierOptions } from '#/utils/resolveSelectedCarrierOptions.ts'
 import { useAvailableCarriers } from '#/hooks/parent-company/useAvailableCarriers.ts'
 import { useGetStates } from '#/hooks/carrier/useGetStates.ts'
 import type { ParentCompanyFormValues } from '#/types/parent-company.ts'
@@ -61,9 +62,11 @@ export function ReviewStep() {
   const getStateName = (stateId: string) =>
     states?.find((state) => state.id === stateId)?.name ?? stateId
 
-  const selectedCarrierNames = [...new Set(values.carrierIds)]
-    .map((id) => carriers.find((carrier) => carrier.id === id))
-    .filter((carrier): carrier is (typeof carriers)[number] => Boolean(carrier))
+  const selectedCarrierNames = resolveSelectedCarrierOptions(
+    values.carrierIds,
+    carriers,
+    values.linkedCarriers ?? [],
+  )
 
   const { sections, fields } = copy
 

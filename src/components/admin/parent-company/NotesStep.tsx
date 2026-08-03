@@ -11,7 +11,7 @@ import {
   FormMessage,
 } from '#/components/ui/Form'
 import { FORM_TEXTAREA_CLASS } from '#/components/admin/parent-company/form-styles.ts'
-import { PARENT_COMPANY_CONTENT } from '#/content/admin/parent-company-content.ts'
+import { PARENT_COMPANY_CONTENT } from '#/utils/parent-company-content.ts'
 import type { ParentCompanyFormValues } from '#/types/parent-company.ts'
 
 const copy = PARENT_COMPANY_CONTENT.notesStep

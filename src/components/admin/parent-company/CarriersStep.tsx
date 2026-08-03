@@ -13,7 +13,8 @@ import {
 import { Input } from '#/components/ui/input.tsx'
 import { ScrollArea } from '#/components/ui/scroll-area.tsx'
 import { Separator } from '#/components/ui/separator.tsx'
-import { PARENT_COMPANY_CONTENT } from '#/content/admin/parent-company-content.ts'
+import { PARENT_COMPANY_CONTENT } from '#/utils/parent-company-content.ts'
+import { resolveSelectedCarrierOptions } from '#/utils/resolveSelectedCarrierOptions.ts'
 import { useAvailableCarriers } from '#/hooks/parent-company/useAvailableCarriers.ts'
 import { useLoadMoreIntersection } from '#/hooks/use-load-more-intersection.ts'
 import { cn } from '#/lib/utils.ts'
@@ -74,6 +75,7 @@ export function CarriersStep() {
   } = useAvailableCarriers()
 
   const selectedCarrierIds = form.watch('carrierIds')
+  const linkedCarriers = form.watch('linkedCarriers') ?? []
 
   const uniqueSelectedCarrierIds = useMemo(
     () => [...new Set(selectedCarrierIds)],
@@ -82,12 +84,12 @@ export function CarriersStep() {
 
   const selectedCarriers = useMemo(
     () =>
-      uniqueSelectedCarrierIds
-        .map((id) => carriers.find((carrier) => carrier.id === id))
-        .filter((carrier): carrier is (typeof carriers)[number] =>
-          Boolean(carrier),
-        ),
-    [carriers, uniqueSelectedCarrierIds],
+      resolveSelectedCarrierOptions(
+        uniqueSelectedCarrierIds,
+        carriers,
+        linkedCarriers,
+      ),
+    [carriers, linkedCarriers, uniqueSelectedCarrierIds],
   )
 
   const availableCarriers = useMemo(

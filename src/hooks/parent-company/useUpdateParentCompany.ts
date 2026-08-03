@@ -2,8 +2,8 @@ import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { updateParentCompanyApi } from '#/api/parent-company/parent-company.api.ts'
-import { PARENT_COMPANY_CONTENT } from '#/content/admin/parent-company-content.ts'
-import { mapParentCompanyFormToRequest } from '#/utils/parent-company/mapParentCompanyFormToRequest.ts'
+import { PARENT_COMPANY_CONTENT } from '#/utils/parent-company-content.ts'
+import { mapParentCompanyFormToRequest } from '#/utils/mapParentCompanyFormToRequest.ts'
 
 import type { ParentCompanyFormValues } from '#/types/parent-company.ts'
 

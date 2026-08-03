@@ -19,8 +19,8 @@ import {
 import { parentCompanySchema } from '#/components/admin/parent-company/parent-company.schema.ts'
 import { useCreateParentCompany } from '#/hooks/parent-company/useCreateParentCompany.ts'
 import { useUpdateParentCompany } from '#/hooks/parent-company/useUpdateParentCompany.ts'
-import { PARENT_COMPANY_CONTENT } from '#/content/admin/parent-company-content.ts'
-import { getStepValidationFields } from '#/utils/parent-company/getStepValidationFields.ts'
+import { PARENT_COMPANY_CONTENT } from '#/utils/parent-company-content.ts'
+import { getStepValidationFields } from '#/utils/getParentCompanyStepValidationFields.ts'
 
 import type { ParentCompanyFormValues } from '#/types/parent-company.ts'
 

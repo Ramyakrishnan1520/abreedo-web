@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import { RoutePlaceholderPage } from '#/components/layout/RoutePlaceholderPage.tsx'
+import { RoutePlaceholderPage } from '#/components/RoutePlaceholderPage.tsx'
 
 export const Route = createFileRoute(
   '/_authenticated/admin/employer-groups/employee-types',

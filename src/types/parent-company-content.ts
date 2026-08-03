@@ -19,6 +19,8 @@ export interface ParentCompanyContent {
       selectLabel: string
       selectPlaceholder: string
       selectLoadingPlaceholder: string
+      selectSearchPlaceholder: string
+      selectNoResults: string
       selectPrompt: string
       loadingDetails: string
       errors: {

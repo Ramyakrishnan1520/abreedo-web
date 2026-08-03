@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { PARENT_COMPANY_CONTENT } from '#/content/admin/parent-company-content.ts'
+import { PARENT_COMPANY_CONTENT } from '#/utils/parent-company-content.ts'
 
 const { validation: messages } = PARENT_COMPANY_CONTENT
 
@@ -52,6 +52,14 @@ export const parentCompanySchema = z.object({
       (ids) => new Set(ids).size === ids.length,
       messages.duplicateCarriers,
     ),
+  linkedCarriers: z
+    .array(
+      z.object({
+        id: z.string(),
+        name: z.string(),
+      }),
+    )
+    .optional(),
   notes: z.string().trim(),
   allowCobra: z.boolean(),
 })

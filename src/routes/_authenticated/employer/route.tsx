@@ -1,7 +1,8 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
 
-import { EmployerLayout } from '#/components/layouts/EmployerLayout.tsx'
-import { getRoleHome } from '#/features/auth/auth.tsx'
+import { EmployerLayout } from '#/components/layout/EmployerLayout.tsx'
+import { getRoleHome } from '#/utils/getRoleHome.ts'
+import { UserRole } from '#/enums/user-role.ts'
 import { ROUTES } from '#/static/routes.ts'
 
 export const Route = createFileRoute('/_authenticated/employer')({
@@ -12,7 +13,7 @@ export const Route = createFileRoute('/_authenticated/employer')({
       throw redirect({ to: ROUTES.LOGIN })
     }
 
-    if (user.role !== 'employer') {
+    if (user.role !== UserRole.Employer) {
       throw redirect({ to: getRoleHome(user.role) })
     }
   },

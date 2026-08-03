@@ -5,10 +5,13 @@ import { getCoverageCodeTableColumns } from '#/components/admin/coverage-code/co
 import { ReusableTable } from '#/components/table'
 import { Button } from '#/components/ui/button.tsx'
 import { useCoverageCodes } from '#/hooks/coverage-code/use-coverage-codes'
+import { COVERAGE_CODE_CONTENT } from '#/utils/coverage-code-content.ts'
+import { ROUTES } from '#/static/routes.ts'
 
 import type { PaginationState } from '@tanstack/react-table'
 import type { CoverageCode } from '#/types/coverage-code.ts'
-import { ROUTES } from '#/static/routes.ts'
+
+const copy = COVERAGE_CODE_CONTENT.list
 
 export function CoverageCodesPage() {
   const navigate = useNavigate()
@@ -43,14 +46,11 @@ export function CoverageCodesPage() {
     <main className="page-wrap py-8">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
-          <p className="island-kicker">Site Manager</p>
+          <p className="island-kicker">{copy.kicker}</p>
           <h1 className="display-title mt-3 text-4xl font-bold text-slate-900">
-            Coverage Codes
+            {copy.title}
           </h1>
-          <p className="mt-3 max-w-2xl text-slate-600">
-            Manage coverage code records and pricing rules with reusable TanStack
-            Table columns, server-side pagination, and action controls.
-          </p>
+          <p className="mt-3 max-w-2xl text-slate-600">{copy.description}</p>
         </div>
         <div>
           <Button
@@ -59,7 +59,7 @@ export function CoverageCodesPage() {
             onClick={() => void navigate({ to: ROUTES.ADMIN_COVERAGE_CODES_NEW })}
             className="bg-tan-dark hover:bg-tan-dark/90 text-white rounded-md px-6 h-9 font-semibold shadow-xs transition-colors cursor-pointer"
           >
-            New Coverage Code
+            {copy.addButton}
           </Button>
         </div>
       </div>
@@ -68,9 +68,7 @@ export function CoverageCodesPage() {
         <div className="mb-4 rounded-xl border border-destructive/20 bg-destructive/10 p-4 text-sm text-destructive">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <p>
-              {error instanceof Error
-                ? error.message
-                : 'Unable to load coverage codes. Please try again.'}
+              {error instanceof Error ? error.message : copy.loadErrorFallback}
             </p>
             <Button
               type="button"
@@ -79,7 +77,7 @@ export function CoverageCodesPage() {
               onClick={() => void refetch()}
               disabled={isFetching}
             >
-              Retry
+              {copy.retry}
             </Button>
           </div>
         </div>
@@ -97,5 +95,3 @@ export function CoverageCodesPage() {
     </main>
   )
 }
-
-

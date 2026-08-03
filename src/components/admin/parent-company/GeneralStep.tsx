@@ -20,7 +20,7 @@ import {
   FORM_INPUT_CLASS,
   REQUIRED_LABEL_CLASS,
 } from '#/components/admin/parent-company/form-styles.ts'
-import { PARENT_COMPANY_CONTENT } from '#/content/admin/parent-company-content.ts'
+import { PARENT_COMPANY_CONTENT } from '#/utils/parent-company-content.ts'
 import { useGetStates } from '#/hooks/carrier/useGetStates.ts'
 import type { ParentCompanyFormValues } from '#/types/parent-company.ts'
 

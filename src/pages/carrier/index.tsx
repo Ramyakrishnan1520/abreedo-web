@@ -5,10 +5,13 @@ import { ReusableTable } from '#/components/table'
 import { Button } from '#/components/ui/button.tsx'
 import { getCarrierTableColumns } from '#/components/admin/carrier/carrier-table-columns'
 import { useCarriers } from '#/hooks/carrier/use-carriers'
+import { CARRIER_CONTENT } from '#/utils/carrier-content.ts'
 import { ROUTES } from '#/static/routes.ts'
 
 import type { PaginationState } from '@tanstack/react-table'
 import type { Carrier } from '#/types/carrier.ts'
+
+const copy = CARRIER_CONTENT.list
 
 export function CarriersPage() {
   const navigate = useNavigate()
@@ -43,14 +46,11 @@ export function CarriersPage() {
     <main className="page-wrap py-8">
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="island-kicker">Carriers</p>
+          <p className="island-kicker">{copy.kicker}</p>
           <h1 className="display-title mt-3 text-4xl font-bold text-slate-900">
-            Carrier Table
+            {copy.title}
           </h1>
-          <p className="mt-3 max-w-2xl text-slate-600">
-            Manage carrier records with reusable TanStack Table columns,
-            pagination, and action controls.
-          </p>
+          <p className="mt-3 max-w-2xl text-slate-600">{copy.description}</p>
         </div>
         <div>
           <Button
@@ -59,7 +59,7 @@ export function CarriersPage() {
             onClick={() => void navigate({ to: ROUTES.ADMIN_CARRIERS_NEW })}
             className="h-9 rounded-md bg-tan-dark px-6 font-semibold text-white shadow-xs transition-colors hover:bg-tan-dark/90"
           >
-            Add Carrier
+            {copy.addButton}
           </Button>
         </div>
       </div>
@@ -68,9 +68,7 @@ export function CarriersPage() {
         <div className="mb-4 rounded-xl border border-destructive/20 bg-destructive/10 p-4 text-sm text-destructive">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <p>
-              {error instanceof Error
-                ? error.message
-                : 'Unable to load carriers. Please try again.'}
+              {error instanceof Error ? error.message : copy.loadErrorFallback}
             </p>
             <Button
               type="button"
@@ -79,7 +77,7 @@ export function CarriersPage() {
               onClick={() => void refetch()}
               disabled={isFetching}
             >
-              Retry
+              {copy.retry}
             </Button>
           </div>
         </div>

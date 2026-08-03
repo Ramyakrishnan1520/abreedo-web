@@ -1,23 +1,12 @@
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 
-import type { AuthTokenResponse, StoredTokens } from '#/api/auth/auth.types.ts'
-
-export type UserRole = 'admin' | 'employer'
-
-export interface AuthUser {
-  id: string
-  name: string
-  email: string
-  role: UserRole
-}
-
-export interface LoginInput {
-  id: string
-  name: string
-  email: string
-  role: UserRole
-}
+import type {
+  AuthTokenResponse,
+  AuthUser,
+  LoginInput,
+  StoredTokens,
+} from '#/types/auth.ts'
 
 export interface AuthStoreState {
   user: AuthUser | null
@@ -86,3 +75,5 @@ export const useAuthStore = create<AuthStoreState>()(
     },
   ),
 )
+
+export type AuthStore = typeof useAuthStore

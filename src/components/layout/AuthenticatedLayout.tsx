@@ -1,7 +1,7 @@
 import { useCallback } from 'react'
 import { Outlet, useNavigate } from '@tanstack/react-router'
 
-import { useAuth } from '#/features/auth/auth.tsx'
+import { useAuth } from '#/hooks/auth/useAuth.ts'
 import { useInactivityTimeout } from '#/hooks/auth/useInactivityTimeout.ts'
 
 export function AuthenticatedLayout() {

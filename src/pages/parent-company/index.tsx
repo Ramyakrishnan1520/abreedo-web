@@ -1,5 +1,5 @@
 import { SelectionCard } from '#/components/admin/parent-company/selection-card'
-import { PARENT_COMPANY_CONTENT } from '#/content/admin/parent-company-content.ts'
+import { PARENT_COMPANY_CONTENT } from '#/utils/parent-company-content.ts'
 import { ROUTES } from '#/static/routes.ts'
 
 const { pages } = PARENT_COMPANY_CONTENT

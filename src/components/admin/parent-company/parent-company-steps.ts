@@ -1,4 +1,4 @@
-import { PARENT_COMPANY_CONTENT } from '#/content/admin/parent-company-content.ts'
+import { PARENT_COMPANY_CONTENT } from '#/utils/parent-company-content.ts'
 
 export const PARENT_COMPANY_DEFAULT_VALUES = {
   name: '',

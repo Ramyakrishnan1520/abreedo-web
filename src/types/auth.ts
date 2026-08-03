@@ -1,3 +1,21 @@
+import type { UserRole } from '#/enums/user-role.ts'
+
+export type { UserRole } from '#/enums/user-role.ts'
+
+export interface AuthUser {
+  id: string
+  name: string
+  email: string
+  role: UserRole
+}
+
+export interface LoginInput {
+  id: string
+  name: string
+  email: string
+  role: UserRole
+}
+
 export interface LoginRequest {
   username: string
   password: string
@@ -16,7 +34,7 @@ export interface AuthTokenResponse {
 export interface StoredTokens {
   accessToken: string
   refreshToken: string
-  expiresAt: number // unix ms when access token expires
+  expiresAt: number
 }
 
 export interface MeResponse {

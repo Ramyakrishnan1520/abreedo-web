@@ -1,7 +1,8 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
 
-import { AdminLayout } from '#/components/layouts/AdminLayout.tsx'
-import { getRoleHome } from '#/features/auth/auth.tsx'
+import { AdminLayout } from '#/components/layout/AdminLayout.tsx'
+import { getRoleHome } from '#/utils/getRoleHome.ts'
+import { UserRole } from '#/enums/user-role.ts'
 import { ROUTES } from '#/static/routes.ts'
 
 export const Route = createFileRoute('/_authenticated/admin')({
@@ -12,7 +13,7 @@ export const Route = createFileRoute('/_authenticated/admin')({
       throw redirect({ to: ROUTES.LOGIN })
     }
 
-    if (user.role !== 'admin') {
+    if (user.role !== UserRole.Admin) {
       throw redirect({ to: getRoleHome(user.role) })
     }
   },

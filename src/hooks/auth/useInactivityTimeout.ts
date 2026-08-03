@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 
-import { INACTIVITY_TIMEOUT } from '#/constants/session.ts'
+import { INACTIVITY_TIMEOUT } from '#/utils/session.ts'
 
 const ACTIVITY_EVENTS = [
   'mousemove',

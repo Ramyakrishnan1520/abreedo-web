@@ -2,7 +2,7 @@ import axios from 'axios'
 
 import { API_BASE_URL, API_HEADERS } from '#/api/api-config.ts'
 
-import type { AuthTokenResponse } from './auth.types.ts'
+import type { AuthTokenResponse } from '#/types/auth.ts'
 
 const AUTH_REFRESH_PATH = '/api/v1/auth/refresh'
 

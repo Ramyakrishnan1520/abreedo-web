@@ -1,6 +1,6 @@
-import type { ParentCompanyContent } from '#/content/admin/parent-company-content.types.ts'
+import type { ParentCompanyContent } from '#/types/parent-company-content.ts'
 
-export type { ParentCompanyContent } from '#/content/admin/parent-company-content.types.ts'
+export type { ParentCompanyContent } from '#/types/parent-company-content.ts'
 
 export const PARENT_COMPANY_CONTENT = {
   pages: {
@@ -29,6 +29,8 @@ export const PARENT_COMPANY_CONTENT = {
       selectLabel: 'Select Parent Company',
       selectPlaceholder: 'Choose a parent company',
       selectLoadingPlaceholder: 'Loading parent companies...',
+      selectSearchPlaceholder: 'Search parent companies...',
+      selectNoResults: 'No parent companies match your search.',
       selectPrompt: 'Select a parent company above to begin editing.',
       loadingDetails: 'Loading parent company details...',
       errors: {

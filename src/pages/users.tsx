@@ -1,11 +1,12 @@
 import { useMemo, useState } from 'react'
 
 import { ReusableTable } from '#/components/table'
-import { getUserTableColumns } from '#/components/admin/user-table-columns.tsx'
-import { users } from '#/data/users.ts'
+import { getUserTableColumns } from '#/components/admin/user/user-table-columns'
 
 import type { PaginationState } from '@tanstack/react-table'
 import type { User } from '#/types/user.ts'
+
+const users: User[] = []
 
 export function UsersPage() {
   const [pagination, setPagination] = useState<PaginationState>({

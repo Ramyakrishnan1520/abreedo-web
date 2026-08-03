@@ -3,19 +3,13 @@ import { useNavigate } from '@tanstack/react-router'
 import { AlertCircle, Loader2 } from 'lucide-react'
 
 import { ParentCompanyForm } from '#/components/admin/parent-company/ParentCompanyForm.tsx'
+import { ParentCompanySearchSelect } from '#/components/admin/parent-company/ParentCompanySearchSelect.tsx'
 import { Label } from '#/components/ui/label.tsx'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '#/components/ui/select.tsx'
-import { PARENT_COMPANY_CONTENT } from '#/content/admin/parent-company-content.ts'
+import { PARENT_COMPANY_CONTENT } from '#/utils/parent-company-content.ts'
 import { useParentCompanies } from '#/hooks/parent-company/useParentCompanies.ts'
 import { useParentCompany } from '#/hooks/parent-company/useParentCompany.ts'
 import { ROUTES } from '#/static/routes.ts'
-import { mapParentCompanyDetailToFormValues } from '#/utils/parent-company/mapParentCompanyDetailToFormValues.ts'
+import { mapParentCompanyDetailToFormValues } from '#/utils/mapParentCompanyDetailToFormValues.ts'
 
 const { pages } = PARENT_COMPANY_CONTENT
 const copy = pages.edit
@@ -63,31 +57,18 @@ export function EditParentCompanyPage() {
         >
           {copy.selectLabel}
         </Label>
-        <Select
+        <ParentCompanySearchSelect
+          id="parent-company-select"
+          options={parentCompanies}
           value={selectedParentCompanyId}
           onValueChange={setSelectedParentCompanyId}
-          disabled={isLoadingList || isListError}
-        >
-          <SelectTrigger
-            id="parent-company-select"
-            className="h-10 w-full border-slate-200 bg-white"
-          >
-            <SelectValue
-              placeholder={
-                isLoadingList
-                  ? copy.selectLoadingPlaceholder
-                  : copy.selectPlaceholder
-              }
-            />
-          </SelectTrigger>
-          <SelectContent>
-            {parentCompanies.map((company) => (
-              <SelectItem key={company.id} value={company.id}>
-                {company.name}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+          disabled={isListError}
+          isLoading={isLoadingList}
+          placeholder={copy.selectPlaceholder}
+          loadingPlaceholder={copy.selectLoadingPlaceholder}
+          searchPlaceholder={copy.selectSearchPlaceholder}
+          noResultsMessage={copy.selectNoResults}
+        />
         {isListError ? (
           <p className="flex items-center gap-2 text-sm text-destructive">
             <AlertCircle className="size-4 shrink-0" />

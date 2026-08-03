@@ -14,7 +14,7 @@ import {
   FORM_LABEL_CLASS,
   REQUIRED_LABEL_CLASS,
 } from '#/components/admin/parent-company/form-styles.ts'
-import { PARENT_COMPANY_CONTENT } from '#/content/admin/parent-company-content.ts'
+import { PARENT_COMPANY_CONTENT } from '#/utils/parent-company-content.ts'
 import type { ParentCompanyFormValues } from '#/types/parent-company.ts'
 
 const copy = PARENT_COMPANY_CONTENT.contactStep

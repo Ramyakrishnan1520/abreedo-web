@@ -11,6 +11,12 @@ export interface ParentCompanyListItem {
   name: string
 }
 
+export interface ParentCompanyLinkedCarrier {
+  carrierId: string
+  name: string
+  groupNumber?: string
+}
+
 export interface ParentCompanyApiItem {
   parentCompanyId?: string
   id?: string
@@ -32,6 +38,7 @@ export interface ParentCompanyApiItem {
   isCreateInvoice?: boolean
   isExactDayCoverage?: boolean
   carrierIds?: string[]
+  carriers?: ParentCompanyLinkedCarrier[]
   contact?: Partial<ParentCompanyContact>
 }
 
@@ -68,6 +75,8 @@ export interface ParentCompanyFormValues {
   zipCode: string
   contact: ParentCompanyContact
   carrierIds: string[]
+  /** Id/name from GET detail; used to show selections before carrier list pages load */
+  linkedCarriers?: AvailableCarrierOption[]
   notes: string
   allowCobra: boolean
 }

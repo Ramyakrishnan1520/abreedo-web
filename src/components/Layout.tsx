@@ -1,8 +1,8 @@
 import { Outlet, useNavigate } from '@tanstack/react-router'
 
-import { Header } from '#/components/layout/Header.tsx'
-import { Sidebar } from '#/components/layout/Sidebar.tsx'
-import { useAuth } from '#/features/auth/auth.tsx'
+import { Header } from '#/components/Header.tsx'
+import { Sidebar } from '#/components/Sidebar.tsx'
+import { useAuth } from '#/hooks/auth/useAuth.ts'
 import { ROUTES } from '#/static/routes.ts'
 import type { NavigationRoleInput } from '#/types/navigation.ts'
 

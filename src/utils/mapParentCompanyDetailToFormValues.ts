@@ -6,6 +6,20 @@ import type {
 export function mapParentCompanyDetailToFormValues(
   detail: ParentCompanyApiItem,
 ): ParentCompanyFormValues {
+  const linkedCarriers =
+    detail.carriers
+      ?.map((carrier) => ({
+        id: carrier.carrierId,
+        name: carrier.name,
+      }))
+      .filter((carrier) => carrier.id.length > 0) ?? []
+
+  const carrierIdsFromLinks = linkedCarriers.map((carrier) => carrier.id)
+  const carrierIds =
+    detail.carrierIds && detail.carrierIds.length > 0
+      ? detail.carrierIds
+      : carrierIdsFromLinks
+
   return {
     name: detail.name ?? '',
     address1: detail.address1 ?? '',
@@ -23,7 +37,8 @@ export function mapParentCompanyDetailToFormValues(
       email: detail.email ?? detail.contact?.email ?? '',
       website: detail.website ?? detail.contact?.website ?? '',
     },
-    carrierIds: detail.carrierIds ?? [],
+    carrierIds,
+    linkedCarriers: linkedCarriers.length > 0 ? linkedCarriers : undefined,
     notes: detail.notes ?? '',
   }
 }

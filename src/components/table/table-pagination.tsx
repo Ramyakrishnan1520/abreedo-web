@@ -1,5 +1,5 @@
 import { Button } from '#/components/ui/button.tsx'
-import { PAGE_SIZE_OPTIONS } from '#/data/table.ts'
+import { PAGE_SIZE_OPTIONS } from '#/utils/table.ts'
 
 import type { TablePaginationProps } from '#/types/table.ts'
 
