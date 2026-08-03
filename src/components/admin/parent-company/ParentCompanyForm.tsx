@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -18,11 +18,20 @@ import {
 } from '#/components/admin/parent-company/parent-company-steps.ts'
 import { parentCompanySchema } from '#/components/admin/parent-company/parent-company.schema.ts'
 import { useCreateParentCompany } from '#/hooks/parent-company/useCreateParentCompany.ts'
+import { useUpdateParentCompany } from '#/hooks/parent-company/useUpdateParentCompany.ts'
+import { PARENT_COMPANY_CONTENT } from '#/content/admin/parent-company-content.ts'
 import { getStepValidationFields } from '#/utils/parent-company/getStepValidationFields.ts'
 
 import type { ParentCompanyFormValues } from '#/types/parent-company.ts'
 
-interface CreateParentCompanyFormProps {
+const { form: formCopy } = PARENT_COMPANY_CONTENT
+
+export type ParentCompanyFormMode = 'create' | 'edit'
+
+interface ParentCompanyFormProps {
+  mode: ParentCompanyFormMode
+  parentCompanyId?: string
+  initialValues?: ParentCompanyFormValues
   onSuccess?: () => void
 }
 
@@ -34,18 +43,41 @@ const STEP_COMPONENTS = [
   ReviewStep,
 ] as const
 
-export function CreateParentCompanyForm({
+export function ParentCompanyForm({
+  mode,
+  parentCompanyId,
+  initialValues,
   onSuccess,
-}: CreateParentCompanyFormProps) {
+}: ParentCompanyFormProps) {
   const [currentStep, setCurrentStep] = useState(0)
-  const { mutate: createParentCompany, isPending } = useCreateParentCompany()
+  const { mutate: createParentCompany, isPending: isCreating } =
+    useCreateParentCompany()
+  const { mutate: updateParentCompany, isPending: isUpdating } =
+    useUpdateParentCompany()
+
+  const isPending = isCreating || isUpdating
+  const isEditMode = mode === 'edit'
+  const formTitle = isEditMode ? formCopy.titles.edit : formCopy.titles.create
+  const saveLabel = isEditMode
+    ? formCopy.saveLabels.edit
+    : formCopy.saveLabels.create
 
   const form = useForm<ParentCompanyFormValues>({
     resolver: zodResolver(parentCompanySchema),
-    defaultValues: PARENT_COMPANY_DEFAULT_VALUES,
+    defaultValues:
+      isEditMode && initialValues
+        ? initialValues
+        : PARENT_COMPANY_DEFAULT_VALUES,
     mode: 'onSubmit',
     reValidateMode: 'onSubmit',
   })
+
+  useEffect(() => {
+    if (isEditMode && initialValues) {
+      form.reset(initialValues)
+      setCurrentStep(0)
+    }
+  }, [form, initialValues, isEditMode])
 
   const isFirstStep = currentStep === 0
   const isLastStep = currentStep === PARENT_COMPANY_STEPS.length - 1
@@ -67,6 +99,22 @@ export function CreateParentCompanyForm({
   }
 
   const onSubmit = (data: ParentCompanyFormValues) => {
+    if (isEditMode) {
+      if (!parentCompanyId) {
+        return
+      }
+
+      updateParentCompany(
+        { id: parentCompanyId, values: data },
+        {
+          onSuccess: () => {
+            onSuccess?.()
+          },
+        },
+      )
+      return
+    }
+
     createParentCompany(data, {
       onSuccess: () => {
         onSuccess?.()
@@ -88,13 +136,12 @@ export function CreateParentCompanyForm({
         <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wider text-tan-accent">
-              Site Manager
+              {formCopy.kicker}
             </p>
             <h1 className="display-title mt-1 text-2xl font-bold text-sidebar-foreground">
-              Create Parent Company
+              {formTitle}
             </h1>
           </div>
-         
         </div>
 
         <Stepper
@@ -118,7 +165,7 @@ export function CreateParentCompanyForm({
                 <div className="mt-6 flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3">
                   <AlertCircle className="mt-0.5 size-4 shrink-0 text-destructive" />
                   <p className="text-xs font-medium text-destructive">
-                    Please fix the highlighted fields before saving.
+                    {formCopy.validationSummary}
                   </p>
                 </div>
               )}
@@ -133,7 +180,7 @@ export function CreateParentCompanyForm({
                 disabled={isFirstStep || isPending}
                 className="h-9 rounded-md border-slate-200 px-6 font-semibold text-slate-700 shadow-xs hover:bg-slate-100"
               >
-                Back
+                {formCopy.navigation.back}
               </Button>
 
               {isLastStep ? (
@@ -146,7 +193,7 @@ export function CreateParentCompanyForm({
                   {isPending ? (
                     <Loader2 className="size-4 animate-spin" />
                   ) : (
-                    'Save'
+                    saveLabel
                   )}
                 </Button>
               ) : (
@@ -155,7 +202,7 @@ export function CreateParentCompanyForm({
                   onClick={() => void handleNext()}
                   className="h-9 rounded-md bg-tan-dark px-6 font-semibold text-white shadow-xs hover:bg-tan-dark/90"
                 >
-                  Next
+                  {formCopy.navigation.next}
                 </Button>
               )}
             </div>

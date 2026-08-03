@@ -1,6 +1,6 @@
 import { useNavigate } from '@tanstack/react-router'
 
-import { CreateParentCompanyForm } from '#/components/admin/parent-company/CreateParentCompanyForm.tsx'
+import { ParentCompanyForm } from '#/components/admin/parent-company/ParentCompanyForm.tsx'
 import { ROUTES } from '#/static/routes.ts'
 
 export function NewParentCompanyPage() {
@@ -12,7 +12,7 @@ export function NewParentCompanyPage() {
 
   return (
     <main className="page-wrap mx-auto max-w-5xl py-8">
-      <CreateParentCompanyForm onSuccess={handleSuccess} />
+      <ParentCompanyForm mode="create" onSuccess={handleSuccess} />
     </main>
   )
 }

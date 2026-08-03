@@ -48,7 +48,7 @@ function getApiError(error: unknown): ApiError {
 
 apiClient.interceptors.request.use((config) => {
   const { tokens } = useAuthStore.getState()
-
+  
   if (tokens?.accessToken) {
     const headers = AxiosHeaders.from(config.headers)
     headers.set('Authorization', `Bearer ${tokens.accessToken}`)

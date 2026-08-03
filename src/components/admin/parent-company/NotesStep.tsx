@@ -11,7 +11,10 @@ import {
   FormMessage,
 } from '#/components/ui/Form'
 import { FORM_TEXTAREA_CLASS } from '#/components/admin/parent-company/form-styles.ts'
+import { PARENT_COMPANY_CONTENT } from '#/content/admin/parent-company-content.ts'
 import type { ParentCompanyFormValues } from '#/types/parent-company.ts'
+
+const copy = PARENT_COMPANY_CONTENT.notesStep
 
 export function NotesStep() {
   const form = useFormContext<ParentCompanyFormValues>()
@@ -19,11 +22,8 @@ export function NotesStep() {
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-base font-bold text-slate-900">Important Notes</h3>
-        <p className="mt-1 text-sm text-slate-600">
-          Add any additional information that should be recorded for this parent
-          company.
-        </p>
+        <h3 className="text-base font-bold text-slate-900">{copy.heading}</h3>
+        <p className="mt-1 text-sm text-slate-600">{copy.description}</p>
       </div>
 
       <Separator />
@@ -54,7 +54,7 @@ export function NotesStep() {
           <FormItem>
             <FormControl>
               <Textarea
-                placeholder="Paragraph describing any additional information needed"
+                placeholder={copy.placeholder}
                 className={FORM_TEXTAREA_CLASS}
                 {...field}
               />

@@ -1,4 +1,4 @@
-import type { ParentCompanyStep } from '#/types/parent-company.ts'
+import { PARENT_COMPANY_CONTENT } from '#/content/admin/parent-company-content.ts'
 
 export const PARENT_COMPANY_DEFAULT_VALUES = {
   name: '',
@@ -22,10 +22,4 @@ export const PARENT_COMPANY_DEFAULT_VALUES = {
   allowCobra: false,
 }
 
-export const PARENT_COMPANY_STEPS: ParentCompanyStep[] = [
-  { id: 'general', label: 'General', index: 0 },
-  { id: 'contact', label: 'Contact', index: 1 },
-  { id: 'carriers', label: 'Carriers', index: 2 },
-  { id: 'notes', label: 'Notes', index: 3 },
-  { id: 'review', label: 'Review', index: 4 },
-]
+export const PARENT_COMPANY_STEPS = PARENT_COMPANY_CONTENT.form.steps

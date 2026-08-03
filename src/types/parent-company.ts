@@ -6,6 +6,48 @@ export interface ParentCompany {
   email: string
 }
 
+export interface ParentCompanyListItem {
+  id: string
+  name: string
+}
+
+export interface ParentCompanyApiItem {
+  parentCompanyId?: string
+  id?: string
+  name: string
+  contactFirst?: string
+  contactLast?: string
+  address1?: string
+  address2?: string
+  city?: string
+  state?: string
+  zip?: string
+  zipCode?: string
+  phone?: string
+  alternatePhone?: string
+  notes?: string
+  email?: string
+  fax?: string
+  website?: string
+  isCreateInvoice?: boolean
+  isExactDayCoverage?: boolean
+  carrierIds?: string[]
+  contact?: Partial<ParentCompanyContact>
+}
+
+export type ParentCompanyListResponse =
+  | ParentCompanyApiItem[]
+  | {
+      data?: ParentCompanyApiItem[]
+      parentCompanies?: ParentCompanyApiItem[]
+      items?: ParentCompanyApiItem[]
+      results?: ParentCompanyApiItem[]
+      page?: number
+      pageSize?: number
+      totalCount?: number
+      totalPages?: number
+    }
+
 export interface ParentCompanyContact {
   firstName: string
   lastName: string
