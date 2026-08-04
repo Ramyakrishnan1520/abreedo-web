@@ -3,15 +3,18 @@ import { useNavigate } from '@tanstack/react-router'
 
 import { loginApi, getMeApi } from '#/api/auth/auth.api.ts'
 import { createApiError, isApiError } from '#/api/api-client.ts'
-import { useAuth, getRoleHome } from '#/features/auth/auth.tsx'
+import { LOGIN_CONTENT } from '#/utils/login-content.ts'
+import { useAuth } from '#/hooks/auth/useAuth.ts'
+import { getRoleHome } from '#/utils/getRoleHome.ts'
 
-import type { LoginRequest } from '#/api/auth/auth.types.ts'
-import type { UserRole } from '#/features/auth/auth.tsx'
+import { UserRole } from '#/enums/user-role.ts'
+
+import type { LoginRequest } from '#/types/auth.ts'
 
 function mapUserRole(userRole: string): UserRole {
   const normalized = userRole.trim().toLowerCase()
-  if (normalized === 'administrator') return 'admin'
-  return 'employer'
+  if (normalized === 'administrator') return UserRole.Admin
+  return UserRole.Employer
 }
 
 export function useLogin() {
@@ -24,7 +27,6 @@ export function useLogin() {
 
       setTokens(tokens)
 
-      // Fetch user profile from the /me API
       const profile = await getMeApi(tokens.accessToken)
 
       login({
@@ -39,10 +41,7 @@ export function useLogin() {
 
     onError: (err) => {
       if (isApiError(err) && err.status === 401) {
-        throw createApiError(
-          401,
-          'Invalid username or password. Please check your credentials.',
-        )
+        throw createApiError(401, LOGIN_CONTENT.errors.invalidCredentials)
       }
     },
   })

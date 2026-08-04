@@ -6,6 +6,57 @@ export interface ParentCompany {
   email: string
 }
 
+export interface ParentCompanyListItem {
+  id: string
+  name: string
+}
+
+export interface ParentCompanyLinkedCarrier {
+  carrierId: string
+  name: string
+  groupNumber?: string
+}
+
+export interface ParentCompanyApiItem {
+  parentCompanyId?: string
+  id?: string
+  name: string
+  fullName: string
+  contactFirst?: string
+  contactLast?: string
+  address1?: string
+  address2?: string
+  city?: string
+  state?: string
+  zip?: string
+  zipCode?: string
+  phone?: string
+  alternatePhone?: string
+  notes?: string
+  allowCobra: boolean
+  email?: string
+  fax?: string
+  website?: string
+  isCreateInvoice?: boolean
+  isExactDayCoverage?: boolean
+  carrierIds?: string[]
+  carriers?: ParentCompanyLinkedCarrier[]
+  contact?: Partial<ParentCompanyContact>
+}
+
+export type ParentCompanyListResponse =
+  | ParentCompanyApiItem[]
+  | {
+      data?: ParentCompanyApiItem[]
+      parentCompanies?: ParentCompanyApiItem[]
+      items?: ParentCompanyApiItem[]
+      results?: ParentCompanyApiItem[]
+      page?: number
+      pageSize?: number
+      totalCount?: number
+      totalPages?: number
+    }
+
 export interface ParentCompanyContact {
   firstName: string
   lastName: string
@@ -26,6 +77,8 @@ export interface ParentCompanyFormValues {
   zipCode: string
   contact: ParentCompanyContact
   carrierIds: string[]
+  /** Id/name from GET detail; used to show selections before carrier list pages load */
+  linkedCarriers?: AvailableCarrierOption[]
   notes: string
   allowCobra: boolean
 }

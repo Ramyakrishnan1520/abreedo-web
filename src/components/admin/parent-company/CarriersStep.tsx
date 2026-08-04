@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react'
-// import type { UIEvent } from 'react'
 import { ChevronLeft, ChevronRight, Loader2, Search } from 'lucide-react'
 import { useFormContext } from 'react-hook-form'
 
@@ -14,6 +13,8 @@ import {
 import { Input } from '#/components/ui/input.tsx'
 import { ScrollArea } from '#/components/ui/scroll-area.tsx'
 import { Separator } from '#/components/ui/separator.tsx'
+import { PARENT_COMPANY_CONTENT } from '#/utils/parent-company-content.ts'
+import { resolveSelectedCarrierOptions } from '#/utils/resolveSelectedCarrierOptions.ts'
 import { useAvailableCarriers } from '#/hooks/parent-company/useAvailableCarriers.ts'
 import { useLoadMoreIntersection } from '#/hooks/use-load-more-intersection.ts'
 import { cn } from '#/lib/utils.ts'
@@ -21,6 +22,8 @@ import type {
   CarrierListItemProps,
   ParentCompanyFormValues,
 } from '#/types/parent-company.ts'
+
+const copy = PARENT_COMPANY_CONTENT.carriersStep
 
 function CarrierListItem({
   name,
@@ -72,6 +75,7 @@ export function CarriersStep() {
   } = useAvailableCarriers()
 
   const selectedCarrierIds = form.watch('carrierIds')
+  const linkedCarriers = form.watch('linkedCarriers') ?? []
 
   const uniqueSelectedCarrierIds = useMemo(
     () => [...new Set(selectedCarrierIds)],
@@ -80,12 +84,12 @@ export function CarriersStep() {
 
   const selectedCarriers = useMemo(
     () =>
-      uniqueSelectedCarrierIds
-        .map((id) => carriers.find((carrier) => carrier.id === id))
-        .filter((carrier): carrier is (typeof carriers)[number] =>
-          Boolean(carrier),
-        ),
-    [carriers, uniqueSelectedCarrierIds],
+      resolveSelectedCarrierOptions(
+        uniqueSelectedCarrierIds,
+        carriers,
+        linkedCarriers,
+      ),
+    [carriers, linkedCarriers, uniqueSelectedCarrierIds],
   )
 
   const availableCarriers = useMemo(
@@ -140,15 +144,16 @@ export function CarriersStep() {
     root: availableScrollRoot,
   })
 
+  const shownCountLabel = copy.shownCount.replace(
+    '{{count}}',
+    String(availableCarriers.length),
+  )
+
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-base font-bold text-slate-900">
-          Carrier Selection
-        </h3>
-        <p className="mt-1 text-sm text-slate-600">
-          Choose carriers associated with this parent company.
-        </p>
+        <h3 className="text-base font-bold text-slate-900">{copy.heading}</h3>
+        <p className="mt-1 text-sm text-slate-600">{copy.description}</p>
       </div>
 
       <Separator />
@@ -156,11 +161,11 @@ export function CarriersStep() {
       {isLoading ? (
         <div className="flex items-center justify-center gap-2 py-12 text-sm text-slate-600">
           <Loader2 className="size-4 animate-spin" />
-          Loading carriers...
+          {copy.loading}
         </div>
       ) : isError ? (
         <div className="rounded-lg border border-destructive/20 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-          Failed to load carriers. Please refresh the page.
+          {copy.loadError}
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
@@ -168,12 +173,12 @@ export function CarriersStep() {
             <CardHeader className="border-b border-slate-200 px-4 py-4">
               <CardTitle className="flex items-center justify-between text-sm font-bold uppercase tracking-wide text-slate-700">
                 <span className="flex items-center gap-2">
-                  Available Carriers
+                  {copy.availableHeading}
                   <Badge variant="secondary">{totalCount}</Badge>
                 </span>
                 {availableSearchQuery.trim() ? (
                   <span className="text-xs font-medium normal-case tracking-normal text-slate-500">
-                    {availableCarriers.length} shown
+                    {shownCountLabel}
                   </span>
                 ) : null}
               </CardTitle>
@@ -186,7 +191,7 @@ export function CarriersStep() {
                   onChange={(event) =>
                     setAvailableSearchQuery(event.target.value)
                   }
-                  placeholder="Search available carriers..."
+                  placeholder={copy.searchAvailablePlaceholder}
                   className="h-9 rounded-md border-slate-200 bg-slate-50/50 pl-9 focus:border-tan-dark focus:bg-white"
                 />
               </div>
@@ -197,7 +202,7 @@ export function CarriersStep() {
                 <div className="space-y-2">
                   {availableCarriers.length === 0 ? (
                     <p className="py-8 text-center text-sm text-slate-500">
-                      No carriers match your search.
+                      {copy.noSearchMatches}
                     </p>
                   ) : (
                     availableCarriers.map((carrier) => {
@@ -209,7 +214,9 @@ export function CarriersStep() {
                         <CarrierListItem
                           key={carrier.id}
                           name={carrier.name}
-                          actionLabel={isSelected ? 'Selected' : 'Select'}
+                          actionLabel={
+                            isSelected ? copy.actionSelected : copy.actionSelect
+                          }
                           disabled={isSelected}
                           onAction={() => addCarrier(carrier.id)}
                         />
@@ -220,7 +227,7 @@ export function CarriersStep() {
                   {isFetchingNextPage ? (
                     <div className="flex items-center justify-center gap-2 py-3 text-xs text-slate-500">
                       <Loader2 className="size-3.5 animate-spin" />
-                      Loading more carriers...
+                      {copy.loadingMore}
                     </div>
                   ) : null}
                 </div>
@@ -231,7 +238,7 @@ export function CarriersStep() {
           <Card className="gap-0 py-0 shadow-xs">
             <CardHeader className="border-b border-slate-200 px-4 py-4">
               <CardTitle className="flex items-center justify-between text-sm font-bold uppercase tracking-wide text-slate-700">
-                Selected Carriers
+                {copy.selectedHeading}
                 <Badge variant="default">{selectedCarriers.length}</Badge>
               </CardTitle>
             </CardHeader>
@@ -243,7 +250,7 @@ export function CarriersStep() {
                   onChange={(event) =>
                     setSelectedSearchQuery(event.target.value)
                   }
-                  placeholder="Search selected carriers..."
+                  placeholder={copy.searchSelectedPlaceholder}
                   className="h-9 rounded-md border-slate-200 bg-slate-50/50 pl-9 focus:border-tan-dark focus:bg-white"
                 />
               </div>
@@ -252,15 +259,15 @@ export function CarriersStep() {
                   {filteredSelectedCarriers.length === 0 ? (
                     <p className="py-8 text-center text-sm text-slate-500">
                       {selectedCarriers.length === 0
-                        ? 'No carriers selected yet.'
-                        : 'No selected carriers match your search.'}
+                        ? copy.noneSelected
+                        : copy.noSelectedSearchMatches}
                     </p>
                   ) : (
                     filteredSelectedCarriers.map((carrier) => (
                       <CarrierListItem
                         key={carrier.id}
                         name={carrier.name}
-                        actionLabel="Remove"
+                        actionLabel={copy.actionRemove}
                         onAction={() => removeCarrier(carrier.id)}
                       />
                     ))
@@ -274,10 +281,9 @@ export function CarriersStep() {
 
       <div className="flex flex-wrap items-center gap-2 rounded-lg border border-dashed border-slate-200 bg-slate-50/50 px-4 py-3 text-xs text-slate-600">
         <ChevronRight className="size-4 text-tan-dark" aria-hidden />
-        Select carriers from the left panel. Already selected carriers stay
-        visible but disabled.
+        {copy.hintLeft}
         <ChevronLeft className="size-4 text-tan-dark" aria-hidden />
-        Remove carriers from the right panel to deselect them.
+        {copy.hintRight}
       </div>
     </div>
   )

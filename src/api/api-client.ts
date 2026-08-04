@@ -3,7 +3,7 @@ import axios, { AxiosHeaders, isAxiosError } from 'axios'
 import { API_BASE_URL, API_HEADERS } from '#/api/api-config.ts'
 import { refreshAccessToken } from '#/api/auth/auth-refresh.api.ts'
 import { useAuthStore } from '#/stores/auth-store.ts'
-import type { ApiError, RetryRequestConfig } from './api-client.types.ts'
+import type { ApiError, RetryRequestConfig } from '#/types/api-client.ts'
 
 export const apiClient = axios.create({
   baseURL: API_BASE_URL,
@@ -48,7 +48,7 @@ function getApiError(error: unknown): ApiError {
 
 apiClient.interceptors.request.use((config) => {
   const { tokens } = useAuthStore.getState()
-
+  
   if (tokens?.accessToken) {
     const headers = AxiosHeaders.from(config.headers)
     headers.set('Authorization', `Bearer ${tokens.accessToken}`)

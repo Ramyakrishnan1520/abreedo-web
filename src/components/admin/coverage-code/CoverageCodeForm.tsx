@@ -1,14 +1,18 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
 import { AlertCircle, Loader2 } from 'lucide-react'
 
+import {
+  coverageCodeSchema,
+  type CoverageCodeFormValues,
+} from '#/components/admin/coverage-code/coverage-code.schema.ts'
 import { useCreateCoverageCode } from '#/hooks/coverage-code/useCreateCoverageCode.ts'
 import { useGetCoverageClasses } from '#/hooks/coverage-code/useGetCoverageClasses.ts'
 import { useGetCoverageTypes } from '#/hooks/coverage-code/useGetCoverageTypes.ts'
 import { useInfiniteCarrierOptions } from '#/hooks/carrier/use-infinite-carrier-options.ts'
 import { useLoadMoreIntersection } from '#/hooks/use-load-more-intersection.ts'
+import { COVERAGE_CODE_CONTENT } from '#/utils/coverage-code-content.ts'
 
 import { Button } from '#/components/ui/button.tsx'
 import { Checkbox } from '#/components/ui/checkbox.tsx'
@@ -30,59 +34,7 @@ import {
 } from '#/components/ui/Form'
 import { cn } from '#/lib/utils.ts'
 
-const coverageCodeSchema = z.object({
-  code: z
-    .string()
-    .min(1, 'Code is required')
-    .max(50, 'Code must be 50 characters or fewer')
-    .trim(),
-
-  name: z
-    .string()
-    .min(1, 'Name is required')
-    .max(100, 'Name must be 100 characters or fewer')
-    .trim(),
-
-  carrierId: z.string().min(1, 'Carrier is required').trim(),
-
-  coverageClassId: z.string().min(1, 'Coverage Class is required').trim(),
-
-  codeInvoice: z
-    .string()
-    .min(1, 'Combination for Bill is required')
-    .max(100, 'Combination for Bill must be 100 characters or fewer')
-    .trim(),
-
-  invoiceInclude: z.boolean(),
-
-  codeReport: z
-    .string()
-    .min(1, 'Combination for Reports is required')
-    .max(100, 'Combination for Reports must be 100 characters or fewer')
-    .trim(),
-
-  title: z
-    .string()
-    .min(1, 'Description is required')
-    .max(250, 'Description must be 250 characters or fewer')
-    .trim(),
-
-  shortTitle: z
-    .string()
-    .min(1, 'Short description is required')
-    .max(100, 'Short description must be 100 characters or fewer')
-    .trim(),
-
-  remittanceTypeId: z.string().min(1, 'Coverage Type is required').trim(),
-
-  invoiceGroup: z
-    .string()
-    .min(1, 'Invoice Group is required')
-    .max(100, 'Invoice Group must be 100 characters or fewer')
-    .trim(),
-})
-
-type CoverageCodeFormValues = z.infer<typeof coverageCodeSchema>
+const copy = COVERAGE_CODE_CONTENT.form
 
 interface CoverageCodeFormProps {
   defaultValues?: Partial<CoverageCodeFormValues>
@@ -98,7 +50,7 @@ export function CoverageCodeForm({
   defaultValues,
   onBack,
   onSuccess,
-  title = 'New Coverage Code',
+  title = COVERAGE_CODE_CONTENT.form.defaultTitle,
 }: CoverageCodeFormProps) {
   const { mutate: createCoverageCode, isPending } = useCreateCoverageCode()
   const {
@@ -204,13 +156,13 @@ export function CoverageCodeForm({
                     'after:content-["*"] after:ml-0.5 after:text-destructive',
                   )}
                 >
-                  Code
+                  {copy.labels.code}
                 </FormLabel>
                 <div className="space-y-1">
                   <FormControl>
                     <Input
                       id="coverage-code"
-                      placeholder="Enter coverage code"
+                      placeholder={copy.placeholders.code}
                       className="h-9 rounded-md bg-slate-50/50 border-slate-200 text-slate-900 focus:bg-white focus:border-tan-dark"
                       {...field}
                     />
@@ -233,13 +185,13 @@ export function CoverageCodeForm({
                     'after:content-["*"] after:ml-0.5 after:text-destructive',
                   )}
                 >
-                  Name
+                  {copy.labels.name}
                 </FormLabel>
                 <div className="space-y-1">
                   <FormControl>
                     <Input
                       id="coverage-name"
-                      placeholder="Enter coverage name"
+                      placeholder={copy.placeholders.name}
                       className="h-9 rounded-md bg-slate-50/50 border-slate-200 text-slate-900 focus:bg-white focus:border-tan-dark"
                       {...field}
                     />
@@ -262,7 +214,7 @@ export function CoverageCodeForm({
                     'after:content-["*"] after:ml-0.5 after:text-destructive',
                   )}
                 >
-                  Carrier
+                  {copy.labels.carrier}
                 </FormLabel>
                 <div className="space-y-1">
                   <FormControl>
@@ -280,8 +232,8 @@ export function CoverageCodeForm({
                         <SelectValue
                           placeholder={
                             carriersLoading
-                              ? 'Loading...'
-                              : 'Select a carrier...'
+                              ? copy.placeholders.carrierLoading
+                              : copy.placeholders.carrierSelect
                           }
                         />
                       </SelectTrigger>
@@ -303,7 +255,7 @@ export function CoverageCodeForm({
                         {carriersFetchingNextPage ? (
                           <div className="flex items-center justify-center gap-2 py-2 text-xs text-slate-500">
                             <Loader2 className="size-3.5 animate-spin" />
-                            Loading more carriers...
+                            {copy.loadingMoreCarriers}
                           </div>
                         ) : null}
                       </SelectContent>
@@ -311,7 +263,7 @@ export function CoverageCodeForm({
                   </FormControl>
                   {carriersError && (
                     <p className="text-xs text-destructive font-medium">
-                      Failed to load carriers. Please refresh.
+                      {copy.carriersLoadError}
                     </p>
                   )}
                   <FormMessage />
@@ -332,7 +284,7 @@ export function CoverageCodeForm({
                     'after:content-["*"] after:ml-0.5 after:text-destructive',
                   )}
                 >
-                  Coverage Class
+                  {copy.labels.coverageClass}
                 </FormLabel>
                 <div className="space-y-1">
                   <FormControl>
@@ -348,8 +300,8 @@ export function CoverageCodeForm({
                         <SelectValue
                           placeholder={
                             classesLoading
-                              ? 'Loading...'
-                              : 'Select a coverage class...'
+                              ? copy.placeholders.coverageClassLoading
+                              : copy.placeholders.coverageClassSelect
                           }
                         />
                       </SelectTrigger>
@@ -367,7 +319,7 @@ export function CoverageCodeForm({
                   </FormControl>
                   {classesError && (
                     <p className="text-xs text-destructive font-medium">
-                      Failed to load coverage classes. Please refresh.
+                      {copy.coverageClassesLoadError}
                     </p>
                   )}
                   <FormMessage />
@@ -388,13 +340,13 @@ export function CoverageCodeForm({
                     'after:content-["*"] after:ml-0.5 after:text-destructive',
                   )}
                 >
-                  Combination for Bill
+                  {copy.labels.combinationForBill}
                 </FormLabel>
                 <div className="space-y-1">
                   <FormControl>
                     <Input
                       id="coverage-code-invoice"
-                      placeholder="Enter combination for bill"
+                      placeholder={copy.placeholders.combinationForBill}
                       className="h-9 rounded-md bg-slate-50/50 border-slate-200 text-slate-900 focus:bg-white focus:border-tan-dark"
                       {...field}
                     />
@@ -412,7 +364,7 @@ export function CoverageCodeForm({
             render={({ field }) => (
               <FormItem className="grid grid-cols-1 sm:grid-cols-[200px_1fr] items-center gap-x-4 gap-y-1 py-3 border-b border-slate-100">
                 <FormLabel className="sm:text-right text-left text-sm font-semibold text-slate-700">
-                  Use for Bill
+                  {copy.labels.useForBill}
                 </FormLabel>
                 <div className="flex items-center h-9">
                   <FormControl>
@@ -440,13 +392,13 @@ export function CoverageCodeForm({
                     'whitespace-nowrap after:content-["*"] after:ml-0.5 after:text-destructive',
                   )}
                 >
-                  Combination for Reports
+                  {copy.labels.combinationForReports}
                 </FormLabel>
                 <div className="space-y-1">
                   <FormControl>
                     <Input
                       id="coverage-code-report"
-                      placeholder="Enter combination for reports"
+                      placeholder={copy.placeholders.combinationForReports}
                       className="h-9 rounded-md bg-slate-50/50 border-slate-200 text-slate-900 focus:bg-white focus:border-tan-dark"
                       {...field}
                     />
@@ -469,13 +421,13 @@ export function CoverageCodeForm({
                     'after:content-["*"] after:ml-0.5 after:text-destructive',
                   )}
                 >
-                  Description
+                  {copy.labels.description}
                 </FormLabel>
                 <div className="space-y-1">
                   <FormControl>
                     <Input
                       id="coverage-description"
-                      placeholder="Enter full description"
+                      placeholder={copy.placeholders.description}
                       className="h-9 rounded-md bg-slate-50/50 border-slate-200 text-slate-900 focus:bg-white focus:border-tan-dark"
                       {...field}
                     />
@@ -498,13 +450,13 @@ export function CoverageCodeForm({
                     'after:content-["*"] after:ml-0.5 after:text-destructive',
                   )}
                 >
-                  Short description
+                  {copy.labels.shortDescription}
                 </FormLabel>
                 <div className="space-y-1">
                   <FormControl>
                     <Input
                       id="coverage-short-description"
-                      placeholder="Enter short description"
+                      placeholder={copy.placeholders.shortDescription}
                       className="h-9 rounded-md bg-slate-50/50 border-slate-200 text-slate-900 focus:bg-white focus:border-tan-dark"
                       {...field}
                     />
@@ -527,7 +479,7 @@ export function CoverageCodeForm({
                     'after:content-["*"] after:ml-0.5 after:text-destructive',
                   )}
                 >
-                  Coverage Type
+                  {copy.labels.coverageType}
                 </FormLabel>
                 <div className="space-y-1">
                   <FormControl>
@@ -562,7 +514,7 @@ export function CoverageCodeForm({
                   </FormControl>
                   {typesError && (
                     <p className="text-xs text-destructive font-medium">
-                      Failed to load coverage types. Please refresh.
+                      {copy.coverageTypesLoadError}
                     </p>
                   )}
                   <FormMessage />
@@ -583,7 +535,7 @@ export function CoverageCodeForm({
                     'after:content-["*"] after:ml-0.5 after:text-destructive',
                   )}
                 >
-                  Invoice Group
+                  {copy.labels.invoiceGroup}
                 </FormLabel>
                 <div className="space-y-1">
                   <FormControl>
@@ -605,7 +557,7 @@ export function CoverageCodeForm({
             <div className="flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 mt-4">
               <AlertCircle className="size-4 shrink-0 mt-0.5 text-destructive" />
               <p className="text-xs text-destructive font-medium">
-                Please fix the highlighted fields before saving.
+                {copy.validationSummary}
               </p>
             </div>
           )}
@@ -619,7 +571,7 @@ export function CoverageCodeForm({
               onClick={onBack}
               className="border-slate-200 text-slate-700 hover:bg-slate-100 rounded-md px-6 h-9 font-semibold shadow-xs transition-colors"
             >
-              Back
+              {copy.actions.back}
             </Button>
             <Button
               id="coverage-save-btn"
@@ -627,7 +579,7 @@ export function CoverageCodeForm({
               disabled={isPending}
               className="bg-tan-dark hover:bg-tan-dark/90 text-white rounded-md px-6 h-9 font-semibold shadow-xs transition-colors disabled:opacity-70"
             >
-              {isPending ? <Loader2 className="size-4 animate-spin" /> : 'Save'}
+              {isPending ? <Loader2 className="size-4 animate-spin" /> : copy.actions.save}
             </Button>
           </div>
         </form>

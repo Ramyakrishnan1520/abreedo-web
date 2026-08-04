@@ -14,7 +14,10 @@ import {
   FORM_LABEL_CLASS,
   REQUIRED_LABEL_CLASS,
 } from '#/components/admin/parent-company/form-styles.ts'
+import { PARENT_COMPANY_CONTENT } from '#/utils/parent-company-content.ts'
 import type { ParentCompanyFormValues } from '#/types/parent-company.ts'
+
+const copy = PARENT_COMPANY_CONTENT.contactStep
 
 function handleTenDigitInput(
   value: string,
@@ -29,12 +32,8 @@ export function ContactStep() {
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-base font-bold text-slate-900">
-          Primary Contact Information
-        </h3>
-        <p className="mt-1 text-sm text-slate-600">
-          Enter the main point of contact for this parent company.
-        </p>
+        <h3 className="text-base font-bold text-slate-900">{copy.heading}</h3>
+        <p className="mt-1 text-sm text-slate-600">{copy.description}</p>
       </div>
 
       <Separator />
@@ -45,12 +44,12 @@ export function ContactStep() {
         render={({ field }) => (
           <FormItem className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-start sm:gap-4">
             <FormLabel className={REQUIRED_LABEL_CLASS}>
-              Contact First Name
+              {copy.firstNameLabel}
             </FormLabel>
             <div className="space-y-1">
               <FormControl>
                 <Input
-                  placeholder="ex. John"
+                  placeholder={copy.firstNamePlaceholder}
                   className={FORM_INPUT_CLASS}
                   {...field}
                 />
@@ -67,12 +66,12 @@ export function ContactStep() {
         render={({ field }) => (
           <FormItem className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-start sm:gap-4">
             <FormLabel className={REQUIRED_LABEL_CLASS}>
-              Contact Last Name
+              {copy.lastNameLabel}
             </FormLabel>
             <div className="space-y-1">
               <FormControl>
                 <Input
-                  placeholder="ex. Doe"
+                  placeholder={copy.lastNamePlaceholder}
                   className={FORM_INPUT_CLASS}
                   {...field}
                 />
@@ -89,7 +88,7 @@ export function ContactStep() {
         render={({ field }) => (
           <FormItem className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-start sm:gap-4">
             <FormLabel className={REQUIRED_LABEL_CLASS}>
-              Contact Phone Number
+              {copy.phoneLabel}
             </FormLabel>
             <div className="space-y-1">
               <FormControl>
@@ -97,7 +96,7 @@ export function ContactStep() {
                   type="tel"
                   inputMode="numeric"
                   maxLength={10}
-                  placeholder="(000) 000-0000"
+                  placeholder={copy.phonePlaceholder}
                   className={FORM_INPUT_CLASS}
                   {...field}
                   onChange={(event) =>
@@ -117,7 +116,7 @@ export function ContactStep() {
         render={({ field }) => (
           <FormItem className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-start sm:gap-4">
             <FormLabel className={REQUIRED_LABEL_CLASS}>
-              Alternative Phone Number
+              {copy.alternativePhoneLabel}
             </FormLabel>
             <div className="space-y-1">
               <FormControl>
@@ -125,7 +124,7 @@ export function ContactStep() {
                   type="tel"
                   inputMode="numeric"
                   maxLength={10}
-                  placeholder="(000) 000-0000"
+                  placeholder={copy.phonePlaceholder}
                   className={FORM_INPUT_CLASS}
                   {...field}
                   onChange={(event) =>
@@ -144,14 +143,14 @@ export function ContactStep() {
         name="contact.fax"
         render={({ field }) => (
           <FormItem className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-start sm:gap-4">
-            <FormLabel className={REQUIRED_LABEL_CLASS}>Fax</FormLabel>
+            <FormLabel className={REQUIRED_LABEL_CLASS}>{copy.faxLabel}</FormLabel>
             <div className="space-y-1">
               <FormControl>
                 <Input
                   type="tel"
                   inputMode="numeric"
                   maxLength={10}
-                  placeholder="(000) 000-0000"
+                  placeholder={copy.phonePlaceholder}
                   className={FORM_INPUT_CLASS}
                   {...field}
                   onChange={(event) =>
@@ -170,12 +169,14 @@ export function ContactStep() {
         name="contact.email"
         render={({ field }) => (
           <FormItem className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-start sm:gap-4">
-            <FormLabel className={REQUIRED_LABEL_CLASS}>Email</FormLabel>
+            <FormLabel className={REQUIRED_LABEL_CLASS}>
+              {copy.emailLabel}
+            </FormLabel>
             <div className="space-y-1">
               <FormControl>
                 <Input
                   type="email"
-                  placeholder="ex. john.doe@example.com"
+                  placeholder={copy.emailPlaceholder}
                   className={FORM_INPUT_CLASS}
                   {...field}
                 />
@@ -191,12 +192,12 @@ export function ContactStep() {
         name="contact.website"
         render={({ field }) => (
           <FormItem className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-start sm:gap-4">
-            <FormLabel className={FORM_LABEL_CLASS}>Website</FormLabel>
+            <FormLabel className={FORM_LABEL_CLASS}>{copy.websiteLabel}</FormLabel>
             <div className="space-y-1">
               <FormControl>
                 <Input
                   type="url"
-                  placeholder="ex. https://yourcompany.com"
+                  placeholder={copy.websitePlaceholder}
                   className={FORM_INPUT_CLASS}
                   {...field}
                 />

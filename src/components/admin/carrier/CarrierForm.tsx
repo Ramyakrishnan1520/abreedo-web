@@ -1,10 +1,14 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
 import { AlertCircle, Loader2 } from 'lucide-react'
 
+import {
+  carrierSchema,
+  type CarrierFormValues,
+} from '#/components/admin/carrier/carrier.schema.ts'
 import { useCreateCarrier } from '#/hooks/carrier/useCreateCarrier.ts'
 import { useGetStates } from '#/hooks/carrier/useGetStates.ts'
+import { CARRIER_CONTENT } from '#/utils/carrier-content.ts'
 
 import { Button } from '#/components/ui/button.tsx'
 import { Checkbox } from '#/components/ui/checkbox.tsx'
@@ -26,86 +30,7 @@ import {
 } from '#/components/ui/Form'
 import { cn } from '#/lib/utils.ts'
 
-
-const phoneRegex = /^\(\d{3}\)\d{3}-\d{4}$/
-
-const carrierSchema = z.object({
-  name: z
-    .string()
-    .min(1, 'Name is required')
-    .max(100, 'Name must be 100 characters or fewer')
-    .trim(),
-
-  groupTitle: z
-    .string()
-    .min(1, 'Group Title is required')
-    .max(100, 'Group Title must be 100 characters or fewer')
-    .trim(),
-
-  address1: z
-    .string()
-    .max(200, 'Address must be 200 characters or fewer')
-    .optional()
-    .or(z.literal('')),
-
-  address2: z
-    .string()
-    .max(200, 'Address must be 200 characters or fewer')
-    .optional()
-    .or(z.literal('')),
-
-  city: z
-    .string()
-    .max(100, 'City must be 100 characters or fewer')
-    .regex(/^[a-zA-Z\s\-'.]*$/, 'City must contain only letters')
-    .optional()
-    .or(z.literal('')),
-
-  state: z.string().optional(),
-
-  zip: z
-    .string()
-    .regex(/^\d{5}(-\d{4})?$/, 'Enter a valid ZIP code (e.g. 12345 or 12345-6789)')
-    .optional()
-    .or(z.literal('')),
-
-  contactFirstName: z
-    .string()
-    .max(50, 'First name must be 50 characters or fewer')
-    .regex(/^[a-zA-Z\s\-'.]*$/, 'First name must contain only letters')
-    .optional()
-    .or(z.literal('')),
-
-  contactLastName: z
-    .string()
-    .max(50, 'Last name must be 50 characters or fewer')
-    .regex(/^[a-zA-Z\s\-'.]*$/, 'Last name must contain only letters')
-    .optional()
-    .or(z.literal('')),
-
-  phone: z
-    .string()
-    .regex(phoneRegex, 'Enter a valid phone number — (___) ___-____')
-    .optional()
-    .or(z.literal('')),
-
-  fax: z
-    .string()
-    .regex(phoneRegex, 'Enter a valid fax number — (___) ___-____')
-    .optional()
-    .or(z.literal('')),
-
-  email: z
-    .string()
-    .email('Enter a valid email address')
-    .max(254, 'Email must be 254 characters or fewer')
-    .optional()
-    .or(z.literal('')),
-
-  allowFlexibleDates: z.boolean().optional(),
-})
-
-type CarrierFormValues = z.infer<typeof carrierSchema>
+const copy = CARRIER_CONTENT.form
 
 // Props
 interface CarrierFormProps {
@@ -122,7 +47,7 @@ export function CarrierForm({
   defaultValues,
   onBack,
   onSuccess,
-  title = 'New Carrier',
+  title = CARRIER_CONTENT.form.defaultTitle,
 }: CarrierFormProps) {
   const { mutate: createCarrier, isPending } = useCreateCarrier()
   const { data: states, isLoading: statesLoading, isError: statesError } = useGetStates()
@@ -199,13 +124,13 @@ export function CarrierForm({
                     'after:content-["*"] after:ml-0.5 after:text-destructive',
                   )}
                 >
-                  Name
+                  {copy.labels.name}
                 </FormLabel>
                 <div className="space-y-1">
                   <FormControl>
                     <Input
                       id="carrier-name"
-                      placeholder="Enter carrier name"
+                      placeholder={copy.placeholders.name}
                       className="h-9 rounded-md bg-slate-50/50 border-slate-200 text-slate-900 focus:bg-white focus:border-tan-dark"
                       {...field}
                     />
@@ -228,13 +153,13 @@ export function CarrierForm({
                     'after:content-["*"] after:ml-0.5 after:text-destructive',
                   )}
                 >
-                  Group Title
+                  {copy.labels.groupTitle}
                 </FormLabel>
                 <div className="space-y-1">
                   <FormControl>
                     <Input
                       id="carrier-group-title"
-                      placeholder="Enter group title"
+                      placeholder={copy.placeholders.groupTitle}
                       className="h-9 rounded-md bg-slate-50/50 border-slate-200 text-slate-900 focus:bg-white focus:border-tan-dark"
                       {...field}
                     />
@@ -251,12 +176,12 @@ export function CarrierForm({
             name="address1"
             render={({ field }) => (
               <FormItem className="grid grid-cols-1 sm:grid-cols-[200px_1fr] items-start gap-x-4 gap-y-1 py-3 border-b border-slate-100">
-                <FormLabel className={LABEL_COL}>Address 1</FormLabel>
+                <FormLabel className={LABEL_COL}>{copy.labels.address1}</FormLabel>
                 <div className="space-y-1">
                   <FormControl>
                     <Input
                       id="carrier-address1"
-                      placeholder="Enter address line 1"
+                      placeholder={copy.placeholders.address1}
                       className="h-9 rounded-md bg-slate-50/50 border-slate-200 text-slate-900 focus:bg-white focus:border-tan-dark"
                       {...field}
                     />
@@ -273,12 +198,12 @@ export function CarrierForm({
             name="address2"
             render={({ field }) => (
               <FormItem className="grid grid-cols-1 sm:grid-cols-[200px_1fr] items-start gap-x-4 gap-y-1 py-3 border-b border-slate-100">
-                <FormLabel className={LABEL_COL}>Address 2</FormLabel>
+                <FormLabel className={LABEL_COL}>{copy.labels.address2}</FormLabel>
                 <div className="space-y-1">
                   <FormControl>
                     <Input
                       id="carrier-address2"
-                      placeholder="Enter address line 2"
+                      placeholder={copy.placeholders.address2}
                       className="h-9 rounded-md bg-slate-50/50 border-slate-200 text-slate-900 focus:bg-white focus:border-tan-dark"
                       {...field}
                     />
@@ -295,12 +220,12 @@ export function CarrierForm({
             name="city"
             render={({ field }) => (
               <FormItem className="grid grid-cols-1 sm:grid-cols-[200px_1fr] items-start gap-x-4 gap-y-1 py-3 border-b border-slate-100">
-                <FormLabel className={LABEL_COL}>City</FormLabel>
+                <FormLabel className={LABEL_COL}>{copy.labels.city}</FormLabel>
                 <div className="space-y-1">
                   <FormControl>
                     <Input
                       id="carrier-city"
-                      placeholder="Enter city"
+                      placeholder={copy.placeholders.city}
                       className="h-9 rounded-md bg-slate-50/50 border-slate-200 text-slate-900 focus:bg-white focus:border-tan-dark"
                       {...field}
                     />
@@ -317,7 +242,7 @@ export function CarrierForm({
             name="state"
             render={({ field }) => (
               <FormItem className="grid grid-cols-1 sm:grid-cols-[200px_1fr] items-start gap-x-4 gap-y-1 py-3 border-b border-slate-100">
-                <FormLabel className={LABEL_COL}>State</FormLabel>
+                <FormLabel className={LABEL_COL}>{copy.labels.state}</FormLabel>
                 <div className="space-y-1">
                   <FormControl>
                     <Select
@@ -331,7 +256,9 @@ export function CarrierForm({
                       >
                         <SelectValue
                           placeholder={
-                            statesLoading ? 'Loading...' : 'Select state...'
+                            statesLoading
+                              ? copy.stateLoading
+                              : copy.statePlaceholder
                           }
                         />
                       </SelectTrigger>
@@ -346,7 +273,7 @@ export function CarrierForm({
                   </FormControl>
                   {statesError && (
                     <p className="text-xs text-destructive font-medium">
-                      Failed to load states. Please refresh.
+                      {copy.stateLoadError}
                     </p>
                   )}
                   <FormMessage />
@@ -361,12 +288,12 @@ export function CarrierForm({
             name="zip"
             render={({ field }) => (
               <FormItem className="grid grid-cols-1 sm:grid-cols-[200px_1fr] items-start gap-x-4 gap-y-1 py-3 border-b border-slate-100">
-                <FormLabel className={LABEL_COL}>Zip</FormLabel>
+                <FormLabel className={LABEL_COL}>{copy.labels.zip}</FormLabel>
                 <div className="space-y-1">
                   <FormControl>
                     <Input
                       id="carrier-zip"
-                      placeholder="Enter ZIP code"
+                      placeholder={copy.placeholders.zip}
                       className="h-9 rounded-md bg-slate-50/50 border-slate-200 text-slate-900 focus:bg-white focus:border-tan-dark"
                       {...field}
                     />
@@ -383,12 +310,12 @@ export function CarrierForm({
             name="contactFirstName"
             render={({ field }) => (
               <FormItem className="grid grid-cols-1 sm:grid-cols-[200px_1fr] items-start gap-x-4 gap-y-1 py-3 border-b border-slate-100">
-                <FormLabel className={LABEL_COL}>Contact First Name</FormLabel>
+                <FormLabel className={LABEL_COL}>{copy.labels.contactFirstName}</FormLabel>
                 <div className="space-y-1">
                   <FormControl>
                     <Input
                       id="carrier-contact-first-name"
-                      placeholder="Enter contact first name"
+                      placeholder={copy.placeholders.contactFirstName}
                       className="h-9 rounded-md bg-slate-50/50 border-slate-200 text-slate-900 focus:bg-white focus:border-tan-dark"
                       {...field}
                     />
@@ -405,12 +332,12 @@ export function CarrierForm({
             name="contactLastName"
             render={({ field }) => (
               <FormItem className="grid grid-cols-1 sm:grid-cols-[200px_1fr] items-start gap-x-4 gap-y-1 py-3 border-b border-slate-100">
-                <FormLabel className={LABEL_COL}>Contact Last Name</FormLabel>
+                <FormLabel className={LABEL_COL}>{copy.labels.contactLastName}</FormLabel>
                 <div className="space-y-1">
                   <FormControl>
                     <Input
                       id="carrier-contact-last-name"
-                      placeholder="Enter contact last name"
+                      placeholder={copy.placeholders.contactLastName}
                       className="h-9 rounded-md bg-slate-50/50 border-slate-200 text-slate-900 focus:bg-white focus:border-tan-dark"
                       {...field}
                     />
@@ -427,13 +354,13 @@ export function CarrierForm({
             name="phone"
             render={({ field }) => (
               <FormItem className="grid grid-cols-1 sm:grid-cols-[200px_1fr] items-start gap-x-4 gap-y-1 py-3 border-b border-slate-100">
-                <FormLabel className={LABEL_COL}>Phone</FormLabel>
+                <FormLabel className={LABEL_COL}>{copy.labels.phone}</FormLabel>
                 <div className="space-y-1">
                   <FormControl>
                     <Input
                       id="carrier-phone"
                       type="tel"
-                      placeholder="(___) ___-____"
+                      placeholder={copy.placeholders.phone}
                       className="h-9 rounded-md bg-slate-50/50 border-slate-200 text-slate-900 focus:bg-white focus:border-tan-dark"
                       {...field}
                     />
@@ -450,13 +377,13 @@ export function CarrierForm({
             name="fax"
             render={({ field }) => (
               <FormItem className="grid grid-cols-1 sm:grid-cols-[200px_1fr] items-start gap-x-4 gap-y-1 py-3 border-b border-slate-100">
-                <FormLabel className={LABEL_COL}>Fax</FormLabel>
+                <FormLabel className={LABEL_COL}>{copy.labels.fax}</FormLabel>
                 <div className="space-y-1">
                   <FormControl>
                     <Input
                       id="carrier-fax"
                       type="tel"
-                      placeholder="(___) ___-____"
+                      placeholder={copy.placeholders.phone}
                       className="h-9 rounded-md bg-slate-50/50 border-slate-200 text-slate-900 focus:bg-white focus:border-tan-dark"
                       {...field}
                     />
@@ -472,14 +399,14 @@ export function CarrierForm({
             control={form.control}
             name="email"
             render={({ field }) => (
-              <FormItem className="grid grid-cols-1 sm:grid-cols-[200px_1fr] items-start gap-x-4 gap-y-1 py-3 border-b border-slate-100">
-                <FormLabel className={LABEL_COL}>Email</FormLabel>
+              <FormItem className="grid grid-cols-1 sm:grid-cols-[200px_1fr] items-start gap-x-4 gap-y-1 py-3 border-b border-slate-100 last:border-0">
+                <FormLabel className={LABEL_COL}>{copy.labels.email}</FormLabel>
                 <div className="space-y-1">
                   <FormControl>
                     <Input
                       id="carrier-email"
                       type="email"
-                      placeholder="Enter email address"
+                      placeholder={copy.placeholders.email}
                       className="h-9 rounded-md bg-slate-50/50 border-slate-200 text-slate-900 focus:bg-white focus:border-tan-dark"
                       {...field}
                     />
@@ -497,7 +424,7 @@ export function CarrierForm({
             render={({ field }) => (
               <FormItem className="grid grid-cols-1 sm:grid-cols-[200px_1fr] items-center gap-x-4 gap-y-1 py-3 border-b border-slate-100 last:border-0">
                 <FormLabel className="sm:text-right text-left text-sm font-semibold text-slate-700">
-                  Allow Flexible Dates
+                  {copy.labels.allowFlexibleDates}
                 </FormLabel>
                 <div className="flex items-center h-9">
                   <FormControl>
@@ -518,7 +445,7 @@ export function CarrierForm({
             <div className="flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 mt-4">
               <AlertCircle className="size-4 shrink-0 mt-0.5 text-destructive" />
               <p className="text-xs text-destructive font-medium">
-                Please fix the highlighted fields before saving.
+                {copy.validationSummary}
               </p>
             </div>
           )}
@@ -532,7 +459,7 @@ export function CarrierForm({
               onClick={onBack}
               className="border-slate-200 text-slate-700 hover:bg-slate-100 rounded-md px-6 h-9 font-semibold shadow-xs transition-colors"
             >
-              Back
+              {copy.actions.back}
             </Button>
             <Button
               id="carrier-save-btn"
@@ -540,7 +467,7 @@ export function CarrierForm({
               disabled={isPending}
               className="bg-tan-dark hover:bg-tan-dark/90 text-white rounded-md px-6 h-9 font-semibold shadow-xs transition-colors disabled:opacity-70"
             >
-              {isPending ? <Loader2 className="size-4 animate-spin" /> : 'Save'}
+              {isPending ? <Loader2 className="size-4 animate-spin" /> : copy.actions.save}
             </Button>
           </div>
         </form>

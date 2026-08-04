@@ -6,7 +6,7 @@ import type {
   LoginRequest,
   MeResponse,
   RefreshRequest,
-} from './auth.types.ts'
+} from '#/types/auth.ts'
 
 export async function loginApi(data: LoginRequest): Promise<AuthTokenResponse> {
   const response = await apiClient.post<AuthTokenResponse>(

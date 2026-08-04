@@ -1,6 +1,6 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
 
-import { getRoleHome } from '#/features/auth/auth.tsx'
+import { getRoleHome } from '#/utils/getRoleHome.ts'
 import { ROUTES } from '#/static/routes.ts'
 
 export const Route = createFileRoute('/')({

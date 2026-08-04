@@ -11,6 +11,7 @@ export const ROUTES = {
   ADMIN_COVERAGE_CODES_NEW: '/admin/coverage-codes/new',
   ADMIN_PARENT_COMPANIES: '/admin/parent-companies',
   ADMIN_PARENT_COMPANIES_NEW: '/admin/parent-companies/new',
+  ADMIN_PARENT_COMPANIES_EDIT: '/admin/parent-companies/edit',
   ADMIN_TERMINATION_CODES: '/admin/termination-codes',
   ADMIN_EMPLOYERS: '/admin/employers',
   ADMIN_PLANS: '/admin/plans',

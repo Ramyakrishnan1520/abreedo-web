@@ -1,11 +1,11 @@
 import { createRootRouteWithContext } from '@tanstack/react-router'
 
-import { RootRouteComponent } from '#/components/layouts/RootRouteComponent.tsx'
+import { RootRouteComponent } from '#/components/layout/RootRouteComponent.tsx'
 
 import appCss from '../styles.css?url'
 
 import type { QueryClient } from '@tanstack/react-query'
-import type { AuthStore } from '#/features/auth/auth.tsx'
+import type { AuthStore } from '#/stores/auth-store.ts'
 
 interface MyRouterContext {
   auth: AuthStore
