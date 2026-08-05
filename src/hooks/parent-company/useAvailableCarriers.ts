@@ -1,3 +1,5 @@
+import { useMemo } from 'react'
+
 import { useInfiniteCarrierOptions } from '#/hooks/carrier/use-infinite-carrier-options.ts'
 
 import type { AvailableCarrierOption } from '#/types/parent-company.ts'
@@ -13,10 +15,14 @@ export function useAvailableCarriers() {
     fetchNextPage,
   } = useInfiniteCarrierOptions()
 
-  const carrierOptions: AvailableCarrierOption[] = carriers.map((carrier) => ({
-    id: String(carrier.id),
-    name: carrier.name,
-  }))
+  const carrierOptions: AvailableCarrierOption[] = useMemo(
+    () =>
+      carriers.map((carrier) => ({
+        id: String(carrier.id),
+        name: carrier.name,
+      })),
+    [carriers],
+  )
 
   return {
     carriers: carrierOptions,

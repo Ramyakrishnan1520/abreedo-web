@@ -7,6 +7,7 @@ import type {
   ParentCompanyListItem,
   ParentCompanyListResponse,
 } from '#/types/parent-company.ts'
+import type { PaginatedResult, PaginationRequest } from '#/types/pagination.ts'
 
 function mapParentCompanyListItem(
   item: ParentCompanyApiItem,
@@ -44,16 +45,46 @@ export async function createParentCompanyApi(
   return response.data
 }
 
-export async function getParentCompaniesApi(): Promise<
-  ParentCompanyListItem[]
-> {
+export async function getParentCompaniesApi(
+  request?: PaginationRequest,
+): Promise<PaginatedResult<ParentCompanyListItem>> {
   const { data } = await apiClient.get<ParentCompanyListResponse>(
     '/api/v1/parent-companies',
+    request
+      ? {
+          params: {
+            Page: request.pageIndex + 1,
+            PageSize: request.pageSize,
+          },
+        }
+      : undefined,
   )
 
-  return extractParentCompanyItems(data)
+  const items = extractParentCompanyItems(data)
     .map(mapParentCompanyListItem)
     .filter((item) => item.id.length > 0)
+
+  if (Array.isArray(data)) {
+    return {
+      items,
+      page: request ? request.pageIndex + 1 : 1,
+      pageSize: request ? request.pageSize : items.length,
+      totalCount: items.length,
+      totalPages: 1,
+    }
+  }
+
+  const totalCount = data.totalCount ?? items.length
+  const pageSize = data.pageSize ?? (request ? request.pageSize : items.length)
+
+  return {
+    items,
+    page: data.page ?? (request ? request.pageIndex + 1 : 1),
+    pageSize,
+    totalCount,
+    totalPages:
+      data.totalPages ?? Math.max(Math.ceil(totalCount / pageSize), 1),
+  }
 }
 
 export async function getParentCompanyByIdApi(
