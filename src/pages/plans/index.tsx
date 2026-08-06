@@ -1,10 +1,12 @@
 import { useCallback, useMemo, useState } from 'react'
+import { useNavigate } from '@tanstack/react-router'
 
 import { getPlanTableColumns } from '#/components/admin/plan/plan-table-columns.tsx'
 import { PlanTableFilters } from '#/components/admin/plan/plan-table-filters.tsx'
 import { ReusableTable } from '#/components/table'
 import { Button } from '#/components/ui/button.tsx'
 import { usePlans } from '#/hooks/plan/use-plans.ts'
+import { ROUTES } from '#/static/routes.ts'
 import { PLAN_CONTENT } from '#/utils/plan-content.ts'
 
 import type { PaginationState } from '@tanstack/react-table'
@@ -13,6 +15,7 @@ import type { Plan } from '#/types/plan.ts'
 const copy = PLAN_CONTENT.list
 
 export function PlansPage() {
+  const navigate = useNavigate()
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
@@ -72,9 +75,7 @@ export function PlansPage() {
           <Button
             id="new-plan-btn"
             type="button"
-            onClick={() => {
-              console.log('Add new plan')
-            }}
+            onClick={() => void navigate({ to: ROUTES.ADMIN_PLANS_NEW })}
             className="h-9 rounded-md bg-tan-dark px-6 font-semibold text-white shadow-xs transition-colors hover:bg-tan-dark/90 cursor-pointer"
           >
             {copy.addButton}

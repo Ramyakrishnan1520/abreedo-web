@@ -1,6 +1,8 @@
 import { apiClient } from '#/api/api-client.ts'
 
 import type {
+  CreatePlanRequest,
+  CreatePlanResponse,
   GetPlansQueryParams,
   Plan,
   PlanApiItem,
@@ -21,7 +23,6 @@ function formatDateString(dateStr?: string | null): string {
 }
 
 function mapPlan(item: PlanApiItem): Plan {
-
   return {
     id: item.planId,
     name: item.name ?? '',
@@ -50,6 +51,17 @@ function getPaginationResult(
     totalPages:
       response?.totalPages ?? Math.max(Math.ceil(totalCount / pageSize), 1),
   }
+}
+
+export async function createPlanApi(
+  data: CreatePlanRequest,
+): Promise<CreatePlanResponse> {
+  const response = await apiClient.post<CreatePlanResponse>(
+    '/api/v1/Plans',
+    data,
+  )
+
+  return response.data
 }
 
 export async function getPlansApi(

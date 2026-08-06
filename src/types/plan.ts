@@ -39,3 +39,36 @@ export interface GetPlansQueryParams {
   pageIndex: number
   pageSize: number
 }
+
+export interface CreatePlanRequest {
+  code?: string | null
+  name?: string | null
+  option?: string | null
+  parentCompanyId?: string | null
+  coverageCodeId?: string | null
+  groupTypeId?: string | null
+  tierId?: string | null
+  linkedPlanId?: string | null
+  linkedPlan2Id?: string | null
+  commissionCodeId?: string | null
+  effectiveDate?: string | null
+  obsoleteDate?: string | null
+  isVoluntaryLifeInsurance?: boolean
+  flexibleDates?: boolean
+  tobacco?: boolean
+}
+
+export interface CreatePlanResponse {
+  planId?: string
+}
+
+export interface PlanFormValues {
+  parentCompanyId?: string
+  coverageCodeId: string
+  option: string
+  name: string
+  effectiveDate: string
+  groupType: string
+  linkedPlanId?: string
+  linkedPlan2Id?: string
+}

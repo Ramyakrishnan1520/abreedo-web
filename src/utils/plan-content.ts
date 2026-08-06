@@ -8,6 +8,11 @@ export const PLAN_CONTENT = {
     loadErrorFallback: 'Unable to load plans. Please try again.',
     retry: 'Retry',
   },
+  pages: {
+    new: {
+      formTitle: 'New Plan',
+    },
+  },
   filters: {
     allParentCompanies: 'Select a parent company...',
     allCarriers: 'Select a carrier...',
@@ -29,5 +34,50 @@ export const PLAN_CONTENT = {
     },
     editAria: (name: string) => `Edit ${name}`,
     deleteAria: (name: string) => `Delete ${name}`,
+  },
+  form: {
+    defaultTitle: 'New Plan',
+    labels: {
+      parentCompany: 'Parent Company',
+      coverageCode: 'Coverage Code',
+      option: 'Option',
+      name: 'Name',
+      effectiveDate: 'Effective Date',
+      groupType: 'Group Type',
+      linkedPlan: 'Linked Plan',
+      linkedPlan2: 'Linked Plan 2',
+    },
+    placeholders: {
+      parentCompanySelect: 'Select parent company...',
+      parentCompanyLoading: 'Loading parent companies...',
+      coverageCodeSelect: 'Please, select coverage code...',
+      coverageCodeLoading: 'Loading coverage codes...',
+      option: 'Enter option',
+      name: 'Enter plan name',
+      groupTypeSelect: 'Select group type...',
+      linkedPlanSelect: 'Select a plan...',
+      linkedPlanLoading: 'Loading plans...',
+    },
+    loadingMore: 'Loading more...',
+    validationSummary: 'Please fix the highlighted fields before saving.',
+    actions: {
+      back: 'Back',
+      save: 'Save',
+    },
+  },
+  validation: {
+    parentCompanyRequired: 'Parent Company is required',
+    coverageCodeRequired: 'Coverage Code is required',
+    optionRequired: 'Option is required',
+    optionMax: 'Option must be 50 characters or fewer',
+    nameRequired: 'Name is required',
+    nameMax: 'Name must be 100 characters or fewer',
+    effectiveDateRequired: 'Effective Date is required',
+    groupTypeRequired: 'Group Type is required',
+    linkedPlanDuplicateError: 'Linked Plan and Linked Plan 2 cannot be the same plan',
+  },
+  toasts: {
+    createSuccess: 'Plan created successfully!',
+    createError: 'Failed to create plan. Please try again.',
   },
 } as const
