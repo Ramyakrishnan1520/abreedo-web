@@ -12,4 +12,6 @@ dist-ssr
 __unconfig*
 todos.json
 FRONTEND_ARCHITECTURE.md
+.agents/
+GEMINI.md
 routeTree.gen.ts

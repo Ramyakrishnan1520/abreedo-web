@@ -30,6 +30,7 @@ export function ReusableTable<TData>({
     onPaginationChange,
     pageCount,
     rowCount,
+    manualPagination: usesServerPagination,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: usesServerPagination
       ? undefined
@@ -73,7 +74,10 @@ export function ReusableTable<TData>({
                   className="border-b border-slate-100 transition-colors last:border-b-0 hover:bg-slate-50/60"
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <td key={cell.id} className="px-4 py-3.5 align-middle text-sm text-slate-600">
+                    <td
+                      key={cell.id}
+                      className="px-4 py-3.5 align-middle text-sm text-slate-600"
+                    >
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext(),
