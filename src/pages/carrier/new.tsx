@@ -12,7 +12,7 @@ export function NewCarrierPage() {
   }
 
   return (
-    <main className="page-wrap mx-auto max-w-4xl py-8">
+    <main className="page-wrap mx-auto max-w-5xl py-8">
       <CarrierForm
         title={CARRIER_CONTENT.pages.new.formTitle}
         onBack={handleNavigateBack}

@@ -2,10 +2,14 @@ import { Check } from 'lucide-react'
 
 import { cn } from '#/lib/utils.ts'
 
-import type { ParentCompanyStep } from '#/types/parent-company.ts'
+export interface StepItem {
+  id: string
+  label: string
+  index: number
+}
 
 interface StepperProps {
-  steps: ParentCompanyStep[]
+  steps: readonly StepItem[]
   currentStep: number
   className?: string
 }

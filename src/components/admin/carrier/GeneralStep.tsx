@@ -1,5 +1,6 @@
 import { useFormContext } from 'react-hook-form'
 
+import { Checkbox } from '#/components/ui/checkbox.tsx'
 import { Input } from '#/components/ui/input.tsx'
 import {
   Select,
@@ -16,15 +17,16 @@ import {
   FormLabel,
   FormMessage,
 } from '#/components/ui/Form'
-import {
-  FORM_INPUT_CLASS,
-  REQUIRED_LABEL_CLASS,
-} from '#/components/admin/common/form-styles.ts'
-import { PARENT_COMPANY_CONTENT } from '#/utils/parent-company-content.ts'
+import { FORM_INPUT_CLASS } from '#/components/admin/common/form-styles'
 import { useGetStates } from '#/hooks/carrier/useGetStates.ts'
-import type { ParentCompanyFormValues } from '#/types/parent-company.ts'
+import { CARRIER_CONTENT } from '#/utils/carrier-content.ts'
+import { cn } from '#/lib/utils.ts'
+import type { CarrierFormValues } from '#/components/admin/carrier/carrier.schema.ts'
 
-const copy = PARENT_COMPANY_CONTENT.generalStep
+const copy = CARRIER_CONTENT.generalStep
+
+const LABEL_COL =
+  'text-left sm:text-right text-sm font-semibold text-slate-700 sm:pt-2 pt-0'
 
 function handleFiveDigitInput(
   value: string,
@@ -34,7 +36,7 @@ function handleFiveDigitInput(
 }
 
 export function GeneralStep() {
-  const form = useFormContext<ParentCompanyFormValues>()
+  const form = useFormContext<CarrierFormValues>()
   const {
     data: states,
     isLoading: statesLoading,
@@ -43,17 +45,24 @@ export function GeneralStep() {
 
   return (
     <div className="space-y-6">
+      {/* Name (required) */}
       <FormField
         control={form.control}
         name="name"
         render={({ field }) => (
           <FormItem className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-start sm:gap-4">
-            <FormLabel className={REQUIRED_LABEL_CLASS}>
+            <FormLabel
+              className={cn(
+                LABEL_COL,
+                'after:ml-0.5 after:text-destructive after:content-["*"]',
+              )}
+            >
               {copy.nameLabel}
             </FormLabel>
             <div className="space-y-1">
               <FormControl>
                 <Input
+                  id="carrier-name"
                   placeholder={copy.namePlaceholder}
                   className={FORM_INPUT_CLASS}
                   {...field}
@@ -65,18 +74,25 @@ export function GeneralStep() {
         )}
       />
 
+      {/* Group Title (required) */}
       <FormField
         control={form.control}
-        name="fullName"
+        name="groupTitle"
         render={({ field }) => (
           <FormItem className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-start sm:gap-4">
-            <FormLabel className={REQUIRED_LABEL_CLASS}>
-              {copy.fullnameLabel}
+            <FormLabel
+              className={cn(
+                LABEL_COL,
+                'after:ml-0.5 after:text-destructive after:content-["*"]',
+              )}
+            >
+              {copy.groupTitleLabel}
             </FormLabel>
             <div className="space-y-1">
               <FormControl>
                 <Input
-                  placeholder={copy.fullnamePlaceholder}
+                  id="carrier-group-title"
+                  placeholder={copy.groupTitlePlaceholder}
                   className={FORM_INPUT_CLASS}
                   {...field}
                 />
@@ -87,29 +103,51 @@ export function GeneralStep() {
         )}
       />
 
+      {/* Allow Flexible Dates */}
+      <FormField
+        control={form.control}
+        name="allowFlexibleDates"
+        render={({ field }) => (
+          <FormItem className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-center sm:gap-4">
+            <FormLabel className={LABEL_COL}>
+              {copy.allowFlexibleDatesLabel}
+            </FormLabel>
+            <div className="flex h-9 items-center">
+              <FormControl>
+                <Checkbox
+                  id="carrier-allow-flexible-dates"
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
+              </FormControl>
+              <FormMessage />
+            </div>
+          </FormItem>
+        )}
+      />
+
       <Separator />
 
+      {/* Additional Details section */}
       <div className="space-y-4">
         <h3 className="text-sm font-bold uppercase tracking-wide text-slate-700">
           {copy.additionalDetailsHeading}
         </h3>
 
         <div className="space-y-4 rounded-xl border border-slate-200 bg-slate-50/40 p-4">
-          <p className="text-sm font-semibold text-slate-700">
-            {copy.primaryAddressHeading}
-          </p>
-
+          {/* Address 1 */}
           <FormField
             control={form.control}
             name="address1"
             render={({ field }) => (
               <FormItem className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-start sm:gap-4">
-                <FormLabel className={REQUIRED_LABEL_CLASS}>
+                <FormLabel className={LABEL_COL}>
                   {copy.address1Label}
                 </FormLabel>
                 <div className="space-y-1">
                   <FormControl>
                     <Input
+                      id="carrier-address1"
                       placeholder={copy.address1Placeholder}
                       className={FORM_INPUT_CLASS}
                       {...field}
@@ -121,17 +159,19 @@ export function GeneralStep() {
             )}
           />
 
+          {/* Address 2 */}
           <FormField
             control={form.control}
             name="address2"
             render={({ field }) => (
               <FormItem className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-start sm:gap-4">
-                <FormLabel className={REQUIRED_LABEL_CLASS}>
+                <FormLabel className={LABEL_COL}>
                   {copy.address2Label}
                 </FormLabel>
                 <div className="space-y-1">
                   <FormControl>
                     <Input
+                      id="carrier-address2"
                       placeholder={copy.address2Placeholder}
                       className={FORM_INPUT_CLASS}
                       {...field}
@@ -143,17 +183,17 @@ export function GeneralStep() {
             )}
           />
 
+          {/* City */}
           <FormField
             control={form.control}
             name="city"
             render={({ field }) => (
               <FormItem className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-start sm:gap-4">
-                <FormLabel className={REQUIRED_LABEL_CLASS}>
-                  {copy.cityLabel}
-                </FormLabel>
+                <FormLabel className={LABEL_COL}>{copy.cityLabel}</FormLabel>
                 <div className="space-y-1">
                   <FormControl>
                     <Input
+                      id="carrier-city"
                       placeholder={copy.cityPlaceholder}
                       className={FORM_INPUT_CLASS}
                       {...field}
@@ -165,14 +205,13 @@ export function GeneralStep() {
             )}
           />
 
+          {/* State */}
           <FormField
             control={form.control}
             name="state"
             render={({ field }) => (
               <FormItem className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-start sm:gap-4">
-                <FormLabel className={REQUIRED_LABEL_CLASS}>
-                  {copy.stateLabel}
-                </FormLabel>
+                <FormLabel className={LABEL_COL}>{copy.stateLabel}</FormLabel>
                 <div className="space-y-1">
                   <FormControl>
                     <Select
@@ -180,7 +219,10 @@ export function GeneralStep() {
                       onValueChange={field.onChange}
                       disabled={statesLoading}
                     >
-                      <SelectTrigger className="h-9 w-full rounded-md border-slate-200 bg-slate-50/50 text-slate-900 focus:border-tan-dark focus:bg-white">
+                      <SelectTrigger
+                        id="carrier-state"
+                        className="h-9 w-full rounded-md border-slate-200 bg-slate-50/50 text-slate-900 focus:border-tan-dark focus:bg-white"
+                      >
                         <SelectValue
                           placeholder={
                             statesLoading
@@ -190,9 +232,9 @@ export function GeneralStep() {
                         />
                       </SelectTrigger>
                       <SelectContent>
-                        {states?.map((state) => (
-                          <SelectItem key={state.id} value={state.id}>
-                            {state.name}
+                        {states?.map((s) => (
+                          <SelectItem key={s.id} value={s.id}>
+                            {s.name}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -209,17 +251,19 @@ export function GeneralStep() {
             )}
           />
 
+          {/* Zip */}
           <FormField
             control={form.control}
-            name="zipCode"
+            name="zip"
             render={({ field }) => (
               <FormItem className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-start sm:gap-4">
-                <FormLabel className={REQUIRED_LABEL_CLASS}>
+                <FormLabel className={LABEL_COL}>
                   {copy.zipCodeLabel}
                 </FormLabel>
                 <div className="space-y-1">
                   <FormControl>
                     <Input
+                      id="carrier-zip"
                       type="text"
                       inputMode="numeric"
                       maxLength={5}
