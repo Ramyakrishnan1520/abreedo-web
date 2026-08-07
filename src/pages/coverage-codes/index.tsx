@@ -1,12 +1,10 @@
 import { useMemo, useState } from 'react'
-import { useNavigate } from '@tanstack/react-router'
 
 import { getCoverageCodeTableColumns } from '#/components/admin/coverage-code/coverage-code-table-columns'
 import { ReusableTable } from '#/components/table'
 import { Button } from '#/components/ui/button.tsx'
 import { useCoverageCodes } from '#/hooks/coverage-code/use-coverage-codes'
 import { COVERAGE_CODE_CONTENT } from '#/utils/coverage-code-content.ts'
-import { ROUTES } from '#/static/routes.ts'
 
 import type { PaginationState } from '@tanstack/react-table'
 import type { CoverageCode } from '#/types/coverage-code.ts'
@@ -14,7 +12,6 @@ import type { CoverageCode } from '#/types/coverage-code.ts'
 const copy = COVERAGE_CODE_CONTENT.list
 
 export function CoverageCodesPage() {
-  const navigate = useNavigate()
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
@@ -44,24 +41,12 @@ export function CoverageCodesPage() {
 
   return (
     <main className="page-wrap py-8">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-        <div>
-          <p className="island-kicker">{copy.kicker}</p>
-          <h1 className="display-title mt-3 text-4xl font-bold text-slate-900">
-            {copy.title}
-          </h1>
-          <p className="mt-3 max-w-2xl text-slate-600">{copy.description}</p>
-        </div>
-        <div>
-          <Button
-            id="new-coverage-code-btn"
-            type="button"
-            onClick={() => void navigate({ to: ROUTES.ADMIN_COVERAGE_CODES_NEW })}
-            className="bg-tan-dark hover:bg-tan-dark/90 text-white rounded-md px-6 h-9 font-semibold shadow-xs transition-colors cursor-pointer"
-          >
-            {copy.addButton}
-          </Button>
-        </div>
+      <div className="mb-6">
+        <p className="island-kicker">{copy.kicker}</p>
+        <h1 className="display-title mt-3 text-4xl font-bold text-slate-900">
+          {copy.title}
+        </h1>
+        <p className="mt-3 max-w-2xl text-slate-600">{copy.description}</p>
       </div>
 
       {isError ? (

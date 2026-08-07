@@ -9,6 +9,23 @@ export const COVERAGE_CODE_CONTENT = {
     retry: 'Retry',
   },
   pages: {
+    index: {
+      kicker: 'Administration',
+      title: 'Update Coverage Codes',
+      description:
+        'Select an action below to set up a new coverage code or manage existing coverage codes.',
+      chooseHeading: 'Please Choose',
+      cards: {
+        list: {
+          title: 'List Coverage Code',
+          description: 'View available coverage codes table',
+        },
+        new: {
+          title: 'New Coverage Code',
+          description: 'Guided Coverage Code Setup',
+        },
+      },
+    },
     new: {
       formTitle: 'New Coverage Code',
     },

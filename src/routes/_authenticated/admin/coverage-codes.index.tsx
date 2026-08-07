@@ -1,8 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import { CoverageCodesPage } from '#/pages/coverage-codes/index.tsx'
+import { CoverageCodeSelectionPage } from '#/pages/coverage-codes/selection.tsx'
 
 export const Route = createFileRoute('/_authenticated/admin/coverage-codes/')({
-  component: CoverageCodesPage,
+  component: CoverageCodeSelectionPage,
 })
 
