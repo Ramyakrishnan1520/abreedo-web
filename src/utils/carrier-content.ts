@@ -9,6 +9,23 @@ export const CARRIER_CONTENT = {
     retry: 'Retry',
   },
   pages: {
+    index: {
+      kicker: 'Administration',
+      title: 'Update Carriers',
+      description:
+        'Select an action below to set up a new carrier or manage existing carriers.',
+      chooseHeading: 'Please Choose',
+      cards: {
+        list: {
+          title: 'List Carrier',
+          description: 'View available carriers table',
+        },
+        new: {
+          title: 'New Carrier',
+          description: 'Guided Carrier Setup',
+        },
+      },
+    },
     new: {
       formTitle: 'New Carrier',
     },
