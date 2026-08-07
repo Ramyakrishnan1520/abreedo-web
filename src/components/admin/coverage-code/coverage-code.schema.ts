@@ -38,6 +38,7 @@ export const coverageCodeSchema = z.object({
     .min(1, 'Invoice Group is required')
     .max(100, 'Invoice Group must be 100 characters or fewer')
     .trim(),
+  notes: z.string().optional(),
 })
 
 export type CoverageCodeFormValues = z.infer<typeof coverageCodeSchema>

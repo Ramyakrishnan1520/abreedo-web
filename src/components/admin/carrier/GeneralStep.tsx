@@ -17,16 +17,13 @@ import {
   FormLabel,
   FormMessage,
 } from '#/components/ui/Form'
-import { FORM_INPUT_CLASS } from '#/components/admin/common/form-styles'
+import { FORM_INPUT_CLASS, LABEL_COL } from '#/components/admin/common/form-styles'
 import { useGetStates } from '#/hooks/carrier/useGetStates.ts'
 import { CARRIER_CONTENT } from '#/utils/carrier-content.ts'
 import { cn } from '#/lib/utils.ts'
 import type { CarrierFormValues } from '#/components/admin/carrier/carrier.schema.ts'
 
 const copy = CARRIER_CONTENT.generalStep
-
-const LABEL_COL =
-  'text-left sm:text-right text-sm font-semibold text-slate-700 sm:pt-2 pt-0'
 
 function handleFiveDigitInput(
   value: string,

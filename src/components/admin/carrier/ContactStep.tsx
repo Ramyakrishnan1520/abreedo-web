@@ -8,14 +8,11 @@ import {
   FormLabel,
   FormMessage,
 } from '#/components/ui/Form'
-import { FORM_INPUT_CLASS } from '#/components/admin/common/form-styles'
+import { FORM_INPUT_CLASS, LABEL_COL } from '#/components/admin/common/form-styles'
 import { CARRIER_CONTENT } from '#/utils/carrier-content.ts'
 import type { CarrierFormValues } from '#/components/admin/carrier/carrier.schema.ts'
 
 const copy = CARRIER_CONTENT.contactStep
-
-const LABEL_COL =
-  'text-left sm:text-right text-sm font-semibold text-slate-700 sm:pt-2 pt-0'
 
 export function ContactStep() {
   const form = useFormContext<CarrierFormValues>()

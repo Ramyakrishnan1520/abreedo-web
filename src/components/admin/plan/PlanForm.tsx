@@ -26,7 +26,7 @@ import { useGroupTypeOptions } from '#/hooks/plan/useGroupTypeOptions.ts'
 import { useLoadMoreIntersection } from '#/hooks/use-load-more-intersection.ts'
 import { cn } from '#/lib/utils.ts'
 import { PLAN_CONTENT } from '#/utils/plan-content.ts'
-
+import { LABEL_COL } from '#/components/admin/common/form-styles.ts'
 import type { CreatePlanRequest } from '#/types/plan.ts'
 
 const copy = PLAN_CONTENT.form
@@ -37,9 +37,6 @@ interface PlanFormProps {
   onSuccess?: () => void
   title?: string
 }
-
-const LABEL_COL =
-  'sm:text-right text-left text-sm font-semibold text-slate-700 sm:pt-2 pt-0'
 
 export function PlanForm({
   defaultValues,

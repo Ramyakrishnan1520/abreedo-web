@@ -12,7 +12,7 @@ export function NewCoverageCodePage() {
   }
 
   return (
-    <main className="page-wrap py-8 max-w-3xl mx-auto">
+    <main className="page-wrap mx-auto max-w-5xl py-8">
       <CoverageCodeForm
         title={COVERAGE_CODE_CONTENT.pages.new.formTitle}
         onBack={handleNavigateBack}
