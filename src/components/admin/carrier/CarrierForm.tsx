@@ -19,13 +19,17 @@ import {
   type CarrierFormValues,
 } from '#/components/admin/carrier/carrier.schema.ts'
 import { useCreateCarrier } from '#/hooks/carrier/useCreateCarrier.ts'
+import { useUpdateCarrier } from '#/hooks/carrier/useUpdateCarrier.ts'
 import { CARRIER_CONTENT } from '#/utils/carrier-content.ts'
 import { getCarrierStepValidationFields } from '#/utils/getCarrierStepValidationFields.ts'
 
 const { form: formCopy } = CARRIER_CONTENT
 
 interface CarrierFormProps {
+  mode?: 'create' | 'edit'
+  carrierId?: string
   defaultValues?: Partial<CarrierFormValues>
+  initialValues?: Partial<CarrierFormValues>
   onBack?: () => void
   onSuccess?: () => void
   title?: string
@@ -34,19 +38,31 @@ interface CarrierFormProps {
 const STEP_COMPONENTS = [GeneralStep, ContactStep, ReviewStep] as const
 
 export function CarrierForm({
+  mode = 'create',
+  carrierId,
   defaultValues,
+  initialValues,
   onBack,
   onSuccess,
-  title = CARRIER_CONTENT.form.titles.create,
+  title,
 }: CarrierFormProps) {
   const [currentStep, setCurrentStep] = useState(0)
-  const { mutate: createCarrier, isPending } = useCreateCarrier()
+  const { mutate: createCarrier, isPending: isCreating } = useCreateCarrier()
+  const { mutate: updateCarrier, isPending: isUpdating } = useUpdateCarrier()
+  const isPending = isCreating || isUpdating
+
+  const resolvedTitle =
+    title ??
+    (mode === 'edit'
+      ? CARRIER_CONTENT.form.titles.edit
+      : CARRIER_CONTENT.form.titles.create)
 
   const form = useForm<CarrierFormValues>({
     resolver: zodResolver(carrierSchema),
     defaultValues: {
       ...CARRIER_DEFAULT_VALUES,
       ...defaultValues,
+      ...initialValues,
     },
     mode: 'onSubmit',
     reValidateMode: 'onSubmit',
@@ -76,28 +92,38 @@ export function CarrierForm({
   }
 
   const onSubmit = (data: CarrierFormValues) => {
-    createCarrier(
-      {
-        name: data.name,
-        groupNumber: data.groupTitle,
-        contactFirst: data.contactFirstName ?? '',
-        contactLast: data.contactLastName ?? '',
-        address1: data.address1 ?? '',
-        address2: data.address2 ?? '',
-        city: data.city ?? '',
-        state: data.state ?? '',
-        zip: data.zip ?? '',
-        phone: data.phone ?? '',
-        fax: data.fax ?? '',
-        email: data.email ?? '',
-        allowFlexibleDates: data.allowFlexibleDates ?? false,
-      },
-      {
+    const payload = {
+      name: data.name,
+      groupNumber: data.groupTitle,
+      contactFirst: data.contactFirstName ?? '',
+      contactLast: data.contactLastName ?? '',
+      address1: data.address1 ?? '',
+      address2: data.address2 ?? '',
+      city: data.city ?? '',
+      state: data.state ?? '',
+      zip: data.zip ?? '',
+      phone: data.phone ?? '',
+      fax: data.fax ?? '',
+      email: data.email ?? '',
+      allowFlexibleDates: data.allowFlexibleDates ?? false,
+    }
+
+    if (mode === 'edit' && carrierId) {
+      updateCarrier(
+        { id: carrierId, data: payload },
+        {
+          onSuccess: () => {
+            onSuccess?.()
+          },
+        },
+      )
+    } else {
+      createCarrier(payload, {
         onSuccess: () => {
           onSuccess?.()
         },
-      },
-    )
+      })
+    }
   }
 
   const handleSave = () => {
@@ -107,6 +133,11 @@ export function CarrierForm({
   const handleFormSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
   }
+
+  const saveLabel =
+    mode === 'edit'
+      ? formCopy.saveLabels.edit
+      : formCopy.saveLabels.create
 
   return (
     <div className="flex min-h-[calc(100vh-8rem)] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xs">
@@ -118,7 +149,7 @@ export function CarrierForm({
               {formCopy.kicker}
             </p>
             <h1 className="display-title mt-1 text-2xl font-bold text-sidebar-foreground">
-              {title}
+              {resolvedTitle}
             </h1>
           </div>
         </div>
@@ -176,7 +207,7 @@ export function CarrierForm({
                   {isPending ? (
                     <Loader2 className="size-4 animate-spin" />
                   ) : (
-                    formCopy.saveLabels.create
+                    saveLabel
                   )}
                 </Button>
               ) : (

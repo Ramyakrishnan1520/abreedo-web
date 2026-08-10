@@ -8,6 +8,7 @@ export const ROUTES = {
   ADMIN_CARRIERS: '/admin/carriers',
   ADMIN_CARRIERS_LIST: '/admin/carriers/list',
   ADMIN_CARRIERS_NEW: '/admin/carriers/new',
+  ADMIN_CARRIERS_EDIT: '/admin/carriers/edit',
   ADMIN_COVERAGE_CODES: '/admin/coverage-codes',
   ADMIN_COVERAGE_CODES_LIST: '/admin/coverage-codes/list',
   ADMIN_COVERAGE_CODES_NEW: '/admin/coverage-codes/new',

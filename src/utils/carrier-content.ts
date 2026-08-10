@@ -24,10 +24,35 @@ export const CARRIER_CONTENT = {
           title: 'New Carrier',
           description: 'Guided Carrier Setup',
         },
+        update: {
+          title: 'Update Current Carrier',
+          description: 'Update Available Carriers',
+        },
       },
     },
     new: {
       formTitle: 'New Carrier',
+    },
+    edit: {
+      kicker: 'Administration',
+      title: 'Carrier Edit',
+      description:
+        'Select a carrier to load its details, then update using the same guided steps as new setup.',
+      selectLabel: 'Select Carrier',
+      selectCardDescription:
+        'Search the list below and choose a carrier to load its profile for editing.',
+      selectPlaceholder: 'Choose a carrier',
+      selectLoadingPlaceholder: 'Loading carriers...',
+      selectSearchPlaceholder: 'Search carriers...',
+      selectNoResults: 'No carriers match your search.',
+      selectPrompt: 'Choose a carrier from the dropdown to continue.',
+      emptyStateTitle: 'Ready when you are',
+      editingLabel: 'Editing:',
+      loadingDetails: 'Loading carrier details...',
+      errors: {
+        listLoad: 'Failed to load carriers. Please try again.',
+        detailLoad: 'Failed to load carrier details. Please try again.',
+      },
     },
   },
   table: {
@@ -150,5 +175,7 @@ export const CARRIER_CONTENT = {
   toasts: {
     createSuccess: 'Carrier created successfully!',
     createError: 'Failed to create carrier. Please try again.',
+    updateSuccess: 'Carrier updated successfully!',
+    updateError: 'Failed to update carrier. Please try again.',
   },
 } as const

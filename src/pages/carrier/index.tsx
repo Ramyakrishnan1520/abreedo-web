@@ -1,10 +1,12 @@
 import { useMemo, useState } from 'react'
+import { useNavigate } from '@tanstack/react-router'
 
 import { ReusableTable } from '#/components/table'
 import { Button } from '#/components/ui/button.tsx'
 import { getCarrierTableColumns } from '#/components/admin/carrier/carrier-table-columns'
 import { useCarriers } from '#/hooks/carrier/use-carriers'
 import { CARRIER_CONTENT } from '#/utils/carrier-content.ts'
+import { ROUTES } from '#/static/routes.ts'
 
 import type { PaginationState } from '@tanstack/react-table'
 import type { Carrier } from '#/types/carrier.ts'
@@ -26,17 +28,18 @@ export function CarriersPage() {
   } = useCarriers(pagination)
   const carriers = carriersResult?.items ?? []
 
+  const navigate = useNavigate()
   const columns = useMemo(
     () =>
       getCarrierTableColumns({
-        onEdit: (carrier: Carrier) => {
-          console.log('Edit carrier', carrier.id)
+        onEdit: (_carrier: Carrier) => {
+          navigate({ to: ROUTES.ADMIN_CARRIERS_EDIT })
         },
         onDelete: (carrier: Carrier) => {
           console.log('Delete carrier', carrier.id)
         },
       }),
-    [],
+    [navigate],
   )
 
   return (
