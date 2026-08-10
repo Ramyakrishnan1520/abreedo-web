@@ -12,6 +12,7 @@ export const ROUTES = {
   ADMIN_COVERAGE_CODES: '/admin/coverage-codes',
   ADMIN_COVERAGE_CODES_LIST: '/admin/coverage-codes/list',
   ADMIN_COVERAGE_CODES_NEW: '/admin/coverage-codes/new',
+  ADMIN_COVERAGE_CODES_EDIT: '/admin/coverage-codes/edit',
   ADMIN_PARENT_COMPANIES: '/admin/parent-companies',
   ADMIN_PARENT_COMPANIES_NEW: '/admin/parent-companies/new',
   ADMIN_PARENT_COMPANIES_EDIT: '/admin/parent-companies/edit',

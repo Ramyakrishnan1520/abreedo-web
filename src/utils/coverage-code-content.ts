@@ -24,10 +24,35 @@ export const COVERAGE_CODE_CONTENT = {
           title: 'New Coverage Code',
           description: 'Guided Coverage Code Setup',
         },
+        update: {
+          title: 'Update Current Coverage Code',
+          description: 'Update Available Coverage Codes',
+        },
       },
     },
     new: {
       formTitle: 'New Coverage Code',
+    },
+    edit: {
+      kicker: 'Administration',
+      title: 'Coverage Code Edit',
+      description:
+        'Select a coverage code to load its details, then update using the same guided steps as new setup.',
+      selectLabel: 'Select Coverage Code',
+      selectCardDescription:
+        'Search the list below and choose a coverage code to load its profile for editing.',
+      selectPlaceholder: 'Choose a coverage code',
+      selectLoadingPlaceholder: 'Loading coverage codes...',
+      selectSearchPlaceholder: 'Search coverage codes...',
+      selectNoResults: 'No coverage codes match your search.',
+      selectPrompt: 'Choose a coverage code from the dropdown to continue.',
+      emptyStateTitle: 'Ready when you are',
+      editingLabel: 'Editing:',
+      loadingDetails: 'Loading coverage code details...',
+      errors: {
+        listLoad: 'Failed to load coverage codes. Please try again.',
+        detailLoad: 'Failed to load coverage code details. Please try again.',
+      },
     },
   },
   table: {
@@ -151,5 +176,7 @@ export const COVERAGE_CODE_CONTENT = {
   toasts: {
     createSuccess: 'Coverage code created successfully!',
     createError: 'Failed to create coverage code. Please try again.',
+    updateSuccess: 'Coverage code updated successfully!',
+    updateError: 'Failed to update coverage code. Please try again.',
   },
 } as const

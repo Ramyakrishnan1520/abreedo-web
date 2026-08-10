@@ -20,13 +20,17 @@ import {
   type CoverageCodeFormValues,
 } from '#/components/admin/coverage-code/coverage-code.schema.ts'
 import { useCreateCoverageCode } from '#/hooks/coverage-code/useCreateCoverageCode.ts'
+import { useUpdateCoverageCode } from '#/hooks/coverage-code/useUpdateCoverageCode.ts'
 import { COVERAGE_CODE_CONTENT } from '#/utils/coverage-code-content.ts'
 import { getCoverageCodeStepValidationFields } from '#/utils/getCoverageCodeStepValidationFields.ts'
 
 const { form: formCopy } = COVERAGE_CODE_CONTENT
 
 interface CoverageCodeFormProps {
+  mode?: 'create' | 'edit'
+  coverageCodeId?: string
   defaultValues?: Partial<CoverageCodeFormValues>
+  initialValues?: Partial<CoverageCodeFormValues>
   onBack?: () => void
   onSuccess?: () => void
   title?: string
@@ -40,19 +44,33 @@ const STEP_COMPONENTS = [
 ] as const
 
 export function CoverageCodeForm({
+  mode = 'create',
+  coverageCodeId,
   defaultValues,
+  initialValues,
   onBack,
   onSuccess,
-  title = COVERAGE_CODE_CONTENT.form.titles.create,
+  title,
 }: CoverageCodeFormProps) {
   const [currentStep, setCurrentStep] = useState(0)
-  const { mutate: createCoverageCode, isPending } = useCreateCoverageCode()
+  const { mutate: createCoverageCode, isPending: isCreating } =
+    useCreateCoverageCode()
+  const { mutate: updateCoverageCode, isPending: isUpdating } =
+    useUpdateCoverageCode()
+  const isPending = isCreating || isUpdating
+
+  const resolvedTitle =
+    title ??
+    (mode === 'edit'
+      ? COVERAGE_CODE_CONTENT.form.titles.edit
+      : COVERAGE_CODE_CONTENT.form.titles.create)
 
   const form = useForm<CoverageCodeFormValues>({
     resolver: zodResolver(coverageCodeSchema),
     defaultValues: {
       ...COVERAGE_CODE_DEFAULT_VALUES,
       ...defaultValues,
+      ...initialValues,
     },
     mode: 'onSubmit',
     reValidateMode: 'onSubmit',
@@ -82,28 +100,38 @@ export function CoverageCodeForm({
   }
 
   const onSubmit = (data: CoverageCodeFormValues) => {
-    createCoverageCode(
-      {
-        code: data.code,
-        matrixName: data.name,
-        carrierId: data.carrierId,
-        coverageClassId: data.coverageClassId,
-        codeInvoice: data.codeInvoice,
-        invoiceInclude: data.invoiceInclude,
-        codeReport: data.codeReport,
-        title: data.title,
-        shortTitle: data.shortTitle,
-        remittanceTypeId: data.remittanceTypeId,
-        invoiceGroup: data.invoiceGroup,
-        linkedCode: '',
-        orderNumber: 0,
-      },
-      {
+    const payload = {
+      code: data.code,
+      matrixName: data.name,
+      carrierId: data.carrierId,
+      coverageClassId: data.coverageClassId,
+      codeInvoice: data.codeInvoice,
+      invoiceInclude: data.invoiceInclude,
+      codeReport: data.codeReport,
+      title: data.title,
+      shortTitle: data.shortTitle,
+      remittanceTypeId: data.remittanceTypeId,
+      invoiceGroup: data.invoiceGroup,
+      linkedCode: '',
+      orderNumber: 0,
+    }
+
+    if (mode === 'edit' && coverageCodeId) {
+      updateCoverageCode(
+        { id: coverageCodeId, data: payload },
+        {
+          onSuccess: () => {
+            onSuccess?.()
+          },
+        },
+      )
+    } else {
+      createCoverageCode(payload, {
         onSuccess: () => {
           onSuccess?.()
         },
-      },
-    )
+      })
+    }
   }
 
   const handleSave = () => {
@@ -113,6 +141,11 @@ export function CoverageCodeForm({
   const handleFormSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
   }
+
+  const saveLabel =
+    mode === 'edit'
+      ? formCopy.saveLabels.edit
+      : formCopy.saveLabels.create
 
   return (
     <div className="flex min-h-[calc(100vh-8rem)] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xs">
@@ -124,7 +157,7 @@ export function CoverageCodeForm({
               {formCopy.kicker}
             </p>
             <h1 className="display-title mt-1 text-2xl font-bold text-sidebar-foreground">
-              {title}
+              {resolvedTitle}
             </h1>
           </div>
         </div>
@@ -182,7 +215,7 @@ export function CoverageCodeForm({
                   {isPending ? (
                     <Loader2 className="size-4 animate-spin" />
                   ) : (
-                    formCopy.saveLabels.create
+                    saveLabel
                   )}
                 </Button>
               ) : (

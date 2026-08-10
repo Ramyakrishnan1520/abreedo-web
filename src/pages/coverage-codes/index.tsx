@@ -1,10 +1,12 @@
 import { useMemo, useState } from 'react'
+import { useNavigate } from '@tanstack/react-router'
 
 import { getCoverageCodeTableColumns } from '#/components/admin/coverage-code/coverage-code-table-columns'
 import { ReusableTable } from '#/components/table'
 import { Button } from '#/components/ui/button.tsx'
 import { useCoverageCodes } from '#/hooks/coverage-code/use-coverage-codes'
 import { COVERAGE_CODE_CONTENT } from '#/utils/coverage-code-content.ts'
+import { ROUTES } from '#/static/routes.ts'
 
 import type { PaginationState } from '@tanstack/react-table'
 import type { CoverageCode } from '#/types/coverage-code.ts'
@@ -26,17 +28,18 @@ export function CoverageCodesPage() {
   } = useCoverageCodes(pagination)
   const coverageCodes = coverageCodesResult?.items ?? []
 
+  const navigate = useNavigate()
   const columns = useMemo(
     () =>
       getCoverageCodeTableColumns({
-        onEdit: (coverageCode: CoverageCode) => {
-          console.log('Edit coverage code', coverageCode.id)
+        onEdit: (_coverageCode: CoverageCode) => {
+          navigate({ to: ROUTES.ADMIN_COVERAGE_CODES_EDIT })
         },
         onDelete: (coverageCode: CoverageCode) => {
           console.log('Delete coverage code', coverageCode.id)
         },
       }),
-    [],
+    [navigate],
   )
 
   return (

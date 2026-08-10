@@ -34,6 +34,12 @@ export function CoverageCodeSelectionPage() {
             description={pages.index.cards.new.description}
             to={ROUTES.ADMIN_COVERAGE_CODES_NEW}
           />
+
+          <SelectionCard
+            title={pages.index.cards.update.title}
+            description={pages.index.cards.update.description}
+            to={ROUTES.ADMIN_COVERAGE_CODES_EDIT}
+          />
         </div>
       </div>
     </main>
