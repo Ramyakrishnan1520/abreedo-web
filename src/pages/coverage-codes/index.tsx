@@ -14,7 +14,6 @@ import type { CoverageCode } from '#/types/coverage-code.ts'
 const copy = COVERAGE_CODE_CONTENT.list
 
 export function CoverageCodesPage() {
-  const navigate = useNavigate()
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
@@ -29,39 +28,28 @@ export function CoverageCodesPage() {
   } = useCoverageCodes(pagination)
   const coverageCodes = coverageCodesResult?.items ?? []
 
+  const navigate = useNavigate()
   const columns = useMemo(
     () =>
       getCoverageCodeTableColumns({
-        onEdit: (coverageCode: CoverageCode) => {
-          console.log('Edit coverage code', coverageCode.id)
+        onEdit: (_coverageCode: CoverageCode) => {
+          navigate({ to: ROUTES.ADMIN_COVERAGE_CODES_EDIT })
         },
         onDelete: (coverageCode: CoverageCode) => {
           console.log('Delete coverage code', coverageCode.id)
         },
       }),
-    [],
+    [navigate],
   )
 
   return (
     <main className="page-wrap py-8">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-        <div>
-          <p className="island-kicker">{copy.kicker}</p>
-          <h1 className="display-title mt-3 text-4xl font-bold text-slate-900">
-            {copy.title}
-          </h1>
-          <p className="mt-3 max-w-2xl text-slate-600">{copy.description}</p>
-        </div>
-        <div>
-          <Button
-            id="new-coverage-code-btn"
-            type="button"
-            onClick={() => void navigate({ to: ROUTES.ADMIN_COVERAGE_CODES_NEW })}
-            className="bg-tan-dark hover:bg-tan-dark/90 text-white rounded-md px-6 h-9 font-semibold shadow-xs transition-colors cursor-pointer"
-          >
-            {copy.addButton}
-          </Button>
-        </div>
+      <div className="mb-6">
+        <p className="island-kicker">{copy.kicker}</p>
+        <h1 className="display-title mt-3 text-4xl font-bold text-slate-900">
+          {copy.title}
+        </h1>
+        <p className="mt-3 max-w-2xl text-slate-600">{copy.description}</p>
       </div>
 
       {isError ? (

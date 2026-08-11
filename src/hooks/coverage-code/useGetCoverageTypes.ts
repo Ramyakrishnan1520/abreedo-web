@@ -8,5 +8,7 @@ export function useGetCoverageTypes() {
   return useQuery<GetCoverageTypesResponse, Error>({
     queryKey: ['coverage-types'],
     queryFn: getCoverageTypesApi,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 10 * 60 * 1000,
   })
 }

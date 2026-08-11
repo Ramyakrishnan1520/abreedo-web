@@ -11,7 +11,7 @@ import { ContactStep } from '#/components/admin/parent-company/ContactStep.tsx'
 import { GeneralStep } from '#/components/admin/parent-company/GeneralStep.tsx'
 import { NotesStep } from '#/components/admin/parent-company/NotesStep.tsx'
 import { ReviewStep } from '#/components/admin/parent-company/ReviewStep.tsx'
-import { Stepper } from '#/components/admin/parent-company/Stepper.tsx'
+import { Stepper } from '#/components/admin/common/Stepper'
 import {
   PARENT_COMPANY_DEFAULT_VALUES,
   PARENT_COMPANY_STEPS,

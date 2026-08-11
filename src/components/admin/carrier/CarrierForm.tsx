@@ -1,474 +1,226 @@
+import { useState } from 'react'
+import type { FormEvent } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { AlertCircle, Loader2 } from 'lucide-react'
 
+import { Button } from '#/components/ui/button.tsx'
+import { Form } from '#/components/ui/Form'
+import { GeneralStep } from '#/components/admin/carrier/GeneralStep.tsx'
+import { ContactStep } from '#/components/admin/carrier/ContactStep.tsx'
+import { ReviewStep } from '#/components/admin/carrier/ReviewStep.tsx'
+import { Stepper } from '#/components/admin/common/Stepper'
+import {
+  CARRIER_DEFAULT_VALUES,
+  CARRIER_STEPS,
+} from '#/components/admin/carrier/carrier-steps.ts'
 import {
   carrierSchema,
   type CarrierFormValues,
 } from '#/components/admin/carrier/carrier.schema.ts'
 import { useCreateCarrier } from '#/hooks/carrier/useCreateCarrier.ts'
-import { useGetStates } from '#/hooks/carrier/useGetStates.ts'
+import { useUpdateCarrier } from '#/hooks/carrier/useUpdateCarrier.ts'
 import { CARRIER_CONTENT } from '#/utils/carrier-content.ts'
+import { getCarrierStepValidationFields } from '#/utils/getCarrierStepValidationFields.ts'
 
-import { Button } from '#/components/ui/button.tsx'
-import { Checkbox } from '#/components/ui/checkbox.tsx'
-import { Input } from '#/components/ui/input.tsx'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '#/components/ui/select.tsx'
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '#/components/ui/Form'
-import { cn } from '#/lib/utils.ts'
+const { form: formCopy } = CARRIER_CONTENT
 
-const copy = CARRIER_CONTENT.form
-
-// Props
 interface CarrierFormProps {
+  mode?: 'create' | 'edit'
+  carrierId?: string
   defaultValues?: Partial<CarrierFormValues>
+  initialValues?: Partial<CarrierFormValues>
   onBack?: () => void
   onSuccess?: () => void
   title?: string
 }
 
-const LABEL_COL =
-  'sm:text-right text-left text-sm font-semibold text-slate-700 sm:pt-2 pt-0'
+const STEP_COMPONENTS = [GeneralStep, ContactStep, ReviewStep] as const
 
 export function CarrierForm({
+  mode = 'create',
+  carrierId,
   defaultValues,
+  initialValues,
   onBack,
   onSuccess,
-  title = CARRIER_CONTENT.form.defaultTitle,
+  title,
 }: CarrierFormProps) {
-  const { mutate: createCarrier, isPending } = useCreateCarrier()
-  const { data: states, isLoading: statesLoading, isError: statesError } = useGetStates()
+  const [currentStep, setCurrentStep] = useState(0)
+  const { mutate: createCarrier, isPending: isCreating } = useCreateCarrier()
+  const { mutate: updateCarrier, isPending: isUpdating } = useUpdateCarrier()
+  const isPending = isCreating || isUpdating
+
+  const resolvedTitle =
+    title ??
+    (mode === 'edit'
+      ? CARRIER_CONTENT.form.titles.edit
+      : CARRIER_CONTENT.form.titles.create)
 
   const form = useForm<CarrierFormValues>({
     resolver: zodResolver(carrierSchema),
     defaultValues: {
-      name: '',
-      groupTitle: '',
-      address1: '',
-      address2: '',
-      city: '',
-      state: '',
-      zip: '',
-      contactFirstName: '',
-      contactLastName: '',
-      phone: '',
-      fax: '',
-      email: '',
-      allowFlexibleDates: false,
+      ...CARRIER_DEFAULT_VALUES,
       ...defaultValues,
+      ...initialValues,
     },
+    mode: 'onSubmit',
+    reValidateMode: 'onSubmit',
   })
 
+  const isFirstStep = currentStep === 0
+  const isLastStep = currentStep === CARRIER_STEPS.length - 1
+  const StepComponent = STEP_COMPONENTS[currentStep]
+
+  const handleBack = () => {
+    if (!isFirstStep) {
+      setCurrentStep((step) => step - 1)
+      return
+    }
+    if (onBack) {
+      onBack()
+    }
+  }
+
+  const handleNext = async () => {
+    const fields = getCarrierStepValidationFields(currentStep)
+    const isValid = await form.trigger(fields)
+
+    if (isValid) {
+      setCurrentStep((step) => step + 1)
+    }
+  }
+
   const onSubmit = (data: CarrierFormValues) => {
-    createCarrier(
-      {
-        name: data.name,
-        groupNumber: data.groupTitle,
-        contactFirst: data.contactFirstName ?? '',
-        contactLast: data.contactLastName ?? '',
-        address1: data.address1 ?? '',
-        address2: data.address2 ?? '',
-        city: data.city ?? '',
-        state: data.state ?? '',
-        zip: data.zip ?? '',
-        phone: data.phone ?? '',
-        fax: data.fax ?? '',
-        email: data.email ?? '',
-        allowFlexibleDates: data.allowFlexibleDates ?? false,
-      },
-      {
+    const payload = {
+      name: data.name,
+      groupNumber: data.groupTitle,
+      contactFirst: data.contactFirstName ?? '',
+      contactLast: data.contactLastName ?? '',
+      address1: data.address1 ?? '',
+      address2: data.address2 ?? '',
+      city: data.city ?? '',
+      state: data.state ?? '',
+      zip: data.zip ?? '',
+      phone: data.phone ?? '',
+      fax: data.fax ?? '',
+      email: data.email ?? '',
+      allowFlexibleDates: data.allowFlexibleDates ?? false,
+    }
+
+    if (mode === 'edit' && carrierId) {
+      updateCarrier(
+        { id: carrierId, data: payload },
+        {
+          onSuccess: () => {
+            onSuccess?.()
+          },
+        },
+      )
+    } else {
+      createCarrier(payload, {
         onSuccess: () => {
           onSuccess?.()
         },
-      },
-    )
+      })
+    }
   }
 
+  const handleSave = () => {
+    void form.handleSubmit(onSubmit)()
+  }
+
+  const handleFormSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+  }
+
+  const saveLabel =
+    mode === 'edit'
+      ? formCopy.saveLabels.edit
+      : formCopy.saveLabels.create
+
   return (
-    <div className="w-full rounded-2xl border border-slate-200 bg-white shadow-xs overflow-hidden">
-      <div className="bg-sidebar px-6 py-4 border-b border-sidebar-border flex items-center justify-between">
-        <h2 className="text-base font-bold tracking-wide text-sidebar-foreground uppercase">
-          {title}
-        </h2>
+    <div className="flex min-h-[calc(100vh-8rem)] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xs">
+      {/* Header with Kicker & Stepper */}
+      <div className="border-b border-slate-200 bg-sidebar px-6 py-5">
+        <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-tan-accent">
+              {formCopy.kicker}
+            </p>
+            <h1 className="display-title mt-1 text-2xl font-bold text-sidebar-foreground">
+              {resolvedTitle}
+            </h1>
+          </div>
+        </div>
+
+        <Stepper
+          steps={CARRIER_STEPS}
+          currentStep={currentStep}
+          className="rounded-xl bg-white/5 px-2 py-4 sm:px-4"
+        />
       </div>
 
-      {/* Form body */}
+      {/* Form Content */}
       <Form {...form}>
         <form
-          onSubmit={form.handleSubmit(onSubmit)}
+          onSubmit={handleFormSubmit}
           noValidate
-          className="px-6 py-6 sm:px-8 space-y-0"
+          className="flex min-h-0 flex-1 flex-col"
         >
-          {/* Name (required) */}
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem className="grid grid-cols-1 sm:grid-cols-[200px_1fr] items-start gap-x-4 gap-y-1 py-3 border-b border-slate-100">
-                <FormLabel
-                  className={cn(
-                    LABEL_COL,
-                    'after:content-["*"] after:ml-0.5 after:text-destructive',
-                  )}
+          <div className="flex-1 overflow-y-auto px-6 py-6 sm:px-8">
+            <StepComponent />
+
+            {Object.keys(form.formState.errors).length > 0 &&
+              form.formState.isSubmitted && (
+                <div className="mt-6 flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3">
+                  <AlertCircle className="mt-0.5 size-4 shrink-0 text-destructive" />
+                  <p className="text-xs font-medium text-destructive">
+                    {formCopy.validationSummary}
+                  </p>
+                </div>
+              )}
+          </div>
+
+          {/* Sticky Bottom Navigation */}
+          <div className="sticky bottom-0 border-t border-slate-200 bg-white/95 px-6 py-4 backdrop-blur-sm sm:px-8">
+            <div className="flex items-center justify-between gap-3">
+              <Button
+                id="carrier-back-btn"
+                type="button"
+                variant="outline"
+                onClick={handleBack}
+                disabled={isPending}
+                className="h-9 rounded-md border-slate-200 px-6 font-semibold text-slate-700 shadow-xs hover:bg-slate-100"
+              >
+                {formCopy.navigation.back}
+              </Button>
+
+              {isLastStep ? (
+                <Button
+                  id="carrier-save-btn"
+                  type="button"
+                  onClick={handleSave}
+                  disabled={isPending}
+                  className="h-9 rounded-md bg-tan-dark px-6 font-semibold text-white shadow-xs hover:bg-tan-dark/90 disabled:opacity-70"
                 >
-                  {copy.labels.name}
-                </FormLabel>
-                <div className="space-y-1">
-                  <FormControl>
-                    <Input
-                      id="carrier-name"
-                      placeholder={copy.placeholders.name}
-                      className="h-9 rounded-md bg-slate-50/50 border-slate-200 text-slate-900 focus:bg-white focus:border-tan-dark"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </div>
-              </FormItem>
-            )}
-          />
-
-          {/* Group Title (required) */}
-          <FormField
-            control={form.control}
-            name="groupTitle"
-            render={({ field }) => (
-              <FormItem className="grid grid-cols-1 sm:grid-cols-[200px_1fr] items-start gap-x-4 gap-y-1 py-3 border-b border-slate-100">
-                <FormLabel
-                  className={cn(
-                    LABEL_COL,
-                    'after:content-["*"] after:ml-0.5 after:text-destructive',
+                  {isPending ? (
+                    <Loader2 className="size-4 animate-spin" />
+                  ) : (
+                    saveLabel
                   )}
+                </Button>
+              ) : (
+                <Button
+                  id="carrier-next-btn"
+                  type="button"
+                  onClick={() => void handleNext()}
+                  className="h-9 rounded-md bg-tan-dark px-6 font-semibold text-white shadow-xs hover:bg-tan-dark/90"
                 >
-                  {copy.labels.groupTitle}
-                </FormLabel>
-                <div className="space-y-1">
-                  <FormControl>
-                    <Input
-                      id="carrier-group-title"
-                      placeholder={copy.placeholders.groupTitle}
-                      className="h-9 rounded-md bg-slate-50/50 border-slate-200 text-slate-900 focus:bg-white focus:border-tan-dark"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </div>
-              </FormItem>
-            )}
-          />
-
-          {/* Address 1 */}
-          <FormField
-            control={form.control}
-            name="address1"
-            render={({ field }) => (
-              <FormItem className="grid grid-cols-1 sm:grid-cols-[200px_1fr] items-start gap-x-4 gap-y-1 py-3 border-b border-slate-100">
-                <FormLabel className={LABEL_COL}>{copy.labels.address1}</FormLabel>
-                <div className="space-y-1">
-                  <FormControl>
-                    <Input
-                      id="carrier-address1"
-                      placeholder={copy.placeholders.address1}
-                      className="h-9 rounded-md bg-slate-50/50 border-slate-200 text-slate-900 focus:bg-white focus:border-tan-dark"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </div>
-              </FormItem>
-            )}
-          />
-
-          {/* Address 2 */}
-          <FormField
-            control={form.control}
-            name="address2"
-            render={({ field }) => (
-              <FormItem className="grid grid-cols-1 sm:grid-cols-[200px_1fr] items-start gap-x-4 gap-y-1 py-3 border-b border-slate-100">
-                <FormLabel className={LABEL_COL}>{copy.labels.address2}</FormLabel>
-                <div className="space-y-1">
-                  <FormControl>
-                    <Input
-                      id="carrier-address2"
-                      placeholder={copy.placeholders.address2}
-                      className="h-9 rounded-md bg-slate-50/50 border-slate-200 text-slate-900 focus:bg-white focus:border-tan-dark"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </div>
-              </FormItem>
-            )}
-          />
-
-          {/* City */}
-          <FormField
-            control={form.control}
-            name="city"
-            render={({ field }) => (
-              <FormItem className="grid grid-cols-1 sm:grid-cols-[200px_1fr] items-start gap-x-4 gap-y-1 py-3 border-b border-slate-100">
-                <FormLabel className={LABEL_COL}>{copy.labels.city}</FormLabel>
-                <div className="space-y-1">
-                  <FormControl>
-                    <Input
-                      id="carrier-city"
-                      placeholder={copy.placeholders.city}
-                      className="h-9 rounded-md bg-slate-50/50 border-slate-200 text-slate-900 focus:bg-white focus:border-tan-dark"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </div>
-              </FormItem>
-            )}
-          />
-
-          {/* State */}
-          <FormField
-            control={form.control}
-            name="state"
-            render={({ field }) => (
-              <FormItem className="grid grid-cols-1 sm:grid-cols-[200px_1fr] items-start gap-x-4 gap-y-1 py-3 border-b border-slate-100">
-                <FormLabel className={LABEL_COL}>{copy.labels.state}</FormLabel>
-                <div className="space-y-1">
-                  <FormControl>
-                    <Select
-                      value={field.value || undefined}
-                      onValueChange={field.onChange}
-                      disabled={statesLoading}
-                    >
-                      <SelectTrigger
-                        id="carrier-state"
-                        className="h-9 w-full rounded-md bg-slate-50/50 border-slate-200 text-slate-900 focus:bg-white focus:border-tan-dark"
-                      >
-                        <SelectValue
-                          placeholder={
-                            statesLoading
-                              ? copy.stateLoading
-                              : copy.statePlaceholder
-                          }
-                        />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {states?.map((s) => (
-                          <SelectItem key={s.id} value={s.id}>
-                            {s.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </FormControl>
-                  {statesError && (
-                    <p className="text-xs text-destructive font-medium">
-                      {copy.stateLoadError}
-                    </p>
-                  )}
-                  <FormMessage />
-                </div>
-              </FormItem>
-            )}
-          />
-
-          {/* Zip */}
-          <FormField
-            control={form.control}
-            name="zip"
-            render={({ field }) => (
-              <FormItem className="grid grid-cols-1 sm:grid-cols-[200px_1fr] items-start gap-x-4 gap-y-1 py-3 border-b border-slate-100">
-                <FormLabel className={LABEL_COL}>{copy.labels.zip}</FormLabel>
-                <div className="space-y-1">
-                  <FormControl>
-                    <Input
-                      id="carrier-zip"
-                      placeholder={copy.placeholders.zip}
-                      className="h-9 rounded-md bg-slate-50/50 border-slate-200 text-slate-900 focus:bg-white focus:border-tan-dark"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </div>
-              </FormItem>
-            )}
-          />
-
-          {/* Contact First Name */}
-          <FormField
-            control={form.control}
-            name="contactFirstName"
-            render={({ field }) => (
-              <FormItem className="grid grid-cols-1 sm:grid-cols-[200px_1fr] items-start gap-x-4 gap-y-1 py-3 border-b border-slate-100">
-                <FormLabel className={LABEL_COL}>{copy.labels.contactFirstName}</FormLabel>
-                <div className="space-y-1">
-                  <FormControl>
-                    <Input
-                      id="carrier-contact-first-name"
-                      placeholder={copy.placeholders.contactFirstName}
-                      className="h-9 rounded-md bg-slate-50/50 border-slate-200 text-slate-900 focus:bg-white focus:border-tan-dark"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </div>
-              </FormItem>
-            )}
-          />
-
-          {/* Contact Last Name */}
-          <FormField
-            control={form.control}
-            name="contactLastName"
-            render={({ field }) => (
-              <FormItem className="grid grid-cols-1 sm:grid-cols-[200px_1fr] items-start gap-x-4 gap-y-1 py-3 border-b border-slate-100">
-                <FormLabel className={LABEL_COL}>{copy.labels.contactLastName}</FormLabel>
-                <div className="space-y-1">
-                  <FormControl>
-                    <Input
-                      id="carrier-contact-last-name"
-                      placeholder={copy.placeholders.contactLastName}
-                      className="h-9 rounded-md bg-slate-50/50 border-slate-200 text-slate-900 focus:bg-white focus:border-tan-dark"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </div>
-              </FormItem>
-            )}
-          />
-
-          {/* Phone */}
-          <FormField
-            control={form.control}
-            name="phone"
-            render={({ field }) => (
-              <FormItem className="grid grid-cols-1 sm:grid-cols-[200px_1fr] items-start gap-x-4 gap-y-1 py-3 border-b border-slate-100">
-                <FormLabel className={LABEL_COL}>{copy.labels.phone}</FormLabel>
-                <div className="space-y-1">
-                  <FormControl>
-                    <Input
-                      id="carrier-phone"
-                      type="tel"
-                      placeholder={copy.placeholders.phone}
-                      className="h-9 rounded-md bg-slate-50/50 border-slate-200 text-slate-900 focus:bg-white focus:border-tan-dark"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </div>
-              </FormItem>
-            )}
-          />
-
-          {/* Fax */}
-          <FormField
-            control={form.control}
-            name="fax"
-            render={({ field }) => (
-              <FormItem className="grid grid-cols-1 sm:grid-cols-[200px_1fr] items-start gap-x-4 gap-y-1 py-3 border-b border-slate-100">
-                <FormLabel className={LABEL_COL}>{copy.labels.fax}</FormLabel>
-                <div className="space-y-1">
-                  <FormControl>
-                    <Input
-                      id="carrier-fax"
-                      type="tel"
-                      placeholder={copy.placeholders.phone}
-                      className="h-9 rounded-md bg-slate-50/50 border-slate-200 text-slate-900 focus:bg-white focus:border-tan-dark"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </div>
-              </FormItem>
-            )}
-          />
-
-          {/* Email */}
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem className="grid grid-cols-1 sm:grid-cols-[200px_1fr] items-start gap-x-4 gap-y-1 py-3 border-b border-slate-100 last:border-0">
-                <FormLabel className={LABEL_COL}>{copy.labels.email}</FormLabel>
-                <div className="space-y-1">
-                  <FormControl>
-                    <Input
-                      id="carrier-email"
-                      type="email"
-                      placeholder={copy.placeholders.email}
-                      className="h-9 rounded-md bg-slate-50/50 border-slate-200 text-slate-900 focus:bg-white focus:border-tan-dark"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </div>
-              </FormItem>
-            )}
-          />
-
-          {/* Allow Flexible Dates */}
-          <FormField
-            control={form.control}
-            name="allowFlexibleDates"
-            render={({ field }) => (
-              <FormItem className="grid grid-cols-1 sm:grid-cols-[200px_1fr] items-center gap-x-4 gap-y-1 py-3 border-b border-slate-100 last:border-0">
-                <FormLabel className="sm:text-right text-left text-sm font-semibold text-slate-700">
-                  {copy.labels.allowFlexibleDates}
-                </FormLabel>
-                <div className="flex items-center h-9">
-                  <FormControl>
-                    <Checkbox
-                      id="carrier-allow-flexible-dates"
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </div>
-              </FormItem>
-            )}
-          />
-
-          {/* Validation error summary */}
-          {Object.keys(form.formState.errors).length > 0 && (
-            <div className="flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3 mt-4">
-              <AlertCircle className="size-4 shrink-0 mt-0.5 text-destructive" />
-              <p className="text-xs text-destructive font-medium">
-                {copy.validationSummary}
-              </p>
+                  {formCopy.navigation.next}
+                </Button>
+              )}
             </div>
-          )}
-
-          {/* Footer actions */}
-          <div className="flex items-center justify-end gap-3 pt-6 border-t border-slate-100 mt-4">
-            <Button
-              id="carrier-back-btn"
-              type="button"
-              variant="outline"
-              onClick={onBack}
-              className="border-slate-200 text-slate-700 hover:bg-slate-100 rounded-md px-6 h-9 font-semibold shadow-xs transition-colors"
-            >
-              {copy.actions.back}
-            </Button>
-            <Button
-              id="carrier-save-btn"
-              type="submit"
-              disabled={isPending}
-              className="bg-tan-dark hover:bg-tan-dark/90 text-white rounded-md px-6 h-9 font-semibold shadow-xs transition-colors disabled:opacity-70"
-            >
-              {isPending ? <Loader2 className="size-4 animate-spin" /> : copy.actions.save}
-            </Button>
           </div>
         </form>
       </Form>

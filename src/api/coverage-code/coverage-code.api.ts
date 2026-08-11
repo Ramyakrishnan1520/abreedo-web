@@ -97,4 +97,22 @@ export async function getCoverageCodesApi(
   )
 }
 
+export async function getCoverageCodeByIdApi(
+  id: string,
+): Promise<CoverageCodeApiItem> {
+  const { data } = await apiClient.get<CoverageCodeApiItem>(
+    `/api/v1/coverageCodes/${id}`,
+  )
+
+  return data
+}
+
+export async function updateCoverageCodeApi(
+  id: string,
+  data: CoverageCodeUpsertRequest,
+): Promise<void> {
+  await apiClient.put(`/api/v1/coverageCodes/${id}`, data)
+}
+
+
 

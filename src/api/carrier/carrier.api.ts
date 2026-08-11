@@ -81,3 +81,19 @@ export async function getCarriersApi(
   )
 }
 
+export async function getCarrierByIdApi(id: string): Promise<CarrierApiItem> {
+  const { data } = await apiClient.get<CarrierApiItem>(
+    `/api/v1/Carriers/${id}`,
+  )
+
+  return data
+}
+
+export async function updateCarrierApi(
+  id: string,
+  data: CreateCarrierRequest,
+): Promise<void> {
+  await apiClient.put(`/api/v1/Carriers/${id}`, data)
+}
+
+
