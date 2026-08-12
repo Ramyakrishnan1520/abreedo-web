@@ -11,6 +11,7 @@ export function useInfiniteParentCompanies() {
       'infinite',
       PARENT_COMPANY_INFINITE_PAGE_SIZE,
     ],
+    refetchOnWindowFocus: false,
     queryFn: ({ pageParam }) =>
       getParentCompaniesApi({
         pageIndex: pageParam,

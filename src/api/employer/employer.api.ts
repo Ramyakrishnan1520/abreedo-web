@@ -5,6 +5,7 @@ import type {
   EmployerApiItem,
   EmployerListResponse,
   EmployerPaginatedListResponse,
+  EmployerUpsertRequest,
 } from '#/types/employer.ts'
 import type {
   PaginatedResult,
@@ -65,3 +66,15 @@ export async function getEmployersApi(
 
   return getPaginationResult(itemsList.map(mapEmployer), request, data)
 }
+
+export async function createEmployerApi(
+  data: EmployerUpsertRequest,
+): Promise<EmployerApiItem> {
+  const response = await apiClient.post<EmployerApiItem>(
+    '/api/v1/employers',
+    data,
+  )
+
+  return response.data
+}
+

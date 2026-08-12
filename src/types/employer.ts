@@ -23,7 +23,46 @@ export interface EmployerApiItem {
   email?: string | null
   notes?: string | null
   allowCobra?: boolean
+  isPaper?: boolean
   isPano?: boolean
+  carrierIds?: string[] | null
+  groupNumber?: string | null
+  status?: number | null
+  policyNumber?: string | null
+  tpacNumber?: string | null
+  customerNumber?: string | null
+  monthlyAdminFee?: number | null
+  renewalDate?: string | null
+  initialNotificationStartOn?: string | null
+}
+
+export interface EmployerUpsertRequest {
+  name: string
+  parentCompanyId?: string | null
+  address1: string
+  address2?: string | null
+  city: string
+  state?: string | null
+  zip: string
+  contactFirst: string
+  contactLast: string
+  title?: string | null
+  phone?: string | null
+  fax?: string | null
+  email?: string | null
+  notes?: string | null
+  allowCobra?: boolean
+  isPaper?: boolean
+  isPano?: boolean
+  carrierIds?: string[] | null
+  groupNumber: string
+  status?: number
+  policyNumber?: string | null
+  tpacNumber?: string | null
+  customerNumber?: string | null
+  monthlyAdminFee?: number | null
+  renewalDate?: string | null
+  initialNotificationStartOn?: string | null
 }
 
 export type EmployerPaginatedListResponse = {
@@ -37,4 +76,6 @@ export type EmployerPaginatedListResponse = {
   totalPages?: number
 }
 
-export type EmployerListResponse = EmployerApiItem[] | EmployerPaginatedListResponse
+export type EmployerListResponse =
+  | EmployerApiItem[]
+  | EmployerPaginatedListResponse
