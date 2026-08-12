@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 
 import { getGroupTypeLookupCodesApi } from '#/api/lookup-code/lookup-code.api.ts'
 
-import type { SelectOption } from '#/components/admin/plan/ConfigurableSelect.tsx'
+import type { SelectOption } from '#/components/admin/common/ConfigurableSelect.tsx'
 
 export function useGroupTypeOptions() {
   const query = useQuery({

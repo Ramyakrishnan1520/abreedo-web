@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { useFormContext } from 'react-hook-form'
 
 import { Checkbox } from '#/components/ui/checkbox.tsx'
@@ -9,13 +10,7 @@ import {
   FormMessage,
 } from '#/components/ui/Form'
 import { Input } from '#/components/ui/input.tsx'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '#/components/ui/select.tsx'
+import { ConfigurableSelect } from '#/components/admin/common/ConfigurableSelect.tsx'
 import {
   FORM_INPUT_CLASS,
   LABEL_COL,
@@ -29,6 +24,14 @@ const copy = EMPLOYER_CONTENT.companyGroupStep
 
 export function CompanyGroupStep() {
   const form = useFormContext<EmployerFormValues>()
+
+  const statusOptions = useMemo(
+    () => [
+      { value: '1', label: copy.statusActive },
+      { value: '0', label: copy.statusInactive },
+    ],
+    [],
+  )
 
   return (
     <div className="space-y-6">
@@ -141,23 +144,15 @@ export function CompanyGroupStep() {
               {copy.statusLabel}
             </FormLabel>
             <div className="space-y-1">
-              <Select
-                onValueChange={(val) => field.onChange(Number(val))}
-                value={String(field.value ?? 1)}
-              >
-                <FormControl>
-                  <SelectTrigger
-                    id="employer-status"
-                    className={`${FORM_INPUT_CLASS} w-full justify-between`}
-                  >
-                    <SelectValue placeholder={copy.statusActive} />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent className="bg-white">
-                  <SelectItem value="1">{copy.statusActive}</SelectItem>
-                  <SelectItem value="0">{copy.statusInactive}</SelectItem>
-                </SelectContent>
-              </Select>
+              <FormControl>
+                <ConfigurableSelect
+                  id="employer-status"
+                  value={String(field.value ?? 1)}
+                  onValueChange={(val) => field.onChange(Number(val))}
+                  options={statusOptions}
+                  triggerClassName={FORM_INPUT_CLASS}
+                />
+              </FormControl>
               <FormMessage />
             </div>
           </FormItem>
@@ -166,7 +161,7 @@ export function CompanyGroupStep() {
 
       {/* Checkboxes Options */}
       <div className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-start sm:gap-4">
-        <label className={`${LABEL_COL}`}>Options</label>
+        <label className={LABEL_COL}>Options</label>
         <div className="flex flex-wrap items-center gap-6 pt-0.5 sm:pt-2">
           {/* Use Paper Invoice */}
           <FormField

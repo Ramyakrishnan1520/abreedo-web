@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useFormContext } from 'react-hook-form'
-import { Loader2 } from 'lucide-react'
 
 import {
   FormControl,
@@ -10,14 +9,8 @@ import {
   FormMessage,
 } from '#/components/ui/Form'
 import { Input } from '#/components/ui/input.tsx'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '#/components/ui/select.tsx'
 import { Separator } from '#/components/ui/separator.tsx'
+import { ConfigurableSelect } from '#/components/admin/common/ConfigurableSelect.tsx'
 import {
   FORM_INPUT_CLASS,
   LABEL_COL,
@@ -56,9 +49,9 @@ export function GeneralStep() {
 
   const parentCompanyOptions = useMemo(
     () =>
-      parentCompanies.filter(
-        (pc) => Boolean(pc.id && String(pc.id).trim() !== ''),
-      ),
+      parentCompanies
+        .filter((pc) => Boolean(pc.id && String(pc.id).trim() !== ''))
+        .map((pc) => ({ value: pc.id, label: pc.name })),
     [parentCompanies],
   )
 
@@ -66,7 +59,7 @@ export function GeneralStep() {
   useEffect(() => {
     const currentId = form.getValues('parentCompanyId')
     if (!currentId && parentCompanyOptions.length > 0) {
-      form.setValue('parentCompanyId', parentCompanyOptions[0].id, {
+      form.setValue('parentCompanyId', parentCompanyOptions[0].value, {
         shouldValidate: true,
       })
     }
@@ -74,6 +67,11 @@ export function GeneralStep() {
 
   const { data: states = [], isLoading: isLoadingStates, isError: isStatesError } =
     useGetStates()
+
+  const stateOptions = useMemo(
+    () => states.map((s) => ({ value: s.name, label: s.name })),
+    [states],
+  )
 
   return (
     <div className="space-y-6">
@@ -111,44 +109,23 @@ export function GeneralStep() {
               {copy.parentCompanyLabel}
             </FormLabel>
             <div className="space-y-1">
-              <Select
-                value={field.value || ''}
-                onValueChange={field.onChange}
-                disabled={isLoadingParentCompanies}
-                open={parentCompanySelectOpen}
-                onOpenChange={setParentCompanySelectOpen}
-              >
-                <FormControl>
-                  <SelectTrigger
-                    id="employer-parent-company"
-                    className={`${FORM_INPUT_CLASS} w-full justify-between`}
-                  >
-                    <SelectValue placeholder={copy.parentCompanySelectPlaceholder} />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent
-                  ref={setParentCompanySelectContent}
-                  position="popper"
-                  className="max-h-60 bg-white"
-                >
-                  {parentCompanyOptions.map((pc) => (
-                    <SelectItem key={pc.id} value={pc.id}>
-                      {pc.name}
-                    </SelectItem>
-                  ))}
-                  <div
-                    ref={parentCompanyLoadMoreRef}
-                    className="h-px"
-                    aria-hidden
-                  />
-                  {isFetchingNextParentCompaniesPage ? (
-                    <div className="flex items-center justify-center gap-2 py-2 text-xs text-slate-500">
-                      <Loader2 className="size-3.5 animate-spin" />
-                      Loading more...
-                    </div>
-                  ) : null}
-                </SelectContent>
-              </Select>
+              <FormControl>
+                <ConfigurableSelect
+                  id="employer-parent-company"
+                  value={field.value || ''}
+                  onValueChange={field.onChange}
+                  options={parentCompanyOptions}
+                  placeholder={copy.parentCompanySelectPlaceholder}
+                  loading={isLoadingParentCompanies}
+                  loadingPlaceholder={copy.parentCompanyLoadingPlaceholder}
+                  open={parentCompanySelectOpen}
+                  onOpenChange={setParentCompanySelectOpen}
+                  onContentRef={setParentCompanySelectContent}
+                  loadMoreRef={parentCompanyLoadMoreRef}
+                  isFetchingNextPage={isFetchingNextParentCompaniesPage}
+                  triggerClassName={FORM_INPUT_CLASS}
+                />
+              </FormControl>
               <FormMessage />
             </div>
           </FormItem>
@@ -246,33 +223,22 @@ export function GeneralStep() {
                   {copy.stateLabel}
                 </FormLabel>
                 <div className="space-y-1">
-                  <Select
-                    onValueChange={field.onChange}
-                    value={field.value || ''}
-                    disabled={isLoadingStates || isStatesError}
-                  >
-                    <FormControl>
-                      <SelectTrigger
-                        id="employer-state"
-                        className={`${FORM_INPUT_CLASS} w-full justify-between`}
-                      >
-                        <SelectValue
-                          placeholder={
-                            isLoadingStates
-                              ? copy.stateLoadingPlaceholder
-                              : copy.stateSelectPlaceholder
-                          }
-                        />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent className="max-h-60 bg-white">
-                      {states.map((stateItem) => (
-                        <SelectItem key={stateItem.id} value={stateItem.id}>
-                          {stateItem.name}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                  <FormControl>
+                    <ConfigurableSelect
+                      id="employer-state"
+                      value={field.value || ''}
+                      onValueChange={field.onChange}
+                      options={stateOptions}
+                      placeholder={
+                        isLoadingStates
+                          ? copy.stateLoadingPlaceholder
+                          : copy.stateSelectPlaceholder
+                      }
+                      loading={isLoadingStates}
+                      disabled={isStatesError}
+                      triggerClassName={FORM_INPUT_CLASS}
+                    />
+                  </FormControl>
                   {isStatesError ? (
                     <p className="text-xs text-destructive">{copy.stateLoadError}</p>
                   ) : null}

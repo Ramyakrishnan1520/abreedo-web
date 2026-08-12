@@ -93,3 +93,5 @@ export function ConfigurableSelect({
     </div>
   )
 }
+
+export default ConfigurableSelect

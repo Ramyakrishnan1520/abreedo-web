@@ -1,14 +1,8 @@
+import { useMemo } from 'react'
 import { useFormContext } from 'react-hook-form'
 
 import { Checkbox } from '#/components/ui/checkbox.tsx'
 import { Input } from '#/components/ui/input.tsx'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '#/components/ui/select.tsx'
 import { Separator } from '#/components/ui/separator.tsx'
 import {
   FormControl,
@@ -17,10 +11,10 @@ import {
   FormLabel,
   FormMessage,
 } from '#/components/ui/Form'
+import { ConfigurableSelect } from '#/components/admin/common/ConfigurableSelect.tsx'
 import { FORM_INPUT_CLASS, LABEL_COL } from '#/components/admin/common/form-styles'
 import { useGetStates } from '#/hooks/carrier/useGetStates.ts'
 import { CARRIER_CONTENT } from '#/utils/carrier-content.ts'
-import { cn } from '#/lib/utils.ts'
 import type { CarrierFormValues } from '#/components/admin/carrier/carrier.schema.ts'
 
 const copy = CARRIER_CONTENT.generalStep
@@ -40,22 +34,20 @@ export function GeneralStep() {
     isError: statesError,
   } = useGetStates()
 
+  const stateOptions = useMemo(
+    () => (states ?? []).map((s) => ({ value: s.id, label: s.name })),
+    [states],
+  )
+
   return (
     <div className="space-y-6">
-      {/* Name (required) */}
+      {/* Carrier Name */}
       <FormField
         control={form.control}
         name="name"
         render={({ field }) => (
           <FormItem className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-start sm:gap-4">
-            <FormLabel
-              className={cn(
-                LABEL_COL,
-                'after:ml-0.5 after:text-destructive after:content-["*"]',
-              )}
-            >
-              {copy.nameLabel}
-            </FormLabel>
+            <FormLabel className={LABEL_COL}>{copy.nameLabel}</FormLabel>
             <div className="space-y-1">
               <FormControl>
                 <Input
@@ -71,20 +63,13 @@ export function GeneralStep() {
         )}
       />
 
-      {/* Group Title (required) */}
+      {/* Group Title */}
       <FormField
         control={form.control}
         name="groupTitle"
         render={({ field }) => (
           <FormItem className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-start sm:gap-4">
-            <FormLabel
-              className={cn(
-                LABEL_COL,
-                'after:ml-0.5 after:text-destructive after:content-["*"]',
-              )}
-            >
-              {copy.groupTitleLabel}
-            </FormLabel>
+            <FormLabel className={LABEL_COL}>{copy.groupTitleLabel}</FormLabel>
             <div className="space-y-1">
               <FormControl>
                 <Input
@@ -117,7 +102,6 @@ export function GeneralStep() {
                   onCheckedChange={field.onChange}
                 />
               </FormControl>
-              <FormMessage />
             </div>
           </FormItem>
         )}
@@ -125,7 +109,7 @@ export function GeneralStep() {
 
       <Separator />
 
-      {/* Additional Details section */}
+      {/* Primary Address Section */}
       <div className="space-y-4">
         <h3 className="text-sm font-bold uppercase tracking-wide text-slate-700">
           {copy.additionalDetailsHeading}
@@ -138,9 +122,7 @@ export function GeneralStep() {
             name="address1"
             render={({ field }) => (
               <FormItem className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-start sm:gap-4">
-                <FormLabel className={LABEL_COL}>
-                  {copy.address1Label}
-                </FormLabel>
+                <FormLabel className={LABEL_COL}>{copy.address1Label}</FormLabel>
                 <div className="space-y-1">
                   <FormControl>
                     <Input
@@ -162,9 +144,7 @@ export function GeneralStep() {
             name="address2"
             render={({ field }) => (
               <FormItem className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-start sm:gap-4">
-                <FormLabel className={LABEL_COL}>
-                  {copy.address2Label}
-                </FormLabel>
+                <FormLabel className={LABEL_COL}>{copy.address2Label}</FormLabel>
                 <div className="space-y-1">
                   <FormControl>
                     <Input
@@ -211,31 +191,20 @@ export function GeneralStep() {
                 <FormLabel className={LABEL_COL}>{copy.stateLabel}</FormLabel>
                 <div className="space-y-1">
                   <FormControl>
-                    <Select
-                      value={field.value || undefined}
+                    <ConfigurableSelect
+                      id="carrier-state"
+                      value={field.value || ''}
                       onValueChange={field.onChange}
-                      disabled={statesLoading}
-                    >
-                      <SelectTrigger
-                        id="carrier-state"
-                        className="h-9 w-full rounded-md border-slate-200 bg-slate-50/50 text-slate-900 focus:border-tan-dark focus:bg-white"
-                      >
-                        <SelectValue
-                          placeholder={
-                            statesLoading
-                              ? copy.stateLoadingPlaceholder
-                              : copy.stateSelectPlaceholder
-                          }
-                        />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {states?.map((s) => (
-                          <SelectItem key={s.id} value={s.id}>
-                            {s.name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                      options={stateOptions}
+                      placeholder={
+                        statesLoading
+                          ? copy.stateLoadingPlaceholder
+                          : copy.stateSelectPlaceholder
+                      }
+                      loading={statesLoading}
+                      disabled={statesError}
+                      triggerClassName={FORM_INPUT_CLASS}
+                    />
                   </FormControl>
                   {statesError ? (
                     <p className="text-xs font-medium text-destructive">
