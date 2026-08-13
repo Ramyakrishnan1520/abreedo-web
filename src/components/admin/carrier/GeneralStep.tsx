@@ -63,18 +63,18 @@ export function GeneralStep() {
         )}
       />
 
-      {/* Group Title */}
+      {/* Short description*/}
       <FormField
         control={form.control}
         name="groupTitle"
         render={({ field }) => (
           <FormItem className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-start sm:gap-4">
-            <FormLabel className={LABEL_COL}>{copy.groupTitleLabel}</FormLabel>
+            <FormLabel className={LABEL_COL}>{copy.shortDescriptionLabel}</FormLabel>
             <div className="space-y-1">
               <FormControl>
                 <Input
                   id="carrier-group-title"
-                  placeholder={copy.groupTitlePlaceholder}
+                  placeholder={copy.shortDescriptionPlaceholder}
                   className={FORM_INPUT_CLASS}
                   {...field}
                 />
