@@ -60,11 +60,13 @@ export async function getStatesApi(): Promise<GetStatesResponse> {
 
 export async function getCarriersApi(
   request: PaginationRequest,
+  search?: string,
 ): Promise<PaginatedResult<Carrier>> {
   const { data } = await apiClient.get<CarrierListResponse>('/api/v1/carriers', {
     params: {
       page: request.pageIndex + 1,
       pageSize: request.pageSize,
+      search: search?.trim() || undefined,
     },
   })
 
@@ -95,5 +97,10 @@ export async function updateCarrierApi(
 ): Promise<void> {
   await apiClient.put(`/api/v1/Carriers/${id}`, data)
 }
+
+export async function deleteCarrierApi(id: string): Promise<void> {
+  await apiClient.delete(`/api/v1/Carriers/${id}`)
+}
+
 
 

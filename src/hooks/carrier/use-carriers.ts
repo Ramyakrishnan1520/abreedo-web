@@ -9,12 +9,15 @@ const DEFAULT_PAGINATION: PaginationRequest = {
   pageSize: 100,
 }
 
-export function useCarriers(pagination?: PaginationRequest) {
+export function useCarriers(
+  pagination?: PaginationRequest,
+  search?: string,
+) {
   const req = pagination ?? DEFAULT_PAGINATION
 
   return useQuery({
-    queryKey: ['carriers', req.pageIndex, req.pageSize],
-    queryFn: () => getCarriersApi(req),
+    queryKey: ['carriers', req.pageIndex, req.pageSize, search ?? ''],
+    queryFn: () => getCarriersApi(req, search),
   })
 }
 

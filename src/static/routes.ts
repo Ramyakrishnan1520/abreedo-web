@@ -6,7 +6,6 @@ export const ROUTES = {
   ADMIN_USERS: '/admin/users',
   ADMIN_CARRIER: '/admin/carrier',
   ADMIN_CARRIERS: '/admin/carriers',
-  ADMIN_CARRIERS_LIST: '/admin/carriers/list',
   ADMIN_CARRIERS_NEW: '/admin/carriers/new',
   ADMIN_CARRIERS_EDIT: '/admin/carriers/edit',
   ADMIN_COVERAGE_CODES: '/admin/coverage-codes',

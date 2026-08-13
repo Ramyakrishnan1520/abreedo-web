@@ -1,4 +1,4 @@
-import { Pencil, Trash2 } from 'lucide-react'
+import { Eye, Pencil, Trash2 } from 'lucide-react'
 
 import { Button } from '#/components/ui/button.tsx'
 import { CARRIER_CONTENT } from '#/utils/carrier-content.ts'
@@ -7,8 +7,9 @@ import type { ColumnDef } from '@tanstack/react-table'
 import type { Carrier } from '#/types/carrier.ts'
 
 interface CarrierTableColumnActions {
-  onEdit: (carrier: Carrier) => void
-  onDelete: (carrier: Carrier) => void
+  onView?: (carrier: Carrier) => void
+  onEdit?: (carrier: Carrier) => void
+  onDelete?: (carrier: Carrier) => void
 }
 
 const { table: tableCopy } = CARRIER_CONTENT
@@ -18,10 +19,11 @@ function displayValue(value: string) {
 }
 
 export function getCarrierTableColumns({
+  onView,
   onEdit,
   onDelete,
 }: CarrierTableColumnActions): ColumnDef<Carrier>[] {
-  return [
+  const columns: ColumnDef<Carrier>[] = [
     {
       accessorKey: 'name',
       header: tableCopy.columns.name,
@@ -37,7 +39,28 @@ export function getCarrierTableColumns({
       header: tableCopy.columns.phone,
       cell: ({ row }) => displayValue(row.original.phone),
     },
-    {
+  ]
+
+  if (onView) {
+    columns.push({
+      id: 'view',
+      header: tableCopy.columns.view,
+      cell: ({ row }) => (
+        <Button
+          type="button"
+          variant="outline"
+          size="icon-sm"
+          aria-label={tableCopy.viewAria(row.original.name)}
+          onClick={() => onView(row.original)}
+        >
+          <Eye className="size-4" />
+        </Button>
+      ),
+    })
+  }
+
+  if (onEdit) {
+    columns.push({
       id: 'edit',
       header: tableCopy.columns.edit,
       cell: ({ row }) => (
@@ -51,8 +74,11 @@ export function getCarrierTableColumns({
           <Pencil className="size-4" />
         </Button>
       ),
-    },
-    {
+    })
+  }
+
+  if (onDelete) {
+    columns.push({
       id: 'delete',
       header: tableCopy.columns.delete,
       cell: ({ row }) => (
@@ -66,6 +92,9 @@ export function getCarrierTableColumns({
           <Trash2 className="size-4" />
         </Button>
       ),
-    },
-  ]
+    })
+  }
+
+  return columns
 }
+
