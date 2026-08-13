@@ -1,6 +1,7 @@
 export interface CoverageCode {
   id: number | string
   code: string
+  name?: string
   description: string
   carrierId?: string
   carrierName?: string
