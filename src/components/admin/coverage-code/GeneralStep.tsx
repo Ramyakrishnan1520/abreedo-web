@@ -1,15 +1,7 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useFormContext } from 'react-hook-form'
-import { Loader2 } from 'lucide-react'
 
 import { Input } from '#/components/ui/input.tsx'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '#/components/ui/select.tsx'
 import {
   FormControl,
   FormField,
@@ -17,6 +9,7 @@ import {
   FormLabel,
   FormMessage,
 } from '#/components/ui/Form'
+import { ConfigurableSelect } from '#/components/admin/common/ConfigurableSelect.tsx'
 import {
   FORM_INPUT_CLASS,
   LABEL_COL,
@@ -58,6 +51,7 @@ export function GeneralStep() {
   const [carrierSelectContent, setCarrierSelectContent] =
     useState<HTMLDivElement | null>(null)
   const [carrierSelectOpen, setCarrierSelectOpen] = useState(false)
+
   const carrierLoadMoreRef = useLoadMoreIntersection({
     hasNextPage: carriersHasNextPage,
     isFetchingNextPage: carriersFetchingNextPage,
@@ -65,6 +59,29 @@ export function GeneralStep() {
     enabled: carrierSelectOpen,
     root: carrierSelectContent,
   })
+
+  const carrierOptions = useMemo(
+    () => carriers.map((c) => ({ value: String(c.id), label: c.name })),
+    [carriers],
+  )
+
+  const classOptions = useMemo(
+    () =>
+      coverageClasses.map((cc) => ({
+        value: cc.coverageClassId,
+        label: cc.name || cc.code || '',
+      })),
+    [coverageClasses],
+  )
+
+  const typeOptions = useMemo(
+    () =>
+      coverageTypes.map((ct) => ({
+        value: ct.coverageTypeId,
+        label: ct.name || ct.code || '',
+      })),
+    [coverageTypes],
+  )
 
   return (
     <div className="space-y-6">
@@ -74,9 +91,7 @@ export function GeneralStep() {
         name="code"
         render={({ field }) => (
           <FormItem className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-start sm:gap-4">
-            <FormLabel
-              className={cn(LABEL_COL, REQUIRED_LABEL_CLASS)}
-            >
+            <FormLabel className={cn(LABEL_COL, REQUIRED_LABEL_CLASS)}>
               {copy.codeLabel}
             </FormLabel>
             <div className="space-y-1">
@@ -100,9 +115,7 @@ export function GeneralStep() {
         name="name"
         render={({ field }) => (
           <FormItem className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-start sm:gap-4">
-            <FormLabel
-              className={cn(LABEL_COL, REQUIRED_LABEL_CLASS)}
-            >
+            <FormLabel className={cn(LABEL_COL, REQUIRED_LABEL_CLASS)}>
               {copy.nameLabel}
             </FormLabel>
             <div className="space-y-1">
@@ -126,55 +139,29 @@ export function GeneralStep() {
         name="carrierId"
         render={({ field }) => (
           <FormItem className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-start sm:gap-4">
-            <FormLabel
-              className={cn(LABEL_COL, REQUIRED_LABEL_CLASS)}
-            >
+            <FormLabel className={cn(LABEL_COL, REQUIRED_LABEL_CLASS)}>
               {copy.carrierLabel}
             </FormLabel>
             <div className="space-y-1">
               <FormControl>
-                <Select
-                  value={field.value || undefined}
+                <ConfigurableSelect
+                  id="coverage-carrier"
+                  value={field.value || ''}
                   onValueChange={field.onChange}
-                  disabled={carriersLoading}
+                  options={carrierOptions}
+                  placeholder={copy.carrierSelectPlaceholder}
+                  loading={carriersLoading}
+                  loadingPlaceholder={copy.carrierLoadingPlaceholder}
                   open={carrierSelectOpen}
                   onOpenChange={setCarrierSelectOpen}
-                >
-                  <SelectTrigger
-                    id="coverage-carrier"
-                    className="h-9 w-full rounded-md border-slate-200 bg-slate-50/50 text-slate-900 focus:border-tan-dark focus:bg-white"
-                  >
-                    <SelectValue
-                      placeholder={
-                        carriersLoading
-                          ? copy.carrierLoadingPlaceholder
-                          : copy.carrierSelectPlaceholder
-                      }
-                    />
-                  </SelectTrigger>
-                  <SelectContent
-                    ref={setCarrierSelectContent}
-                    position="popper"
-                    className="max-h-60"
-                  >
-                    {carriers.map((c) => (
-                      <SelectItem key={c.id} value={String(c.id)}>
-                        {c.name}
-                      </SelectItem>
-                    ))}
-                    <div
-                      ref={carrierLoadMoreRef}
-                      className="h-px"
-                      aria-hidden
-                    />
-                    {carriersFetchingNextPage ? (
-                      <div className="flex items-center justify-center gap-2 py-2 text-xs text-slate-500">
-                        <Loader2 className="size-3.5 animate-spin" />
-                        {COVERAGE_CODE_CONTENT.form.loadingMoreCarriers}
-                      </div>
-                    ) : null}
-                  </SelectContent>
-                </Select>
+                  onContentRef={setCarrierSelectContent}
+                  loadMoreRef={carrierLoadMoreRef}
+                  isFetchingNextPage={carriersFetchingNextPage}
+                  loadingMoreLabel={
+                    COVERAGE_CODE_CONTENT.form.loadingMoreCarriers
+                  }
+                  triggerClassName={FORM_INPUT_CLASS}
+                />
               </FormControl>
               {carriersError ? (
                 <p className="text-xs font-medium text-destructive">
@@ -193,41 +180,25 @@ export function GeneralStep() {
         name="coverageClassId"
         render={({ field }) => (
           <FormItem className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-start sm:gap-4">
-            <FormLabel
-              className={cn(LABEL_COL, REQUIRED_LABEL_CLASS)}
-            >
+            <FormLabel className={cn(LABEL_COL, REQUIRED_LABEL_CLASS)}>
               {copy.coverageClassLabel}
             </FormLabel>
             <div className="space-y-1">
               <FormControl>
-                <Select
-                  value={field.value || undefined}
+                <ConfigurableSelect
+                  id="coverage-class"
+                  value={field.value || ''}
                   onValueChange={field.onChange}
-                  disabled={classesLoading}
-                >
-                  <SelectTrigger
-                    id="coverage-class"
-                    className="h-9 w-full rounded-md border-slate-200 bg-slate-50/50 text-slate-900 focus:border-tan-dark focus:bg-white"
-                  >
-                    <SelectValue
-                      placeholder={
-                        classesLoading
-                          ? copy.coverageClassLoadingPlaceholder
-                          : copy.coverageClassSelectPlaceholder
-                      }
-                    />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {coverageClasses.map((cc) => (
-                      <SelectItem
-                        key={cc.coverageClassId}
-                        value={cc.coverageClassId}
-                      >
-                        {cc.name || cc.code}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  options={classOptions}
+                  placeholder={
+                    classesLoading
+                      ? copy.coverageClassLoadingPlaceholder
+                      : copy.coverageClassSelectPlaceholder
+                  }
+                  loading={classesLoading}
+                  disabled={classesError}
+                  triggerClassName={FORM_INPUT_CLASS}
+                />
               </FormControl>
               {classesError ? (
                 <p className="text-xs font-medium text-destructive">
@@ -246,41 +217,25 @@ export function GeneralStep() {
         name="remittanceTypeId"
         render={({ field }) => (
           <FormItem className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-start sm:gap-4">
-            <FormLabel
-              className={cn(LABEL_COL, REQUIRED_LABEL_CLASS)}
-            >
+            <FormLabel className={cn(LABEL_COL, REQUIRED_LABEL_CLASS)}>
               {copy.coverageTypeLabel}
             </FormLabel>
             <div className="space-y-1">
               <FormControl>
-                <Select
-                  value={field.value || undefined}
+                <ConfigurableSelect
+                  id="coverage-type"
+                  value={field.value || ''}
                   onValueChange={field.onChange}
-                  disabled={typesLoading}
-                >
-                  <SelectTrigger
-                    id="coverage-type"
-                    className="h-9 w-full rounded-md border-slate-200 bg-slate-50/50 text-slate-900 focus:border-tan-dark focus:bg-white"
-                  >
-                    <SelectValue
-                      placeholder={
-                        typesLoading
-                          ? copy.coverageTypeLoadingPlaceholder
-                          : copy.coverageTypeSelectPlaceholder
-                      }
-                    />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {coverageTypes.map((ct) => (
-                      <SelectItem
-                        key={ct.coverageTypeId}
-                        value={ct.coverageTypeId}
-                      >
-                        {ct.name || ct.code}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  options={typeOptions}
+                  placeholder={
+                    typesLoading
+                      ? copy.coverageTypeLoadingPlaceholder
+                      : copy.coverageTypeSelectPlaceholder
+                  }
+                  loading={typesLoading}
+                  disabled={typesError}
+                  triggerClassName={FORM_INPUT_CLASS}
+                />
               </FormControl>
               {typesError ? (
                 <p className="text-xs font-medium text-destructive">

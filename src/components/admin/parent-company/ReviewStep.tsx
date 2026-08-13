@@ -1,14 +1,8 @@
-import type { ReactNode } from 'react'
+import { useMemo } from 'react'
 import { useFormContext } from 'react-hook-form'
 
 import { Badge } from '#/components/ui/badge.tsx'
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '#/components/ui/card.tsx'
-import { Separator } from '#/components/ui/separator.tsx'
+import ReviewSection from '#/components/admin/common/ReviwSection.tsx'
 import { PARENT_COMPANY_CONTENT } from '#/utils/parent-company-content.ts'
 import { resolveSelectedCarrierOptions } from '#/utils/resolveSelectedCarrierOptions.ts'
 import { useAvailableCarriers } from '#/hooks/parent-company/useAvailableCarriers.ts'
@@ -17,99 +11,76 @@ import type { ParentCompanyFormValues } from '#/types/parent-company.ts'
 
 const copy = PARENT_COMPANY_CONTENT.reviewStep
 
-function ReviewField({
-  label,
-  value,
-}: {
-  label: string
-  value: string | undefined
-}) {
-  return (
-    <div className="grid grid-cols-1 gap-1 sm:grid-cols-[180px_1fr] sm:gap-4">
-      <dt className="text-sm font-semibold text-slate-600">{label}</dt>
-      <dd className="text-sm text-slate-900">
-        {value?.trim() ? value : copy.emptyValue}
-      </dd>
-    </div>
-  )
-}
-
-function ReviewSection({
-  title,
-  children,
-}: {
-  title: string
-  children: ReactNode
-}) {
-  return (
-    <Card className="gap-0 py-0 shadow-xs">
-      <CardHeader className="border-b border-slate-200 px-5 py-4">
-        <CardTitle className="text-sm font-bold uppercase tracking-wide text-slate-700">
-          {title}
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-4 px-5 py-4">{children}</CardContent>
-    </Card>
-  )
-}
-
 export function ReviewStep() {
   const form = useFormContext<ParentCompanyFormValues>()
   const values = form.getValues()
   const { carriers } = useAvailableCarriers()
   const { data: states } = useGetStates()
 
-  const getStateName = (stateId: string) =>
-    states?.find((state) => state.id === stateId)?.name ?? stateId
+  const stateName = useMemo(() => {
+    if (!values.state) return undefined
+    return states?.find((s) => s.id === values.state)?.name ?? values.state
+  }, [states, values.state])
 
-  const selectedCarrierNames = resolveSelectedCarrierOptions(
-    values.carrierIds,
-    carriers,
-    values.linkedCarriers ?? [],
+  const selectedCarrierNames = useMemo(
+    () =>
+      resolveSelectedCarrierOptions(
+        values.carrierIds,
+        carriers,
+        values.linkedCarriers ?? [],
+      ),
+    [carriers, values.carrierIds, values.linkedCarriers],
   )
 
   const { sections, fields } = copy
 
+  const generalItems = [
+    { label: fields.name, value: values.name },
+    { label: fields.fullName, value: values.fullName },
+  ]
+
+  const addressItems = [
+    { label: fields.address1, value: values.address1 },
+    { label: fields.address2, value: values.address2 },
+    { label: fields.city, value: values.city },
+    { label: fields.state, value: stateName },
+    { label: fields.zipCode, value: values.zipCode },
+  ]
+
+  const contactItems = [
+    { label: fields.firstName, value: values.contact.firstName },
+    { label: fields.lastName, value: values.contact.lastName },
+    { label: fields.phone, value: values.contact.phoneNumber },
+    {
+      label: fields.alternativePhone,
+      value: values.contact.alternativePhoneNumber,
+    },
+    { label: fields.fax, value: values.contact.fax },
+    { label: fields.email, value: values.contact.email },
+    { label: fields.website, value: values.contact.website },
+  ]
+
+  const notesItems = [
+    { label: 'Allow Cobra', value: values.allowCobra ? 'Yes' : 'No' },
+    { label: 'Notes', value: values.notes },
+  ]
+
   return (
     <div className="space-y-4">
-      <div>
-        <h3 className="text-base font-bold text-slate-900">{copy.heading}</h3>
-        <p className="mt-1 text-sm text-slate-600">{copy.description}</p>
-      </div>
+      <ReviewSection title={sections.general} items={generalItems} />
 
-      <Separator />
+      <ReviewSection title={sections.primaryAddress} items={addressItems} />
 
-      <ReviewSection title={sections.general}>
-        <ReviewField label={fields.name} value={values.name} />
-        <ReviewField label={fields.fullName} value={values.fullName}/>
-      </ReviewSection>
+      <ReviewSection title={sections.contact} items={contactItems} />
 
-      <ReviewSection title={sections.primaryAddress}>
-        <ReviewField label={fields.address1} value={values.address1} />
-        <ReviewField label={fields.address2} value={values.address2} />
-        <ReviewField label={fields.city} value={values.city} />
-        <ReviewField label={fields.state} value={getStateName(values.state)} />
-        <ReviewField label={fields.zipCode} value={values.zipCode} />
-      </ReviewSection>
-
-      <ReviewSection title={sections.contact}>
-        <ReviewField label={fields.firstName} value={values.contact.firstName} />
-        <ReviewField label={fields.lastName} value={values.contact.lastName} />
-        <ReviewField label={fields.phone} value={values.contact.phoneNumber} />
-        <ReviewField
-          label={fields.alternativePhone}
-          value={values.contact.alternativePhoneNumber}
-        />
-        <ReviewField label={fields.fax} value={values.contact.fax} />
-        <ReviewField label={fields.email} value={values.contact.email} />
-        <ReviewField label={fields.website} value={values.contact.website} />
-      </ReviewSection>
-
-      <ReviewSection title={sections.carriers}>
+      <div className="space-y-3 rounded-xl border border-slate-200 bg-slate-50/50 p-4 sm:p-5">
+        <h4 className="text-xs font-bold uppercase tracking-wider text-tan-dark">
+          {sections.carriers}
+        </h4>
         {selectedCarrierNames.length === 0 ? (
           <p className="text-sm text-slate-500">{copy.noCarriersSelected}</p>
         ) : (
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-2 pt-1">
             {selectedCarrierNames.map((carrier) => (
               <Badge key={carrier.id} variant="secondary">
                 {carrier.name}
@@ -117,14 +88,9 @@ export function ReviewStep() {
             ))}
           </div>
         )}
-      </ReviewSection>
+      </div>
 
-      <ReviewField label="Allow Cobra" value={values.allowCobra ? 'Yes' : 'No'} />
-      <ReviewSection title={sections.notes}>
-        <p className="text-sm whitespace-pre-wrap text-slate-900">
-          {values.notes.trim() ? values.notes : copy.emptyValue}
-        </p>
-      </ReviewSection>
+      <ReviewSection title={sections.notes} items={notesItems} />
     </div>
   )
 }
