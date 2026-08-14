@@ -33,15 +33,22 @@ function getApiError(error: unknown): ApiError {
 
   const status = error.response?.status ?? 0
   const data = error.response?.data
-  const message =
-    typeof data === 'string'
-      ? data
-      : data &&
-          typeof data === 'object' &&
-          'message' in data &&
-          typeof data.message === 'string'
-        ? data.message
-        : error.message
+  let message = error.message
+
+  if (typeof data === 'string' && data.trim()) {
+    message = data.trim()
+  } else if (data && typeof data === 'object') {
+    const obj = data as Record<string, unknown>
+    if (typeof obj.title === 'string' && obj.title.trim()) {
+      message = obj.title.trim()
+    } else if (typeof obj.message === 'string' && obj.message.trim()) {
+      message = obj.message.trim()
+    } else if (typeof obj.detail === 'string' && obj.detail.trim()) {
+      message = obj.detail.trim()
+    } else if (typeof obj.error === 'string' && obj.error.trim()) {
+      message = obj.error.trim()
+    }
+  }
 
   return createApiError(status, message)
 }

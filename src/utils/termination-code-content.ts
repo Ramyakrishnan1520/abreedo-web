@@ -1,0 +1,171 @@
+export const TERMINATION_CODE_CONTENT = {
+  list: {
+    kicker: 'Site Manager',
+    title: 'Termination Codes',
+    description:
+      'Manage termination code records, COBRA notice requirements, and coverage rules.',
+    addButton: 'New Termination Code',
+    loadErrorFallback: 'Unable to load termination codes. Please try again.',
+    retry: 'Retry',
+  },
+  pages: {
+    index: {
+      kicker: 'Administration',
+      title: 'Update Termination Codes',
+      description:
+        'Select an action below to set up a new termination code or manage existing termination codes.',
+      chooseHeading: 'Please Choose',
+      cards: {
+        new: {
+          title: 'New Termination Code',
+          description: 'Create a new termination code for members',
+        },
+        update: {
+          title: 'Update Current Termination Code',
+          description: 'Update current termination codes for members',
+        },
+      },
+    },
+    new: {
+      formTitle: 'New Termination Code',
+    },
+    edit: {
+      kicker: 'Administration',
+      title: 'Termination Code Edit',
+      description:
+        'Search and select a termination code to load its details, then update using guided steps.',
+      selectLabel: 'Select Termination Code',
+      selectCardDescription:
+        'Search by termination code or name and choose to view or edit.',
+      selectPlaceholder: 'Choose a termination code',
+      selectLoadingPlaceholder: 'Loading termination codes...',
+      selectSearchPlaceholder: 'Search termination codes...',
+      selectNoResults: 'No termination codes match your search.',
+      selectPrompt: 'Choose a termination code to continue.',
+      emptyStateTitle: 'Ready when you are',
+      editingLabel: 'Editing:',
+      loadingDetails: 'Loading termination code details...',
+      searchPlaceholder: 'Search by termination code or name...',
+      searchButton: 'Search',
+      clearButton: 'Clear',
+      viewTitle: 'Termination Code Details',
+      viewDescription:
+        'View complete details for the selected termination code record.',
+      deleteButton: 'Delete',
+      backButton: 'Back',
+      editButton: 'Edit',
+      confirmDeleteTitle: 'Delete Termination Code',
+      confirmDeletePrompt:
+        'Are you sure you want to delete this termination code? This action cannot be undone.',
+      cancel: 'Cancel',
+      confirmDelete: 'Delete Termination Code',
+      errors: {
+        listLoad: 'Failed to load termination codes. Please try again.',
+        detailLoad:
+          'Failed to load termination code details. Please try again.',
+      },
+    },
+  },
+  table: {
+    emptyValue: '-',
+    columns: {
+      name: 'Name',
+      cobraTerm: 'COBRA Term',
+      coverageMonths: 'COBRA Term',
+      cobraNotice: 'COBRA Notice',
+      code: 'Termination Code',
+      view: 'View',
+      edit: 'Edit',
+      delete: 'Delete',
+    },
+    viewAria: (name: string) => `View ${name}`,
+    editAria: (name: string) => `Edit ${name}`,
+    deleteAria: (name: string) => `Delete ${name}`,
+  },
+  form: {
+    kicker: 'Site Manager',
+    defaultTitle: 'New Termination Code',
+    titles: {
+      create: 'Create Termination Code',
+      edit: 'Edit Termination Code',
+    },
+    saveLabels: {
+      create: 'Save',
+      edit: 'Save Changes',
+    },
+    navigation: {
+      back: 'Back',
+      next: 'Next',
+    },
+    steps: [
+      { id: 'general', label: 'General', index: 0 },
+      { id: 'review', label: 'Review', index: 1 },
+    ],
+    validationSummary: 'Please fix the highlighted fields before saving.',
+    actions: {
+      back: 'Back',
+      save: 'Save',
+    },
+  },
+  generalStep: {
+    heading: 'General Information',
+    description: 'Enter the main details for this termination code.',
+    codeLabel: 'Termination Code',
+    codePlaceholder: 'Enter termination code',
+    additionalDetailsHeading: 'Additional Details',
+    nameLabel: 'Name',
+    namePlaceholder: 'Enter name',
+    bccCodeLabel: 'BCC Code',
+    bccCodePlaceholder: 'Enter BCC code',
+    nepaCodeLabel: 'NEPA Code',
+    nepaCodePlaceholder: 'Enter NEPA code',
+    cobraNoticeLabel: 'COBRA Notice',
+    cobraTermLabel: 'COBRA Term',
+    cobraTermPlaceholder: 'Select COBRA term',
+    cobraMonthsLabel: 'COBRA Month',
+    cobraTermOptions: [
+      { value: '18months', label: '18 Months' },
+      { value: '36months', label: '36 Months' },
+      { value: 'non-standard', label: 'Non-Standard' },
+    ],
+  },
+  reviewStep: {
+    heading: 'Review & Save',
+    description: 'Confirm all details before saving the termination code.',
+    emptyValue: '—',
+    yes: 'Yes',
+    no: 'No',
+    sections: {
+      general: 'General Information',
+      additional: 'Additional Details',
+      cobra: 'COBRA Details',
+    },
+    fields: {
+      code: 'Termination Code',
+      name: 'Name',
+      bccCode: 'BCC Code',
+      nepaCode: 'NEPA Code',
+      cobraNotice: 'COBRA Notice',
+      cobraTerm: 'COBRA Term',
+      cobraMonths: 'COBRA Month(s)',
+    },
+  },
+  validation: {
+    codeRequired: 'Termination code is required',
+    codeMax: 'Termination code must below 2 characters',
+    nameRequired: 'Name is required',
+    nameMax: 'Name must be 100 characters or fewer',
+    bccCodeMax: 'BCC Code must be 50 characters or fewer',
+    nepaCodeMax: 'NEPA Code must be 50 characters or fewer',
+    cobraMonthsMin: 'COBRA Month must be 0 or greater',
+    cobraMonthsMax: 'COBRA Month must be 120 or fewer',
+  },
+  toasts: {
+    createSuccess: 'Termination code created successfully!',
+    createError: 'Failed to create termination code. Please try again.',
+    updateSuccess: 'Termination code updated successfully!',
+    updateError: 'Failed to update termination code. Please try again.',
+    deleteSuccess: 'Termination code deleted successfully!',
+    deleteError: 'Failed to delete termination code. Please try again.',
+  },
+} as const

@@ -8,6 +8,7 @@ import {
   Trash2,
 } from 'lucide-react'
 
+import { DeleteConfirmBanner } from '#/components/admin/common/DeleteConfirmBanner.tsx'
 import ReviewSection from '#/components/admin/common/ReviwSection.tsx'
 import { Badge } from '#/components/ui/badge.tsx'
 import { Button } from '#/components/ui/button.tsx'
@@ -207,45 +208,15 @@ export function CoverageCodeDetailView({
 
           {/* Delete Confirmation Banner */}
           {showConfirmDelete ? (
-            <div className="rounded-xl border border-destructive/30 bg-destructive/5 p-4 sm:p-5">
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div className="space-y-1">
-                  <p className="text-sm font-semibold text-destructive">
-                    {copy.confirmDeleteTitle}
-                  </p>
-                  <p className="text-xs text-slate-600">
-                    {copy.confirmDeletePrompt}
-                  </p>
-                </div>
-                <div className="flex items-center gap-2 shrink-0">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setShowConfirmDelete(false)}
-                    disabled={isDeleting}
-                    className="h-8 border-slate-300"
-                  >
-                    {copy.cancel}
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    size="sm"
-                    onClick={handleDelete}
-                    disabled={isDeleting}
-                    className="h-8 gap-1.5"
-                  >
-                    {isDeleting ? (
-                      <Loader2 className="size-3.5 animate-spin" />
-                    ) : (
-                      <Trash2 className="size-3.5" />
-                    )}
-                    {copy.confirmDelete}
-                  </Button>
-                </div>
-              </div>
-            </div>
+            <DeleteConfirmBanner
+              title={copy.confirmDeleteTitle}
+              prompt={copy.confirmDeletePrompt}
+              cancelLabel={copy.cancel}
+              confirmLabel={copy.confirmDelete}
+              isDeleting={isDeleting}
+              onCancel={() => setShowConfirmDelete(false)}
+              onConfirm={handleDelete}
+            />
           ) : null}
 
           {/* Integrated Actions Bar */}
