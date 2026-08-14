@@ -73,6 +73,8 @@ export const CARRIER_CONTENT = {
     emptyValue: '-',
     columns: {
       name: 'Name',
+      contactName: 'Contact Name',
+      email: 'Email',
       groupTitle: 'Group Title',
       phone: 'Phone',
       view: 'View',

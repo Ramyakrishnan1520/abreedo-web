@@ -30,14 +30,15 @@ export function getCarrierTableColumns({
       cell: ({ row }) => displayValue(row.original.name),
     },
     {
-      accessorKey: 'groupTitle',
-      header: tableCopy.columns.groupTitle,
-      cell: ({ row }) => displayValue(row.original.groupTitle),
+      accessorKey: 'contactName',
+      header: tableCopy.columns.contactName,
+      cell: ({ row }) =>
+        displayValue(row.original.contactName || row.original.contactFirst || ''),
     },
     {
-      accessorKey: 'phone',
-      header: tableCopy.columns.phone,
-      cell: ({ row }) => displayValue(row.original.phone),
+      accessorKey: 'email',
+      header: tableCopy.columns.email,
+      cell: ({ row }) => displayValue(row.original.email || ''),
     },
   ]
 

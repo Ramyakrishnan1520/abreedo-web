@@ -15,11 +15,19 @@ import type {
 } from '#/types/pagination.ts'
 
 function mapCarrier(item: CarrierApiItem): Carrier {
+  const contactName = [item.contactFirst, item.contactLast]
+    .filter(Boolean)
+    .join(' ')
+
   return {
     id: item.carrierId,
     name: item.name,
     groupTitle: item.groupNumber,
     phone: item.phone,
+    contactFirst: item.contactFirst,
+    contactLast: item.contactLast,
+    contactName: contactName || item.contactFirst || '',
+    email: item.email,
   }
 }
 

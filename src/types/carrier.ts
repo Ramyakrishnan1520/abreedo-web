@@ -1,8 +1,12 @@
 export interface Carrier {
   id: number | string
   name: string
-  groupTitle: string
-  phone: string
+  groupTitle?: string
+  phone?: string
+  contactFirst?: string
+  contactLast?: string
+  contactName?: string
+  email?: string
 }
 
 export interface CreateCarrierRequest {
