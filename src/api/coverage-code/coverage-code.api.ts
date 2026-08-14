@@ -16,10 +16,12 @@ import type {
 } from '#/types/pagination.ts'
 
 function mapCoverageCode(item: CoverageCodeApiItem): CoverageCode {
+  const codeName = item.title ?? item.description ?? ''
   return {
     id: item.coverageCodeId ?? item.id ?? item.code,
     code: item.code,
-    description: item.title ?? item.description ?? '',
+    name: codeName,
+    description: codeName,
     carrierId: item.carrierId,
     carrierName: item.carrierName,
     matrixName: item.matrixName,
@@ -73,6 +75,7 @@ export async function getCoverageTypesApi(): Promise<GetCoverageTypesResponse> {
 
 export async function getCoverageCodesApi(
   request: PaginationRequest,
+  search?: string,
 ): Promise<PaginatedResult<CoverageCode>> {
   const { data } = await apiClient.get<CoverageCodeListResponse>(
     '/api/v1/coverageCodes',
@@ -80,6 +83,7 @@ export async function getCoverageCodesApi(
       params: {
         page: request.pageIndex + 1,
         pageSize: request.pageSize,
+        search: search?.trim() || undefined,
       },
     },
   )
@@ -112,6 +116,10 @@ export async function updateCoverageCodeApi(
   data: CoverageCodeUpsertRequest,
 ): Promise<void> {
   await apiClient.put(`/api/v1/coverageCodes/${id}`, data)
+}
+
+export async function deleteCoverageCodeApi(id: string): Promise<void> {
+  await apiClient.delete(`/api/v1/coverageCodes/${id}`)
 }
 
 

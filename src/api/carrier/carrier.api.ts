@@ -15,11 +15,19 @@ import type {
 } from '#/types/pagination.ts'
 
 function mapCarrier(item: CarrierApiItem): Carrier {
+  const contactName = [item.contactFirst, item.contactLast]
+    .filter(Boolean)
+    .join(' ')
+
   return {
     id: item.carrierId,
     name: item.name,
     groupTitle: item.groupNumber,
     phone: item.phone,
+    contactFirst: item.contactFirst,
+    contactLast: item.contactLast,
+    contactName: contactName || item.contactFirst || '',
+    email: item.email,
   }
 }
 
@@ -60,11 +68,13 @@ export async function getStatesApi(): Promise<GetStatesResponse> {
 
 export async function getCarriersApi(
   request: PaginationRequest,
+  search?: string,
 ): Promise<PaginatedResult<Carrier>> {
   const { data } = await apiClient.get<CarrierListResponse>('/api/v1/carriers', {
     params: {
       page: request.pageIndex + 1,
       pageSize: request.pageSize,
+      search: search?.trim() || undefined,
     },
   })
 
@@ -95,5 +105,10 @@ export async function updateCarrierApi(
 ): Promise<void> {
   await apiClient.put(`/api/v1/Carriers/${id}`, data)
 }
+
+export async function deleteCarrierApi(id: string): Promise<void> {
+  await apiClient.delete(`/api/v1/Carriers/${id}`)
+}
+
 
 

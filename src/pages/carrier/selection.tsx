@@ -24,12 +24,6 @@ export function CarrierSelectionPage() {
 
         <div className="flex flex-col gap-4">
           <SelectionCard
-            title={pages.index.cards.list.title}
-            description={pages.index.cards.list.description}
-            to={ROUTES.ADMIN_CARRIERS_LIST}
-          />
-
-          <SelectionCard
             title={pages.index.cards.new.title}
             description={pages.index.cards.new.description}
             to={ROUTES.ADMIN_CARRIERS_NEW}
