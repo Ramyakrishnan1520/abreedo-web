@@ -1,9 +1,18 @@
 import { Loader2, Trash2 } from 'lucide-react'
 
-import { Button } from '#/components/ui/button.tsx'
-import { cn } from '#/lib/utils'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '#/components/ui/alert-dialog.tsx'
 
 export interface DeleteConfirmBannerProps {
+  open?: boolean
   title?: string
   prompt?: string
   cancelLabel?: string
@@ -11,10 +20,10 @@ export interface DeleteConfirmBannerProps {
   isDeleting?: boolean
   onCancel: () => void
   onConfirm: () => void
-  className?: string
 }
 
 export function DeleteConfirmBanner({
+  open = true,
   title = 'Delete Confirmation',
   prompt = 'Are you sure you want to delete this record? This action cannot be undone.',
   cancelLabel = 'Cancel',
@@ -22,48 +31,50 @@ export function DeleteConfirmBanner({
   isDeleting = false,
   onCancel,
   onConfirm,
-  className,
 }: DeleteConfirmBannerProps) {
   return (
-    <div
-      className={cn(
-        'rounded-xl border border-destructive/30 bg-destructive/5 p-4 sm:p-5',
-        className,
-      )}
+    <AlertDialog
+      open={open}
+      onOpenChange={(isOpen) => {
+        if (!isOpen && !isDeleting) {
+          onCancel()
+        }
+      }}
     >
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="space-y-1">
-          <p className="text-sm font-semibold text-destructive">{title}</p>
-          <p className="text-xs text-slate-600">{prompt}</p>
-        </div>
-        <div className="flex items-center gap-2 shrink-0">
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle className="text-destructive">
+            {title}
+          </AlertDialogTitle>
+          <AlertDialogDescription>{prompt}</AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel
+            id="delete-modal-cancel-btn"
             onClick={onCancel}
             disabled={isDeleting}
-            className="h-8 border-slate-300"
+            className="h-9 font-semibold text-slate-700"
           >
             {cancelLabel}
-          </Button>
-          <Button
-            type="button"
-            variant="destructive"
-            size="sm"
-            onClick={onConfirm}
+          </AlertDialogCancel>
+          <AlertDialogAction
+            id="delete-modal-confirm-btn"
+            onClick={(e) => {
+              e.preventDefault()
+              onConfirm()
+            }}
             disabled={isDeleting}
-            className="h-8 gap-1.5"
+            className="h-9 gap-1.5 font-semibold"
           >
             {isDeleting ? (
-              <Loader2 className="size-3.5 animate-spin" />
+              <Loader2 className="size-4 animate-spin text-white" />
             ) : (
-              <Trash2 className="size-3.5" />
+              <Trash2 className="size-4 text-white" />
             )}
             {confirmLabel}
-          </Button>
-        </div>
-      </div>
-    </div>
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   )
 }

@@ -98,6 +98,9 @@ export function TerminationCodeDetailView({
       onSuccess: () => {
         onDeleteSuccess()
       },
+      onError: () => {
+        setShowConfirmDelete(false)
+      },
     })
   }
 

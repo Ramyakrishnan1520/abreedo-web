@@ -129,6 +129,9 @@ export function CoverageCodeDetailView({
       onSuccess: () => {
         onDeleteSuccess()
       },
+      onError: () => {
+        setShowConfirmDelete(false)
+      },
     })
   }
 

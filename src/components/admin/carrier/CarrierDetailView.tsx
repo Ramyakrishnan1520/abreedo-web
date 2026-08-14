@@ -110,6 +110,9 @@ export function CarrierDetailView({
       onSuccess: () => {
         onDeleteSuccess()
       },
+      onError: () => {
+        setShowConfirmDelete(false)
+      },
     })
   }
 
