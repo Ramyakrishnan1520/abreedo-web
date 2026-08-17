@@ -211,14 +211,14 @@ export function GeneralStep() {
         )}
       />
 
-      {/* Coverage Type Dropdown (required) */}
+      {/* Remittance Type Dropdown (required) */}
       <FormField
         control={form.control}
         name="remittanceTypeId"
         render={({ field }) => (
           <FormItem className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-start sm:gap-4">
             <FormLabel className={cn(LABEL_COL, REQUIRED_LABEL_CLASS)}>
-              {copy.coverageTypeLabel}
+              {copy.remittanceTypeLabel}
             </FormLabel>
             <div className="space-y-1">
               <FormControl>
@@ -229,8 +229,8 @@ export function GeneralStep() {
                   options={typeOptions}
                   placeholder={
                     typesLoading
-                      ? copy.coverageTypeLoadingPlaceholder
-                      : copy.coverageTypeSelectPlaceholder
+                      ? copy.remittanceTypeLoadingPlaceholder
+                      : copy.remittanceTypeSelectPlaceholder
                   }
                   loading={typesLoading}
                   disabled={typesError}
@@ -239,7 +239,7 @@ export function GeneralStep() {
               </FormControl>
               {typesError ? (
                 <p className="text-xs font-medium text-destructive">
-                  {COVERAGE_CODE_CONTENT.form.coverageTypesLoadError}
+                  {COVERAGE_CODE_CONTENT.form.remittanceTypesLoadError}
                 </p>
               ) : null}
               <FormMessage />

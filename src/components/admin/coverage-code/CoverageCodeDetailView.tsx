@@ -95,7 +95,7 @@ export function CoverageCodeDetailView({
             { label: reviewCopy.fields.name, value: values.name },
             { label: reviewCopy.fields.carrier, value: carrierName },
             { label: reviewCopy.fields.coverageClass, value: coverageClassName },
-            { label: reviewCopy.fields.coverageType, value: coverageTypeName },
+            { label: reviewCopy.fields.remittanceType, value: coverageTypeName },
           ]
         : [],
     [values, carrierName, coverageClassName, coverageTypeName],

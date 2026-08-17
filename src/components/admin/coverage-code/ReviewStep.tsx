@@ -35,7 +35,7 @@ export function ReviewStep() {
     return match ? match.name || match.code : values.coverageClassId
   }, [coverageClasses, values.coverageClassId])
 
-  const coverageTypeName = useMemo(() => {
+  const remittanceTypeName = useMemo(() => {
     if (!values.remittanceTypeId) return undefined
     const match = coverageTypes.find(
       (ct) => ct.coverageTypeId === values.remittanceTypeId,
@@ -48,7 +48,7 @@ export function ReviewStep() {
     { label: copy.fields.name, value: values.name },
     { label: copy.fields.carrier, value: carrierName },
     { label: copy.fields.coverageClass, value: coverageClassName },
-    { label: copy.fields.coverageType, value: coverageTypeName },
+    { label: copy.fields.remittanceType, value: remittanceTypeName },
   ]
 
   const processingItems = [

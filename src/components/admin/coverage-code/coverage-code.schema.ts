@@ -12,13 +12,13 @@ export const coverageCodeSchema = z.object({
   codeInvoice: z
     .string()
     .min(1, v.combinationForBillRequired)
-    .max(100, v.combinationForBillMax)
+    .max(3, v.combinationForBillMax)
     .trim(),
   invoiceInclude: z.boolean(),
   codeReport: z
     .string()
     .min(1, v.combinationForReportsRequired)
-    .max(100, v.combinationForReportsMax)
+    .max(3, v.combinationForReportsMax)
     .trim(),
   title: z
     .string()
@@ -31,12 +31,12 @@ export const coverageCodeSchema = z.object({
     .max(100, v.shortDescriptionMax)
     .trim(),
   
-    remittanceTypeId: z.string().min(1, 'Coverage Type is required').trim(),
+    remittanceTypeId: z.string().min(1, v.remittanceTypeRequired).trim(),
 
   invoiceGroup: z
     .string()
-    .min(1, 'Invoice Group is required')
-    .max(100, 'Invoice Group must be 100 characters or fewer')
+    .min(1, v.invoiceGroupRequired)
+    .max(100, v.invoiceGroupMax)
     .trim(),
   notes: z.string().optional(),
 })
