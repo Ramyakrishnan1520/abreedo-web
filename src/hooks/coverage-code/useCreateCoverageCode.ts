@@ -3,6 +3,7 @@ import { toast } from 'sonner'
 
 import { createCoverageCodeApi } from '#/api/coverage-code/coverage-code.api.ts'
 import { COVERAGE_CODE_CONTENT } from '#/utils/coverage-code-content.ts'
+import { getApiErrorMessage } from '#/utils/getApiErrorMessage.ts'
 
 import type {
   CoverageCodeUpsertRequest,
@@ -23,8 +24,12 @@ export function useCreateCoverageCode() {
       toast.success(COVERAGE_CODE_CONTENT.toasts.createSuccess)
     },
     onError: (error) => {
-      console.error('Failed to create coverage code:', error.message)
-      toast.error(COVERAGE_CODE_CONTENT.toasts.createError)
+      console.error('Failed to create coverage code:', error)
+      const message = getApiErrorMessage(
+        error,
+        COVERAGE_CODE_CONTENT.toasts.createError,
+      )
+      toast.error(message)
     },
   })
 }

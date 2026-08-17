@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react'
 import {
   AlertCircle,
   ArrowLeft,
-  Building2,
+  FileText,
   Loader2,
   Pencil,
   Trash2,
@@ -18,95 +18,83 @@ import {
   CardHeader,
   CardTitle,
 } from '#/components/ui/card.tsx'
-import { useCarrier } from '#/hooks/carrier/useCarrierById'
-import { useDeleteCarrier } from '#/hooks/carrier/useDeleteCarrier'
-import { useGetStates } from '#/hooks/carrier/useGetStates'
-import { CARRIER_CONTENT } from '#/utils/carrier-content.ts'
-import { mapCarrierDetailToFormValues } from '#/utils/mapCarrierDetailToFormValues.ts'
+import { useDeleteTerminationCode } from '#/hooks/termination-code/useDeleteTerminationCode'
+import { useTerminationCodeById } from '#/hooks/termination-code/useTerminationCodeById'
+import { mapTerminationCodeDetailToFormValues } from '#/utils/mapTerminationCodeDetailToFormValues.ts'
+import { TERMINATION_CODE_CONTENT } from '#/utils/termination-code-content.ts'
 
-interface CarrierDetailViewProps {
-  carrierId: string
+interface TerminationCodeDetailViewProps {
+  terminationCodeId: string
   onBack: () => void
   onEdit: () => void
   onDeleteSuccess: () => void
 }
 
-const copy = CARRIER_CONTENT.pages.edit
-const reviewCopy = CARRIER_CONTENT.reviewStep
+const copy = TERMINATION_CODE_CONTENT.pages.edit
+const reviewCopy = TERMINATION_CODE_CONTENT.reviewStep
 
-export function CarrierDetailView({
-  carrierId,
+export function TerminationCodeDetailView({
+  terminationCodeId,
   onBack,
   onEdit,
   onDeleteSuccess,
-}: CarrierDetailViewProps) {
+}: TerminationCodeDetailViewProps) {
   const [showConfirmDelete, setShowConfirmDelete] = useState(false)
-  const { data: carrierDetail, isLoading, isError } = useCarrier(carrierId)
-  const { data: states = [] } = useGetStates()
-  const { mutate: deleteCarrier, isPending: isDeleting } = useDeleteCarrier()
+  const {
+    data: detail,
+    isLoading,
+    isError,
+  } = useTerminationCodeById(terminationCodeId)
+
+  const { mutate: deleteTerminationCode, isPending: isDeleting } =
+    useDeleteTerminationCode()
 
   const values = useMemo(
-    () => (carrierDetail ? mapCarrierDetailToFormValues(carrierDetail) : null),
-    [carrierDetail],
+    () => (detail ? mapTerminationCodeDetailToFormValues(detail) : null),
+    [detail],
   )
-
-  const stateName = useMemo(() => {
-    if (!values?.state) return undefined
-    return states.find((s) => s.id === values.state)?.name ?? values.state
-  }, [states, values?.state])
-
 
   const generalItems = useMemo(
     () =>
       values
         ? [
+            { label: reviewCopy.fields.code, value: values.code },
             { label: reviewCopy.fields.name, value: values.name },
-            { label: reviewCopy.fields.groupTitle, value: values.groupTitle },
-            {
-              label: reviewCopy.fields.allowFlexibleDates,
-              value: values.allowFlexibleDates ? reviewCopy.yes : reviewCopy.no,
-            },
           ]
         : [],
     [values],
   )
 
-  const addressItems = useMemo(
+  const additionalItems = useMemo(
     () =>
       values
         ? [
-            { label: reviewCopy.fields.address1, value: values.address1 },
-            { label: reviewCopy.fields.address2, value: values.address2 },
-            { label: reviewCopy.fields.city, value: values.city },
-            { label: reviewCopy.fields.state, value: stateName },
-            { label: reviewCopy.fields.zip, value: values.zip },
+            { label: reviewCopy.fields.bccCode, value: values.bccCode },
+            { label: reviewCopy.fields.nepaCode, value: values.nepaCode },
           ]
         : [],
-    [values, stateName],
+    [values],
   )
 
-  const contactItems = useMemo(
+  const cobraItems = useMemo(
     () =>
       values
-        ? [
-            {
-              label: reviewCopy.fields.contactFirstName,
-              value: values.contactFirstName,
-            },
-            {
-              label: reviewCopy.fields.contactLastName,
-              value: values.contactLastName,
-            },
-            { label: reviewCopy.fields.phone, value: values.phone },
-            { label: reviewCopy.fields.fax, value: values.fax },
-            { label: reviewCopy.fields.email, value: values.email },
-          ]
+        ? values.cobraNotice
+          ? [
+              { label: reviewCopy.fields.cobraNotice, value: reviewCopy.yes },
+              { label: reviewCopy.fields.cobraTerm, value: values.cobraTerm },
+              {
+                label: reviewCopy.fields.cobraMonths,
+                value: String(values.cobraMonths ?? 0),
+              },
+            ]
+          : [{ label: reviewCopy.fields.cobraNotice, value: reviewCopy.no }]
         : [],
     [values],
   )
 
   const handleDelete = () => {
-    deleteCarrier(carrierId, {
+    deleteTerminationCode(terminationCodeId, {
       onSuccess: () => {
         onDeleteSuccess()
       },
@@ -158,16 +146,16 @@ export function CarrierDetailView({
           <div className="flex items-start justify-between gap-4">
             <div className="flex gap-4">
               <div className="flex size-11 shrink-0 items-center justify-center rounded-xl border border-tan-dark/15 bg-white text-tan-dark shadow-xs">
-                <Building2 className="size-5" aria-hidden />
+                <FileText className="size-5" aria-hidden />
               </div>
               <div className="min-w-0 space-y-1">
                 <div className="flex items-center gap-2">
                   <CardTitle className="text-xl font-bold text-slate-900">
-                    {values.name}
+                    {values.name || values.code}
                   </CardTitle>
-                  {values.groupTitle ? (
+                  {values.code ? (
                     <Badge variant="secondary" className="font-medium">
-                      {values.groupTitle}
+                      {values.code}
                     </Badge>
                   ) : null}
                 </div>
@@ -182,12 +170,12 @@ export function CarrierDetailView({
             items={generalItems}
           />
           <ReviewSection
-            title={reviewCopy.sections.primaryAddress}
-            items={addressItems}
+            title={reviewCopy.sections.additional}
+            items={additionalItems}
           />
           <ReviewSection
-            title={reviewCopy.sections.contact}
-            items={contactItems}
+            title={reviewCopy.sections.cobra}
+            items={cobraItems}
           />
 
           {/* Delete Confirmation Banner */}
@@ -206,7 +194,7 @@ export function CarrierDetailView({
           {/* Integrated Actions Bar */}
           <div className="flex items-center justify-between gap-3 border-t border-slate-200 pt-5 mt-6">
             <Button
-              id="carrier-view-delete-btn"
+              id="termination-code-view-delete-btn"
               type="button"
               variant="destructive"
               onClick={() => setShowConfirmDelete(true)}
@@ -219,7 +207,7 @@ export function CarrierDetailView({
 
             <div className="flex items-center gap-3">
               <Button
-                id="carrier-view-back-btn"
+                id="termination-code-view-back-btn"
                 type="button"
                 variant="outline"
                 onClick={onBack}
@@ -230,7 +218,7 @@ export function CarrierDetailView({
                 {copy.backButton}
               </Button>
               <Button
-                id="carrier-view-edit-btn"
+                id="termination-code-view-edit-btn"
                 type="button"
                 onClick={onEdit}
                 disabled={isDeleting}

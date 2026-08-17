@@ -3,6 +3,7 @@ import { toast } from 'sonner'
 
 import { updateCarrierApi } from '#/api/carrier/carrier.api.ts'
 import { CARRIER_CONTENT } from '#/utils/carrier-content.ts'
+import { getApiErrorMessage } from '#/utils/getApiErrorMessage.ts'
 
 import type { CreateCarrierRequest } from '#/types/carrier.ts'
 
@@ -22,8 +23,12 @@ export function useUpdateCarrier() {
       toast.success(CARRIER_CONTENT.toasts.updateSuccess)
     },
     onError: (error) => {
-      console.error('Failed to update carrier:', error.message)
-      toast.error(CARRIER_CONTENT.toasts.updateError)
+      console.error('Failed to update carrier:', error)
+      const message = getApiErrorMessage(
+        error,
+        CARRIER_CONTENT.toasts.updateError,
+      )
+      toast.error(message)
     },
   })
 }
