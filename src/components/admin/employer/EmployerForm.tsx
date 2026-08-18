@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -22,6 +22,7 @@ import {
   type EmployerFormValues,
 } from '#/components/admin/employer/employer.schema.ts'
 import { useCreateEmployer } from '#/hooks/employer/useCreateEmployer.ts'
+import { useUpdateEmployer } from '#/hooks/employer/useUpdateEmployer.ts'
 import { EMPLOYER_CONTENT } from '#/utils/employer-content.ts'
 import { getEmployerStepValidationFields } from '#/utils/getEmployerStepValidationFields.ts'
 
@@ -50,6 +51,7 @@ const STEP_COMPONENTS = [
 
 export function EmployerForm({
   mode = 'create',
+  employerId,
   defaultValues,
   initialValues,
   onBack,
@@ -57,7 +59,9 @@ export function EmployerForm({
   title,
 }: EmployerFormProps) {
   const [currentStep, setCurrentStep] = useState(0)
-  const { mutate: createEmployer, isPending } = useCreateEmployer()
+  const { mutate: createEmployer, isPending: isCreating } = useCreateEmployer()
+  const { mutate: updateEmployer, isPending: isUpdating } = useUpdateEmployer()
+  const isPending = isCreating || isUpdating
 
   const resolvedTitle =
     title ??
@@ -75,6 +79,16 @@ export function EmployerForm({
     mode: 'onSubmit',
     reValidateMode: 'onSubmit',
   })
+
+  useEffect(() => {
+    if (mode === 'edit' && initialValues) {
+      form.reset({
+        ...EMPLOYER_DEFAULT_VALUES,
+        ...initialValues,
+      })
+      setCurrentStep(0)
+    }
+  }, [form, initialValues, mode])
 
   const isFirstStep = currentStep === 0
   const isLastStep = currentStep === EMPLOYER_STEPS.length - 1
@@ -132,11 +146,22 @@ export function EmployerForm({
       notes: data.notes || null,
     }
 
-    createEmployer(payload, {
-      onSuccess: () => {
-        onSuccess?.()
-      },
-    })
+    if (mode === 'edit' && employerId) {
+      updateEmployer(
+        { id: employerId, data: payload },
+        {
+          onSuccess: () => {
+            onSuccess?.()
+          },
+        },
+      )
+    } else {
+      createEmployer(payload, {
+        onSuccess: () => {
+          onSuccess?.()
+        },
+      })
+    }
   }
 
   const handleSave = () => {

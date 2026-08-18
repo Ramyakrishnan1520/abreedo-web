@@ -5,8 +5,14 @@ export interface Employer {
   parentCompanyName: string
 }
 
+export interface EmployerLinkedCarrier {
+  carrierId: string
+  name: string
+}
+
 export interface EmployerApiItem {
   employerId: string
+  id?: string
   name?: string | null
   parentCompanyId?: string | null
   parentCompanyName?: string | null
@@ -26,6 +32,7 @@ export interface EmployerApiItem {
   isPaper?: boolean
   isPano?: boolean
   carrierIds?: string[] | null
+  carriers?: EmployerLinkedCarrier[] | null
   groupNumber?: string | null
   status?: number | null
   policyNumber?: string | null
@@ -34,6 +41,9 @@ export interface EmployerApiItem {
   monthlyAdminFee?: number | null
   renewalDate?: string | null
   initialNotificationStartOn?: string | null
+  groupPlan?: string | null
+  groupTypeId?: string | null
+  groupNotes?: string | null
 }
 
 export interface EmployerUpsertRequest {
@@ -63,6 +73,9 @@ export interface EmployerUpsertRequest {
   monthlyAdminFee?: number | null
   renewalDate?: string | null
   initialNotificationStartOn?: string | null
+  groupPlan?: string | null
+  groupTypeId?: string | null
+  groupNotes?: string | null
 }
 
 export type EmployerPaginatedListResponse = {

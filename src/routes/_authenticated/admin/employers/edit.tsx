@@ -1,11 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import { RoutePlaceholderPage } from '#/components/RoutePlaceholderPage.tsx'
+import { EditEmployerPage } from '#/pages/employer/edit.tsx'
 
 export const Route = createFileRoute('/_authenticated/admin/employers/edit')({
   component: EditEmployerPage,
 })
-
-function EditEmployerPage() {
-  return <RoutePlaceholderPage title="Employer Edit" section="Administration" />
-}

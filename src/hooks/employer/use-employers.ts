@@ -12,11 +12,18 @@ const DEFAULT_PAGINATION: PaginationRequest = {
 export function useEmployers(
   parentCompanyId?: string,
   pagination?: PaginationRequest,
+  search?: string,
 ) {
   const req = pagination ?? DEFAULT_PAGINATION
 
   return useQuery({
-    queryKey: ['employers', parentCompanyId ?? 'all', req.pageIndex, req.pageSize],
-    queryFn: () => getEmployersApi(req, parentCompanyId),
+    queryKey: [
+      'employers',
+      parentCompanyId ?? 'all',
+      req.pageIndex,
+      req.pageSize,
+      search ?? '',
+    ],
+    queryFn: () => getEmployersApi(req, parentCompanyId, search),
   })
 }
