@@ -10,9 +10,8 @@ export function useDeleteCoverageCode() {
 
   return useMutation<void, Error, string>({
     mutationFn: (id: string) => deleteCoverageCodeApi(id),
-    onSuccess: (_, id) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['coverage-codes'] })
-      queryClient.invalidateQueries({ queryKey: ['coverage-codes', id] })
       toast.success(COVERAGE_CODE_CONTENT.toasts.deleteSuccess)
     },
     onError: (error) => {

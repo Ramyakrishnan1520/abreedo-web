@@ -13,6 +13,7 @@ import {
 import { ConfigurableSelect } from '#/components/admin/common/ConfigurableSelect.tsx'
 import {
   FORM_INPUT_CLASS,
+  FORM_LABEL_CLASS,
   REQUIRED_LABEL_CLASS,
 } from '#/components/admin/common/form-styles.ts'
 import { PARENT_COMPANY_CONTENT } from '#/utils/parent-company-content.ts'
@@ -70,7 +71,7 @@ export function GeneralStep() {
         name="fullName"
         render={({ field }) => (
           <FormItem className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-start sm:gap-4">
-            <FormLabel className={REQUIRED_LABEL_CLASS}>
+            <FormLabel className={FORM_LABEL_CLASS}>
               {copy.fullnameLabel}
             </FormLabel>
             <div className="space-y-1">
@@ -104,7 +105,7 @@ export function GeneralStep() {
             name="address1"
             render={({ field }) => (
               <FormItem className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-start sm:gap-4">
-                <FormLabel className={REQUIRED_LABEL_CLASS}>
+                <FormLabel className={FORM_LABEL_CLASS}>
                   {copy.address1Label}
                 </FormLabel>
                 <div className="space-y-1">
@@ -126,7 +127,7 @@ export function GeneralStep() {
             name="address2"
             render={({ field }) => (
               <FormItem className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-start sm:gap-4">
-                <FormLabel className={REQUIRED_LABEL_CLASS}>
+                <FormLabel className={FORM_LABEL_CLASS}>
                   {copy.address2Label}
                 </FormLabel>
                 <div className="space-y-1">
@@ -148,7 +149,7 @@ export function GeneralStep() {
             name="city"
             render={({ field }) => (
               <FormItem className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-start sm:gap-4">
-                <FormLabel className={REQUIRED_LABEL_CLASS}>
+                <FormLabel className={FORM_LABEL_CLASS}>
                   {copy.cityLabel}
                 </FormLabel>
                 <div className="space-y-1">
@@ -170,7 +171,7 @@ export function GeneralStep() {
             name="state"
             render={({ field }) => (
               <FormItem className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-start sm:gap-4">
-                <FormLabel className={REQUIRED_LABEL_CLASS}>
+                <FormLabel className={FORM_LABEL_CLASS}>
                   {copy.stateLabel}
                 </FormLabel>
                 <div className="space-y-1">
@@ -205,7 +206,7 @@ export function GeneralStep() {
             name="zipCode"
             render={({ field }) => (
               <FormItem className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-start sm:gap-4">
-                <FormLabel className={REQUIRED_LABEL_CLASS}>
+                <FormLabel className={FORM_LABEL_CLASS}>
                   {copy.zipCodeLabel}
                 </FormLabel>
                 <div className="space-y-1">

@@ -10,9 +10,8 @@ export function useDeleteCarrier() {
 
   return useMutation<void, Error, string>({
     mutationFn: (id: string) => deleteCarrierApi(id),
-    onSuccess: (_, id) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['carriers'] })
-      queryClient.invalidateQueries({ queryKey: ['carriers', id] })
       toast.success(CARRIER_CONTENT.toasts.deleteSuccess)
     },
     onError: (error) => {

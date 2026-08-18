@@ -32,6 +32,7 @@ interface ParentCompanyFormProps {
   mode: ParentCompanyFormMode
   parentCompanyId?: string
   initialValues?: ParentCompanyFormValues
+  onBack?: () => void
   onSuccess?: () => void
 }
 
@@ -47,6 +48,7 @@ export function ParentCompanyForm({
   mode,
   parentCompanyId,
   initialValues,
+  onBack,
   onSuccess,
 }: ParentCompanyFormProps) {
   const [currentStep, setCurrentStep] = useState(0)
@@ -86,6 +88,10 @@ export function ParentCompanyForm({
   const handleBack = () => {
     if (!isFirstStep) {
       setCurrentStep((step) => step - 1)
+      return
+    }
+    if (onBack) {
+      onBack()
     }
   }
 
@@ -174,10 +180,11 @@ export function ParentCompanyForm({
           <div className="sticky bottom-0 border-t border-slate-200 bg-white/95 px-6 py-4 backdrop-blur-sm sm:px-8">
             <div className="flex items-center justify-between gap-3">
               <Button
+                id="parent-company-form-back-btn"
                 type="button"
                 variant="outline"
                 onClick={handleBack}
-                disabled={isFirstStep || isPending}
+                disabled={(!onBack && isFirstStep) || isPending}
                 className="h-9 rounded-md border-slate-200 px-6 font-semibold text-slate-700 shadow-xs hover:bg-slate-100"
               >
                 {formCopy.navigation.back}
