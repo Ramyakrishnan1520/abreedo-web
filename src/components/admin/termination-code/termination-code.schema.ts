@@ -33,8 +33,7 @@ export const terminationCodeSchema = z.object({
     .number()
     .int()
     .min(0, val.cobraMonthsMin)
-    .max(120, val.cobraMonthsMax)
-    .optional(),
+    .max(120, val.cobraMonthsMax),
 })
 
 export type TerminationCodeFormValues = z.infer<typeof terminationCodeSchema>

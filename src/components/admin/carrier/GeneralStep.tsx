@@ -12,7 +12,8 @@ import {
   FormMessage,
 } from '#/components/ui/Form'
 import { ConfigurableSelect } from '#/components/admin/common/ConfigurableSelect.tsx'
-import { FORM_INPUT_CLASS, LABEL_COL } from '#/components/admin/common/form-styles'
+import { FORM_INPUT_CLASS, LABEL_COL , REQUIRED_LABEL_CLASS } from '#/components/admin/common/form-styles'
+import { cn } from '#/lib/utils.ts'
 import { useGetStates } from '#/hooks/carrier/useGetStates.ts'
 import { CARRIER_CONTENT } from '#/utils/carrier-content.ts'
 import type { CarrierFormValues } from '#/components/admin/carrier/carrier.schema.ts'
@@ -47,7 +48,7 @@ export function GeneralStep() {
         name="name"
         render={({ field }) => (
           <FormItem className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-start sm:gap-4">
-            <FormLabel className={LABEL_COL}>{copy.nameLabel}</FormLabel>
+            <FormLabel className={cn(LABEL_COL, REQUIRED_LABEL_CLASS)}>{copy.nameLabel}</FormLabel>
             <div className="space-y-1">
               <FormControl>
                 <Input
@@ -69,7 +70,7 @@ export function GeneralStep() {
         name="groupTitle"
         render={({ field }) => (
           <FormItem className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-start sm:gap-4">
-            <FormLabel className={LABEL_COL}>{copy.shortDescriptionLabel}</FormLabel>
+            <FormLabel className={cn(LABEL_COL, REQUIRED_LABEL_CLASS)}>{copy.shortDescriptionLabel}</FormLabel>
             <div className="space-y-1">
               <FormControl>
                 <Input

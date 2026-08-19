@@ -12,7 +12,6 @@ import {
 import {
   FORM_INPUT_CLASS,
   FORM_LABEL_CLASS,
-  REQUIRED_LABEL_CLASS,
 } from '#/components/admin/common/form-styles.ts'
 import { PARENT_COMPANY_CONTENT } from '#/utils/parent-company-content.ts'
 import type { ParentCompanyFormValues } from '#/types/parent-company.ts'
@@ -43,7 +42,7 @@ export function ContactStep() {
         name="contact.firstName"
         render={({ field }) => (
           <FormItem className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-start sm:gap-4">
-            <FormLabel className={REQUIRED_LABEL_CLASS}>
+            <FormLabel className={FORM_LABEL_CLASS}>
               {copy.firstNameLabel}
             </FormLabel>
             <div className="space-y-1">
@@ -65,7 +64,7 @@ export function ContactStep() {
         name="contact.lastName"
         render={({ field }) => (
           <FormItem className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-start sm:gap-4">
-            <FormLabel className={REQUIRED_LABEL_CLASS}>
+            <FormLabel className={FORM_LABEL_CLASS}>
               {copy.lastNameLabel}
             </FormLabel>
             <div className="space-y-1">
@@ -87,7 +86,7 @@ export function ContactStep() {
         name="contact.phoneNumber"
         render={({ field }) => (
           <FormItem className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-start sm:gap-4">
-            <FormLabel className={REQUIRED_LABEL_CLASS}>
+            <FormLabel className={FORM_LABEL_CLASS}>
               {copy.phoneLabel}
             </FormLabel>
             <div className="space-y-1">
@@ -115,7 +114,7 @@ export function ContactStep() {
         name="contact.alternativePhoneNumber"
         render={({ field }) => (
           <FormItem className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-start sm:gap-4">
-            <FormLabel className={REQUIRED_LABEL_CLASS}>
+            <FormLabel className={FORM_LABEL_CLASS}>
               {copy.alternativePhoneLabel}
             </FormLabel>
             <div className="space-y-1">
@@ -143,7 +142,7 @@ export function ContactStep() {
         name="contact.fax"
         render={({ field }) => (
           <FormItem className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-start sm:gap-4">
-            <FormLabel className={REQUIRED_LABEL_CLASS}>{copy.faxLabel}</FormLabel>
+            <FormLabel className={FORM_LABEL_CLASS}>{copy.faxLabel}</FormLabel>
             <div className="space-y-1">
               <FormControl>
                 <Input
@@ -169,7 +168,7 @@ export function ContactStep() {
         name="contact.email"
         render={({ field }) => (
           <FormItem className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-start sm:gap-4">
-            <FormLabel className={REQUIRED_LABEL_CLASS}>
+            <FormLabel className={FORM_LABEL_CLASS}>
               {copy.emailLabel}
             </FormLabel>
             <div className="space-y-1">

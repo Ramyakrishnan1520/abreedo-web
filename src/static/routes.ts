@@ -18,7 +18,6 @@ export const ROUTES = {
   ADMIN_TERMINATION_CODES_NEW: '/admin/termination-codes/new',
   ADMIN_TERMINATION_CODES_EDIT: '/admin/termination-codes/edit',
   ADMIN_EMPLOYERS: '/admin/employers',
-  ADMIN_EMPLOYERS_LIST: '/admin/employers/list',
   ADMIN_EMPLOYERS_NEW: '/admin/employers/new',
   ADMIN_EMPLOYERS_EDIT: '/admin/employers/edit',
   ADMIN_PLANS: '/admin/plan',

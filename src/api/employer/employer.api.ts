@@ -14,7 +14,7 @@ import type {
 
 function mapEmployer(item: EmployerApiItem): Employer {
   return {
-    id: item.employerId,
+    id: item.employerId || item.id || '',
     name: item.name ?? '',
     parentCompanyId: item.parentCompanyId ?? '',
     parentCompanyName: item.parentCompanyName ?? '',
@@ -42,6 +42,7 @@ function getPaginationResult(
 export async function getEmployersApi(
   request: PaginationRequest,
   parentCompanyId?: string,
+  search?: string,
 ): Promise<PaginatedResult<Employer>> {
   const params: Record<string, string | number> = {
     Page: request.pageIndex + 1,
@@ -50,6 +51,10 @@ export async function getEmployersApi(
 
   if (parentCompanyId) {
     params.parentCompanyId = parentCompanyId
+  }
+
+  if (search?.trim()) {
+    params.search = search.trim()
   }
 
   const { data } = await apiClient.get<EmployerListResponse>(
@@ -67,6 +72,16 @@ export async function getEmployersApi(
   return getPaginationResult(itemsList.map(mapEmployer), request, data)
 }
 
+export async function getEmployerByIdApi(
+  id: string,
+): Promise<EmployerApiItem> {
+  const { data } = await apiClient.get<EmployerApiItem>(
+    `/api/v1/employers/${id}`,
+  )
+
+  return data
+}
+
 export async function createEmployerApi(
   data: EmployerUpsertRequest,
 ): Promise<EmployerApiItem> {
@@ -78,3 +93,13 @@ export async function createEmployerApi(
   return response.data
 }
 
+export async function updateEmployerApi(
+  id: string,
+  data: EmployerUpsertRequest,
+): Promise<void> {
+  await apiClient.put(`/api/v1/employers/${id}`, data)
+}
+
+export async function deleteEmployerApi(id: string): Promise<void> {
+  await apiClient.delete(`/api/v1/employers/${id}`)
+}

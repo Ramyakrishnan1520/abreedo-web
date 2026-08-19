@@ -28,7 +28,7 @@ export const PARENT_COMPANY_CONTENT = {
         'Select a parent company to load its details, then update using the same guided steps as new setup.',
       selectLabel: 'Select Parent Company',
       selectCardDescription:
-        'Search the list below and choose a company to load its profile for editing.',
+        'Search by parent company name and choose to view or edit.',
       selectPlaceholder: 'Choose a parent company',
       selectLoadingPlaceholder: 'Loading parent companies...',
       selectSearchPlaceholder: 'Search parent companies...',
@@ -37,11 +37,39 @@ export const PARENT_COMPANY_CONTENT = {
       emptyStateTitle: 'Ready when you are',
       editingLabel: 'Editing:',
       loadingDetails: 'Loading parent company details...',
+      searchPlaceholder: 'Search by parent company name...',
+      searchButton: 'Search',
+      clearButton: 'Clear',
+      viewTitle: 'Parent Company Information',
+      viewDescription:
+        'View complete details for the selected parent company record.',
+      deleteButton: 'Delete',
+      backButton: 'Back',
+      editButton: 'Edit',
+      confirmDeleteTitle: 'Delete Parent Company',
+      confirmDeletePrompt:
+        'Are you sure you want to delete this parent company? This action cannot be undone.',
+      cancel: 'Cancel',
+      confirmDelete: 'Delete Parent Company',
       errors: {
         listLoad: 'Failed to load parent companies. Please try again.',
         detailLoad: 'Failed to load parent company details. Please try again.',
       },
     },
+  },
+  table: {
+    emptyValue: '-',
+    columns: {
+      name: 'Parent Company Name',
+      contactName: 'Contact Name',
+      email: 'Email',
+      view: 'View',
+      edit: 'Edit',
+      delete: 'Delete',
+    },
+    viewAria: (name: string) => `View ${name}`,
+    editAria: (name: string) => `Edit ${name}`,
+    deleteAria: (name: string) => `Delete ${name}`,
   },
   form: {
     kicker: 'Site Manager',
@@ -189,6 +217,10 @@ export const PARENT_COMPANY_CONTENT = {
     update: {
       success: 'Parent Company updated successfully.',
       error: 'Failed to update parent company. Please try again.',
+    },
+    delete: {
+      success: 'Parent Company deleted successfully.',
+      error: 'Failed to delete parent company. Please try again.',
     },
   },
 } satisfies ParentCompanyContent

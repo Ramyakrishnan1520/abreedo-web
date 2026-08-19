@@ -1,10 +1,9 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { AlertCircle, Loader2 } from 'lucide-react'
+import { AlertCircle } from 'lucide-react'
 
-import { Button } from '#/components/ui/button.tsx'
 import { Form } from '#/components/ui/Form'
 import { GeneralStep } from '#/components/admin/employer/GeneralStep.tsx'
 import { ContactStep } from '#/components/admin/employer/ContactStep.tsx'
@@ -13,6 +12,7 @@ import { CompanyGroupStep } from '#/components/admin/employer/CompanyGroupStep.t
 import { NotesStep } from '#/components/admin/employer/NotesStep.tsx'
 import { ReviewStep } from '#/components/admin/employer/ReviewStep.tsx'
 import { Stepper } from '#/components/admin/common/Stepper'
+import { FormNavigationActions } from '#/components/admin/common/FormNavigationActions.tsx'
 import {
   EMPLOYER_DEFAULT_VALUES,
   EMPLOYER_STEPS,
@@ -22,6 +22,7 @@ import {
   type EmployerFormValues,
 } from '#/components/admin/employer/employer.schema.ts'
 import { useCreateEmployer } from '#/hooks/employer/useCreateEmployer.ts'
+import { useUpdateEmployer } from '#/hooks/employer/useUpdateEmployer.ts'
 import { EMPLOYER_CONTENT } from '#/utils/employer-content.ts'
 import { getEmployerStepValidationFields } from '#/utils/getEmployerStepValidationFields.ts'
 
@@ -50,6 +51,7 @@ const STEP_COMPONENTS = [
 
 export function EmployerForm({
   mode = 'create',
+  employerId,
   defaultValues,
   initialValues,
   onBack,
@@ -57,7 +59,9 @@ export function EmployerForm({
   title,
 }: EmployerFormProps) {
   const [currentStep, setCurrentStep] = useState(0)
-  const { mutate: createEmployer, isPending } = useCreateEmployer()
+  const { mutate: createEmployer, isPending: isCreating } = useCreateEmployer()
+  const { mutate: updateEmployer, isPending: isUpdating } = useUpdateEmployer()
+  const isPending = isCreating || isUpdating
 
   const resolvedTitle =
     title ??
@@ -75,6 +79,16 @@ export function EmployerForm({
     mode: 'onSubmit',
     reValidateMode: 'onSubmit',
   })
+
+  useEffect(() => {
+    if (mode === 'edit' && initialValues) {
+      form.reset({
+        ...EMPLOYER_DEFAULT_VALUES,
+        ...initialValues,
+      })
+      setCurrentStep(0)
+    }
+  }, [form, initialValues, mode])
 
   const isFirstStep = currentStep === 0
   const isLastStep = currentStep === EMPLOYER_STEPS.length - 1
@@ -132,11 +146,22 @@ export function EmployerForm({
       notes: data.notes || null,
     }
 
-    createEmployer(payload, {
-      onSuccess: () => {
-        onSuccess?.()
-      },
-    })
+    if (mode === 'edit' && employerId) {
+      updateEmployer(
+        { id: employerId, data: payload },
+        {
+          onSuccess: () => {
+            onSuccess?.()
+          },
+        },
+      )
+    } else {
+      createEmployer(payload, {
+        onSuccess: () => {
+          onSuccess?.()
+        },
+      })
+    }
   }
 
   const handleSave = () => {
@@ -196,45 +221,17 @@ export function EmployerForm({
           </div>
 
           {/* Sticky Bottom Navigation */}
-          <div className="sticky bottom-0 border-t border-slate-200 bg-white/95 px-6 py-4 backdrop-blur-sm sm:px-8">
-            <div className="flex items-center justify-between gap-3">
-              <Button
-                id="employer-back-btn"
-                type="button"
-                variant="outline"
-                onClick={handleBack}
-                disabled={isPending}
-                className="h-9 rounded-md border-slate-200 px-6 font-semibold text-slate-700 shadow-xs hover:bg-slate-100"
-              >
-                {formCopy.navigation.back}
-              </Button>
-
-              {isLastStep ? (
-                <Button
-                  id="employer-save-btn"
-                  type="button"
-                  onClick={handleSave}
-                  disabled={isPending}
-                  className="h-9 rounded-md bg-tan-dark px-6 font-semibold text-white shadow-xs hover:bg-tan-dark/90 disabled:opacity-70"
-                >
-                  {isPending ? (
-                    <Loader2 className="size-4 animate-spin" />
-                  ) : (
-                    saveLabel
-                  )}
-                </Button>
-              ) : (
-                <Button
-                  id="employer-next-btn"
-                  type="button"
-                  onClick={() => void handleNext()}
-                  className="h-9 rounded-md bg-tan-dark px-6 font-semibold text-white shadow-xs hover:bg-tan-dark/90"
-                >
-                  {formCopy.navigation.next}
-                </Button>
-              )}
-            </div>
-          </div>
+          <FormNavigationActions
+            idPrefix="employer"
+            backLabel={formCopy.navigation.back}
+            nextLabel={formCopy.navigation.next}
+            saveLabel={saveLabel}
+            isLastStep={isLastStep}
+            isPending={isPending}
+            onBack={handleBack}
+            onNext={() => void handleNext()}
+            onSave={handleSave}
+          />
         </form>
       </Form>
     </div>

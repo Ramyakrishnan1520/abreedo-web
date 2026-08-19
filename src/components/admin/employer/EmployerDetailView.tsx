@@ -12,44 +12,69 @@ import {
   CardHeader,
   CardTitle,
 } from '#/components/ui/card.tsx'
-import { useCarrier } from '#/hooks/carrier/useCarrierById'
-import { useDeleteCarrier } from '#/hooks/carrier/useDeleteCarrier'
-import { useGetStates } from '#/hooks/carrier/useGetStates'
-import { CARRIER_CONTENT } from '#/utils/carrier-content.ts'
-import { mapCarrierDetailToFormValues } from '#/utils/mapCarrierDetailToFormValues.ts'
+import { useAvailableCarriers } from '#/hooks/parent-company/useAvailableCarriers.ts'
+import { useDeleteEmployer } from '#/hooks/employer/useDeleteEmployer.ts'
+import { useEmployer } from '#/hooks/employer/useEmployerById.ts'
+import { useGetStates } from '#/hooks/carrier/useGetStates.ts'
+import { useParentCompanies } from '#/hooks/parent-company/useParentCompanies.ts'
+import { EMPLOYER_CONTENT } from '#/utils/employer-content.ts'
+import { mapEmployerDetailToFormValues } from '#/utils/mapEmployerDetailToFormValues.ts'
+import { resolveSelectedCarrierOptions } from '#/utils/resolveSelectedCarrierOptions.ts'
 
 import type { ReviewSectionConfig } from '#/types/review-steps.ts'
 
-interface CarrierDetailViewProps {
-  carrierId: string
+interface EmployerDetailViewProps {
+  employerId: string
   onBack: () => void
   onEdit: () => void
   onDeleteSuccess: () => void
 }
 
-const copy = CARRIER_CONTENT.pages.edit
-const reviewCopy = CARRIER_CONTENT.reviewStep
+const copy = EMPLOYER_CONTENT.pages.edit
+const reviewCopy = EMPLOYER_CONTENT.reviewStep
 
-export function CarrierDetailView({
-  carrierId,
+export function EmployerDetailView({
+  employerId,
   onBack,
   onEdit,
   onDeleteSuccess,
-}: CarrierDetailViewProps) {
+}: EmployerDetailViewProps) {
   const [showConfirmDelete, setShowConfirmDelete] = useState(false)
-  const { data: carrierDetail, isLoading, isError } = useCarrier(carrierId)
+  const { data: employerDetail, isLoading, isError } = useEmployer(employerId)
   const { data: states = [] } = useGetStates()
-  const { mutate: deleteCarrier, isPending: isDeleting } = useDeleteCarrier()
+  const { data: parentCompanies = [] } = useParentCompanies()
+  const { carriers } = useAvailableCarriers()
+  const { mutate: deleteEmployer, isPending: isDeleting } = useDeleteEmployer()
 
   const values = useMemo(
-    () => (carrierDetail ? mapCarrierDetailToFormValues(carrierDetail) : null),
-    [carrierDetail],
+    () => (employerDetail ? mapEmployerDetailToFormValues(employerDetail) : null),
+    [employerDetail],
   )
+
+  const parentCompanyName = useMemo(() => {
+    if (!values?.parentCompanyId) return employerDetail?.parentCompanyName ?? undefined
+    return (
+      parentCompanies.find((company) => company.id === values.parentCompanyId)
+        ?.name ?? employerDetail?.parentCompanyName ?? values.parentCompanyId
+    )
+  }, [parentCompanies, values?.parentCompanyId, employerDetail?.parentCompanyName])
 
   const stateName = useMemo(() => {
     if (!values?.state) return undefined
     return states.find((s) => s.id === values.state)?.name ?? values.state
   }, [states, values?.state])
+
+  const selectedCarrierNames = useMemo(
+    () =>
+      values
+        ? resolveSelectedCarrierOptions(
+          values.carrierIds ?? [],
+          carriers,
+          values.linkedCarriers ?? [],
+        )
+        : [],
+    [carriers, values],
+  )
 
   const sections: ReviewSectionConfig[] = useMemo(
     () =>
@@ -66,15 +91,8 @@ export function CarrierDetailView({
               },
               {
                 type: 'text',
-                label: reviewCopy.fields.groupTitle,
-                value: values.groupTitle,
-              },
-              {
-                type: 'text',
-                label: reviewCopy.fields.allowFlexibleDates,
-                value: values.allowFlexibleDates
-                  ? reviewCopy.yes
-                  : reviewCopy.no,
+                label: reviewCopy.fields.parentCompany,
+                value: parentCompanyName,
               },
             ],
           },
@@ -116,12 +134,17 @@ export function CarrierDetailView({
               {
                 type: 'text',
                 label: reviewCopy.fields.contactFirstName,
-                value: values.contactFirstName,
+                value: values.contactFirst,
               },
               {
                 type: 'text',
                 label: reviewCopy.fields.contactLastName,
-                value: values.contactLastName,
+                value: values.contactLast,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.contactTitle,
+                value: values.contactTitle,
               },
               {
                 type: 'text',
@@ -140,13 +163,99 @@ export function CarrierDetailView({
               },
             ],
           },
+          {
+            id: 'carriers',
+            title: reviewCopy.sections.carriers,
+            items: [
+              {
+                type: 'badges',
+                items: selectedCarrierNames,
+                emptyMessage: reviewCopy.noCarriersSelected,
+              },
+            ],
+          },
+          {
+            id: 'group',
+            title: reviewCopy.sections.groupDetails,
+            items: [
+              {
+                type: 'text',
+                label: reviewCopy.fields.groupNumber,
+                value: values.groupNumber,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.policyNumber,
+                value: values.policyNumber,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.tpacNumber,
+                value: values.tpacNumber,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.monthlyAdminFee,
+                value:
+                  values.monthlyAdminFee !== undefined
+                    ? `$${values.monthlyAdminFee}`
+                    : undefined,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.status,
+                value:
+                  values.status === 1 ? reviewCopy.yes : reviewCopy.no,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.isPaper,
+                value: values.isPaper ? reviewCopy.yes : reviewCopy.no,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.allowCobra,
+                value: values.allowCobra ? reviewCopy.yes : reviewCopy.no,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.isPano,
+                value: values.isPano ? reviewCopy.yes : reviewCopy.no,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.renewalDate,
+                value: values.renewalDate,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.initialNotificationStartOn,
+                value: values.initialNotificationStartOn,
+              },
+            ],
+          },
+          {
+            id: 'notes',
+            title: reviewCopy.sections.notes,
+            items: [
+              {
+                type: 'text',
+                label: reviewCopy.fields.notesTitle,
+                value: values.notesTitle,
+              },
+              {
+                type: 'multiline',
+                value: values.notes,
+              },
+            ],
+          },
         ]
         : [],
-    [values, stateName],
+    [values, parentCompanyName, stateName, selectedCarrierNames],
   )
 
   const handleDelete = () => {
-    deleteCarrier(carrierId, {
+    deleteEmployer(employerId, {
       onSuccess: () => {
         onDeleteSuccess()
       },
@@ -205,9 +314,14 @@ export function CarrierDetailView({
                   <CardTitle className="text-xl font-bold text-slate-900">
                     {values.name}
                   </CardTitle>
-                  {values.groupTitle ? (
+                  {parentCompanyName ? (
                     <Badge variant="secondary" className="font-medium">
-                      {values.groupTitle}
+                      {parentCompanyName}
+                    </Badge>
+                  ) : null}
+                  {values.groupNumber ? (
+                    <Badge variant="outline" className="font-medium text-slate-600">
+                      Grp: {values.groupNumber}
                     </Badge>
                   ) : null}
                 </div>
@@ -218,7 +332,7 @@ export function CarrierDetailView({
         </CardHeader>
         <CardContent className="space-y-5 pt-6">
           <ReviewStep
-            copy={{ emptyValue: '-' }}
+            copy={{ emptyValue: '—' }}
             sections={sections}
             layout="accordion"
             defaultOpenSection="general"
@@ -239,7 +353,7 @@ export function CarrierDetailView({
 
           {/* Integrated Actions Bar */}
           <DetailViewActionsBar
-            idPrefix="carrier-view"
+            idPrefix="employer-view"
             deleteLabel={copy.deleteButton}
             backLabel={copy.backButton}
             editLabel={copy.editButton}

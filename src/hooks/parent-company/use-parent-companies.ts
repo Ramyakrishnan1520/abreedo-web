@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 
-import { getEmployersApi } from '#/api/employer/employer.api.ts'
+import { getParentCompaniesApi } from '#/api/parent-company/parent-company.api.ts'
 
 import type { PaginationRequest } from '#/types/pagination.ts'
 
@@ -9,21 +9,14 @@ const DEFAULT_PAGINATION: PaginationRequest = {
   pageSize: 10,
 }
 
-export function useEmployers(
-  parentCompanyId?: string,
+export function useParentCompanies(
   pagination?: PaginationRequest,
   search?: string,
 ) {
   const req = pagination ?? DEFAULT_PAGINATION
 
   return useQuery({
-    queryKey: [
-      'employers',
-      parentCompanyId ?? 'all',
-      req.pageIndex,
-      req.pageSize,
-      search ?? '',
-    ],
-    queryFn: () => getEmployersApi(req, parentCompanyId, search),
+    queryKey: ['parent-companies', req.pageIndex, req.pageSize, search ?? ''],
+    queryFn: () => getParentCompaniesApi(req, search),
   })
 }

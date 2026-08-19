@@ -1,15 +1,9 @@
 import { useMemo, useState } from 'react'
-import {
-  AlertCircle,
-  ArrowLeft,
-  FileText,
-  Loader2,
-  Pencil,
-  Trash2,
-} from 'lucide-react'
+import { AlertCircle, ArrowLeft, FileText, Loader2 } from 'lucide-react'
 
 import { DeleteConfirmBanner } from '#/components/admin/common/DeleteConfirmBanner.tsx'
-import ReviewSection from '#/components/admin/common/ReviwSection.tsx'
+import { DetailViewActionsBar } from '#/components/admin/common/DetailViewActionsBar.tsx'
+import { ReviewStep } from '#/components/admin/common/ReviewSection'
 import { Badge } from '#/components/ui/badge.tsx'
 import { Button } from '#/components/ui/button.tsx'
 import {
@@ -22,6 +16,8 @@ import { useDeleteTerminationCode } from '#/hooks/termination-code/useDeleteTerm
 import { useTerminationCodeById } from '#/hooks/termination-code/useTerminationCodeById'
 import { mapTerminationCodeDetailToFormValues } from '#/utils/mapTerminationCodeDetailToFormValues.ts'
 import { TERMINATION_CODE_CONTENT } from '#/utils/termination-code-content.ts'
+
+import type { ReviewSectionConfig } from '#/types/review-steps.ts'
 
 interface TerminationCodeDetailViewProps {
   terminationCodeId: string
@@ -41,54 +37,87 @@ export function TerminationCodeDetailView({
 }: TerminationCodeDetailViewProps) {
   const [showConfirmDelete, setShowConfirmDelete] = useState(false)
   const {
-    data: detail,
+    data: terminationCodeDetail,
     isLoading,
     isError,
   } = useTerminationCodeById(terminationCodeId)
-
   const { mutate: deleteTerminationCode, isPending: isDeleting } =
     useDeleteTerminationCode()
 
   const values = useMemo(
-    () => (detail ? mapTerminationCodeDetailToFormValues(detail) : null),
-    [detail],
+    () =>
+      terminationCodeDetail
+        ? mapTerminationCodeDetailToFormValues(terminationCodeDetail)
+        : null,
+    [terminationCodeDetail],
   )
 
-  const generalItems = useMemo(
+  const sections: ReviewSectionConfig[] = useMemo(
     () =>
       values
         ? [
-            { label: reviewCopy.fields.code, value: values.code },
-            { label: reviewCopy.fields.name, value: values.name },
-          ]
-        : [],
-    [values],
-  )
-
-  const additionalItems = useMemo(
-    () =>
-      values
-        ? [
-            { label: reviewCopy.fields.bccCode, value: values.bccCode },
-            { label: reviewCopy.fields.nepaCode, value: values.nepaCode },
-          ]
-        : [],
-    [values],
-  )
-
-  const cobraItems = useMemo(
-    () =>
-      values
-        ? values.cobraNotice
-          ? [
-              { label: reviewCopy.fields.cobraNotice, value: reviewCopy.yes },
-              { label: reviewCopy.fields.cobraTerm, value: values.cobraTerm },
+          {
+            id: 'general',
+            title: reviewCopy.sections.general,
+            items: [
               {
-                label: reviewCopy.fields.cobraMonths,
-                value: String(values.cobraMonths ?? 0),
+                type: 'text',
+                label: reviewCopy.fields.code,
+                value: values.code,
               },
-            ]
-          : [{ label: reviewCopy.fields.cobraNotice, value: reviewCopy.no }]
+              {
+                type: 'text',
+                label: reviewCopy.fields.name,
+                value: values.name,
+              },
+            ],
+          },
+          {
+            id: 'additional',
+            title: reviewCopy.sections.additional,
+            items: [
+              {
+                type: 'text',
+                label: reviewCopy.fields.bccCode,
+                value: values.bccCode,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.nepaCode,
+                value: values.nepaCode,
+              },
+            ],
+          },
+          {
+            id: 'cobra',
+            title: reviewCopy.sections.cobra,
+            items: values.cobraNotice
+              ? [
+                {
+                  type: 'text',
+                  label: reviewCopy.fields.cobraNotice,
+                  value: reviewCopy.yes,
+                },
+                {
+                  type: 'text',
+                  label: reviewCopy.fields.cobraTerm,
+                  value: values.cobraTerm,
+                },
+                {
+                  type: 'text',
+                  label: reviewCopy.fields.cobraMonths,
+                  value: String(values.cobraMonths ?? 0),
+                },
+              ]
+              : [
+                {
+                  type: 'text',
+                  label: reviewCopy.fields.cobraNotice,
+                  value: reviewCopy.no,
+                },
+              ],
+          },
+        ]
         : [],
     [values],
   )
@@ -165,17 +194,11 @@ export function TerminationCodeDetailView({
           </div>
         </CardHeader>
         <CardContent className="space-y-5 pt-6">
-          <ReviewSection
-            title={reviewCopy.sections.general}
-            items={generalItems}
-          />
-          <ReviewSection
-            title={reviewCopy.sections.additional}
-            items={additionalItems}
-          />
-          <ReviewSection
-            title={reviewCopy.sections.cobra}
-            items={cobraItems}
+          <ReviewStep
+            copy={{ emptyValue: '—' }}
+            sections={sections}
+            layout="accordion"
+            defaultOpenSection="general"
           />
 
           {/* Delete Confirmation Banner */}
@@ -192,43 +215,17 @@ export function TerminationCodeDetailView({
           ) : null}
 
           {/* Integrated Actions Bar */}
-          <div className="flex items-center justify-between gap-3 border-t border-slate-200 pt-5 mt-6">
-            <Button
-              id="termination-code-view-delete-btn"
-              type="button"
-              variant="destructive"
-              onClick={() => setShowConfirmDelete(true)}
-              disabled={isDeleting || showConfirmDelete}
-              className="h-9 gap-1.5 rounded-md px-5 font-semibold shadow-xs"
-            >
-              <Trash2 className="size-4" />
-              {copy.deleteButton}
-            </Button>
-
-            <div className="flex items-center gap-3">
-              <Button
-                id="termination-code-view-back-btn"
-                type="button"
-                variant="outline"
-                onClick={onBack}
-                disabled={isDeleting}
-                className="h-9 gap-1.5 rounded-md border-slate-200 px-5 font-semibold text-slate-700 shadow-xs hover:bg-slate-100"
-              >
-                <ArrowLeft className="size-4" />
-                {copy.backButton}
-              </Button>
-              <Button
-                id="termination-code-view-edit-btn"
-                type="button"
-                onClick={onEdit}
-                disabled={isDeleting}
-                className="h-9 gap-1.5 rounded-md bg-tan-dark px-5 font-semibold text-white shadow-xs hover:bg-tan-dark/90"
-              >
-                <Pencil className="size-4" />
-                {copy.editButton}
-              </Button>
-            </div>
-          </div>
+          <DetailViewActionsBar
+            idPrefix="termination-code-view"
+            deleteLabel={copy.deleteButton}
+            backLabel={copy.backButton}
+            editLabel={copy.editButton}
+            isDeleting={isDeleting}
+            isDeleteDisabled={showConfirmDelete}
+            onDelete={() => setShowConfirmDelete(true)}
+            onBack={onBack}
+            onEdit={onEdit}
+          />
         </CardContent>
       </Card>
     </div>

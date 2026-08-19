@@ -1,4 +1,4 @@
-import { Pencil, Trash2 } from 'lucide-react'
+import { Eye, Pencil, Trash2 } from 'lucide-react'
 
 import { Button } from '#/components/ui/button.tsx'
 import { EMPLOYER_CONTENT } from '#/utils/employer-content.ts'
@@ -7,8 +7,9 @@ import type { ColumnDef } from '@tanstack/react-table'
 import type { Employer } from '#/types/employer.ts'
 
 interface EmployerTableColumnActions {
-  onEdit: (employer: Employer) => void
-  onDelete: (employer: Employer) => void
+  onView?: (employer: Employer) => void
+  onEdit?: (employer: Employer) => void
+  onDelete?: (employer: Employer) => void
 }
 
 const { table: tableCopy } = EMPLOYER_CONTENT
@@ -18,10 +19,11 @@ function displayValue(value: string) {
 }
 
 export function getEmployerTableColumns({
+  onView,
   onEdit,
   onDelete,
 }: EmployerTableColumnActions): ColumnDef<Employer>[] {
-  return [
+  const columns: ColumnDef<Employer>[] = [
     {
       accessorKey: 'name',
       header: tableCopy.columns.name,
@@ -32,7 +34,28 @@ export function getEmployerTableColumns({
       header: tableCopy.columns.parentCompany,
       cell: ({ row }) => displayValue(row.original.parentCompanyName),
     },
-    {
+  ]
+
+  if (onView) {
+    columns.push({
+      id: 'view',
+      header: tableCopy.columns.view,
+      cell: ({ row }) => (
+        <Button
+          type="button"
+          variant="outline"
+          size="icon-sm"
+          aria-label={tableCopy.viewAria(row.original.name)}
+          onClick={() => onView(row.original)}
+        >
+          <Eye className="size-4" />
+        </Button>
+      ),
+    })
+  }
+
+  if (onEdit) {
+    columns.push({
       id: 'edit',
       header: tableCopy.columns.edit,
       cell: ({ row }) => (
@@ -46,8 +69,11 @@ export function getEmployerTableColumns({
           <Pencil className="size-4" />
         </Button>
       ),
-    },
-    {
+    })
+  }
+
+  if (onDelete) {
+    columns.push({
       id: 'delete',
       header: tableCopy.columns.delete,
       cell: ({ row }) => (
@@ -61,6 +87,8 @@ export function getEmployerTableColumns({
           <Trash2 className="size-4" />
         </Button>
       ),
-    },
-  ]
+    })
+  }
+
+  return columns
 }

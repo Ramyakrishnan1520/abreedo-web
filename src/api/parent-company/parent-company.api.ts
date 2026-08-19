@@ -3,18 +3,27 @@ import { apiClient } from '#/api/api-client.ts'
 import type {
   CreateParentCompanyRequest,
   CreateParentCompanyResponse,
+  ParentCompany,
   ParentCompanyApiItem,
-  ParentCompanyListItem,
   ParentCompanyListResponse,
 } from '#/types/parent-company.ts'
 import type { PaginatedResult, PaginationRequest } from '#/types/pagination.ts'
 
-function mapParentCompanyListItem(
-  item: ParentCompanyApiItem,
-): ParentCompanyListItem {
+function mapParentCompany(item: ParentCompanyApiItem): ParentCompany {
+  const contactName = [
+    item.contactFirst ?? item.contact?.firstName,
+    item.contactLast ?? item.contact?.lastName,
+  ]
+    .filter(Boolean)
+    .join(' ')
+
   return {
     id: item.parentCompanyId ?? item.id ?? '',
-    name: item.name,
+    name: item.name ?? '',
+    contactName:
+      contactName || item.contactFirst || item.contact?.firstName || '',
+    phone: item.phone ?? item.contact?.phoneNumber ?? '',
+    email: item.email ?? item.contact?.email ?? '',
   }
 }
 
@@ -47,21 +56,24 @@ export async function createParentCompanyApi(
 
 export async function getParentCompaniesApi(
   request?: PaginationRequest,
-): Promise<PaginatedResult<ParentCompanyListItem>> {
+  search?: string,
+): Promise<PaginatedResult<ParentCompany>> {
+  const params: Record<string, unknown> = {}
+  if (request) {
+    params.page = request.pageIndex + 1
+    params.pageSize = request.pageSize
+  }
+  if (search?.trim()) {
+    params.search = search.trim()
+  }
+
   const { data } = await apiClient.get<ParentCompanyListResponse>(
     '/api/v1/parent-companies',
-    request
-      ? {
-          params: {
-            Page: request.pageIndex + 1,
-            PageSize: request.pageSize,
-          },
-        }
-      : undefined,
+    Object.keys(params).length > 0 ? { params } : undefined,
   )
 
   const items = extractParentCompanyItems(data)
-    .map(mapParentCompanyListItem)
+    .map(mapParentCompany)
     .filter((item) => item.id.length > 0)
 
   if (Array.isArray(data)) {
@@ -102,4 +114,8 @@ export async function updateParentCompanyApi(
   data: CreateParentCompanyRequest,
 ): Promise<void> {
   await apiClient.put(`/api/v1/parent-companies/${id}`, data)
+}
+
+export async function deleteParentCompanyApi(id: string): Promise<void> {
+  await apiClient.delete(`/api/v1/parent-companies/${id}`)
 }

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { AlertCircle, ArrowLeft, FileCode2, Loader2 } from 'lucide-react'
+import { AlertCircle, ArrowLeft, Building2, Loader2 } from 'lucide-react'
 
 import { DeleteConfirmBanner } from '#/components/admin/common/DeleteConfirmBanner.tsx'
 import { DetailViewActionsBar } from '#/components/admin/common/DetailViewActionsBar.tsx'
@@ -12,75 +12,67 @@ import {
   CardHeader,
   CardTitle,
 } from '#/components/ui/card.tsx'
-import { useInfiniteCarrierOptions } from '#/hooks/carrier/use-infinite-carrier-options.ts'
-import { useCoverageCodeById } from '#/hooks/coverage-code/useCoverageCodeById'
-import { useDeleteCoverageCode } from '#/hooks/coverage-code/useDeleteCoverageCode'
-import { useGetCoverageClasses } from '#/hooks/coverage-code/useGetCoverageClasses.ts'
-import { useGetCoverageTypes } from '#/hooks/coverage-code/useGetCoverageTypes.ts'
-import { COVERAGE_CODE_CONTENT } from '#/utils/coverage-code-content.ts'
-import { mapCoverageCodeDetailToFormValues } from '#/utils/mapCoverageCodeDetailToFormValues.ts'
+import { useAvailableCarriers } from '#/hooks/parent-company/useAvailableCarriers.ts'
+import { useDeleteParentCompany } from '#/hooks/parent-company/useDeleteParentCompany.ts'
+import { useGetStates } from '#/hooks/carrier/useGetStates.ts'
+import { useParentCompany } from '#/hooks/parent-company/useParentCompany.ts'
+import { PARENT_COMPANY_CONTENT } from '#/utils/parent-company-content.ts'
+import { mapParentCompanyDetailToFormValues } from '#/utils/mapParentCompanyDetailToFormValues.ts'
+import { resolveSelectedCarrierOptions } from '#/utils/resolveSelectedCarrierOptions.ts'
 
 import type { ReviewSectionConfig } from '#/types/review-steps.ts'
 
-interface CoverageCodeDetailViewProps {
-  coverageCodeId: string
+interface ParentCompanyDetailViewProps {
+  parentCompanyId: string
   onBack: () => void
   onEdit: () => void
   onDeleteSuccess: () => void
 }
 
-const copy = COVERAGE_CODE_CONTENT.pages.edit
-const reviewCopy = COVERAGE_CODE_CONTENT.reviewStep
+const copy = PARENT_COMPANY_CONTENT.pages.edit
+const reviewCopy = PARENT_COMPANY_CONTENT.reviewStep
 
-export function CoverageCodeDetailView({
-  coverageCodeId,
+export function ParentCompanyDetailView({
+  parentCompanyId,
   onBack,
   onEdit,
   onDeleteSuccess,
-}: CoverageCodeDetailViewProps) {
+}: ParentCompanyDetailViewProps) {
   const [showConfirmDelete, setShowConfirmDelete] = useState(false)
   const {
-    data: coverageCodeDetail,
+    data: parentCompanyDetail,
     isLoading,
     isError,
-  } = useCoverageCodeById(coverageCodeId)
-  const { carriers } = useInfiniteCarrierOptions()
-  const { data: coverageClasses = [] } = useGetCoverageClasses()
-  const { data: coverageTypes = [] } = useGetCoverageTypes()
-  const { mutate: deleteCoverageCode, isPending: isDeleting } =
-    useDeleteCoverageCode()
+  } = useParentCompany(parentCompanyId)
+  const { data: states } = useGetStates()
+  const { carriers } = useAvailableCarriers()
+  const { mutate: deleteParentCompany, isPending: isDeleting } =
+    useDeleteParentCompany()
 
   const values = useMemo(
     () =>
-      coverageCodeDetail
-        ? mapCoverageCodeDetailToFormValues(coverageCodeDetail)
+      parentCompanyDetail
+        ? mapParentCompanyDetailToFormValues(parentCompanyDetail)
         : null,
-    [coverageCodeDetail],
+    [parentCompanyDetail],
   )
 
-  const carrierName = useMemo(() => {
-    if (!values?.carrierId) return undefined
-    return (
-      carriers.find((c) => String(c.id) === String(values.carrierId))?.name ??
-      values.carrierId
-    )
-  }, [carriers, values?.carrierId])
+  const stateName = useMemo(() => {
+    if (!values?.state) return undefined
+    return states?.find((s) => s.id === values.state)?.name ?? values.state
+  }, [states, values?.state])
 
-  const coverageClassName = useMemo(() => {
-    if (!values?.coverageClassId) return undefined
-    const match = coverageClasses.find(
-      (cc) => cc.coverageClassId === values.coverageClassId,
-    )
-    return match ? match.name || match.code : values.coverageClassId
-  }, [coverageClasses, values?.coverageClassId])
-
-  const coverageTypeName = useMemo(() => {
-    if (!values?.remittanceTypeId) return undefined
-    const match = coverageTypes.find(
-      (ct) => ct.coverageTypeId === values.remittanceTypeId,
-    )
-    return match ? match.name || match.code : values.remittanceTypeId
-  }, [coverageTypes, values?.remittanceTypeId])
+  const selectedCarrierNames = useMemo(
+    () =>
+      values
+        ? resolveSelectedCarrierOptions(
+          values.carrierIds,
+          carriers,
+          values.linkedCarriers ?? [],
+        )
+        : [],
+    [carriers, values],
+  )
 
   const sections: ReviewSectionConfig[] = useMemo(
     () =>
@@ -92,66 +84,101 @@ export function CoverageCodeDetailView({
             items: [
               {
                 type: 'text',
-                label: reviewCopy.fields.code,
-                value: values.code,
-              },
-              {
-                type: 'text',
                 label: reviewCopy.fields.name,
                 value: values.name,
               },
               {
                 type: 'text',
-                label: reviewCopy.fields.carrier,
-                value: carrierName,
+                label: reviewCopy.fields.fullName,
+                value: values.fullName,
               },
               {
                 type: 'text',
-                label: reviewCopy.fields.coverageClass,
-                value: coverageClassName,
-              },
-              {
-                type: 'text',
-                label: reviewCopy.fields.remittanceType,
-                value: coverageTypeName,
+                label: PARENT_COMPANY_CONTENT.notesStep.allowCobraLabel,
+                value: values.allowCobra ? 'Yes' : 'No',
               },
             ],
           },
           {
-            id: 'processing',
-            title: reviewCopy.sections.processing,
+            id: 'address',
+            title: reviewCopy.sections.primaryAddress,
             items: [
               {
                 type: 'text',
-                label: reviewCopy.fields.combinationForBill,
-                value: values.codeInvoice,
+                label: reviewCopy.fields.address1,
+                value: values.address1,
               },
               {
                 type: 'text',
-                label: reviewCopy.fields.combinationForReports,
-                value: values.codeReport,
+                label: reviewCopy.fields.address2,
+                value: values.address2,
               },
               {
                 type: 'text',
-                label: reviewCopy.fields.useForBill,
-                value: values.invoiceInclude
-                  ? reviewCopy.yes
-                  : reviewCopy.no,
+                label: reviewCopy.fields.city,
+                value: values.city,
               },
               {
                 type: 'text',
-                label: reviewCopy.fields.description,
-                value: values.title,
+                label: reviewCopy.fields.state,
+                value: stateName,
               },
               {
                 type: 'text',
-                label: reviewCopy.fields.shortDescription,
-                value: values.shortTitle,
+                label: reviewCopy.fields.zipCode,
+                value: values.zipCode,
+              },
+            ],
+          },
+          {
+            id: 'contact',
+            title: reviewCopy.sections.contact,
+            items: [
+              {
+                type: 'text',
+                label: reviewCopy.fields.firstName,
+                value: values.contact.firstName,
               },
               {
                 type: 'text',
-                label: reviewCopy.fields.invoiceGroup,
-                value: values.invoiceGroup,
+                label: reviewCopy.fields.lastName,
+                value: values.contact.lastName,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.phone,
+                value: values.contact.phoneNumber,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.alternativePhone,
+                value: values.contact.alternativePhoneNumber,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.fax,
+                value: values.contact.fax,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.email,
+                value: values.contact.email,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.website,
+                value: values.contact.website,
+              },
+            ],
+          },
+          {
+            id: 'carriers',
+            title: reviewCopy.sections.carriers,
+            items: [
+              {
+                type: 'badges',
+                items: selectedCarrierNames,
+                emptyMessage: reviewCopy.noCarriersSelected,
               },
             ],
           },
@@ -167,16 +194,11 @@ export function CoverageCodeDetailView({
           },
         ]
         : [],
-    [
-      values,
-      carrierName,
-      coverageClassName,
-      coverageTypeName,
-    ],
+    [values, stateName, selectedCarrierNames],
   )
 
   const handleDelete = () => {
-    deleteCoverageCode(coverageCodeId, {
+    deleteParentCompany(parentCompanyId, {
       onSuccess: () => {
         onDeleteSuccess()
       },
@@ -228,16 +250,16 @@ export function CoverageCodeDetailView({
           <div className="flex items-start justify-between gap-4">
             <div className="flex gap-4">
               <div className="flex size-11 shrink-0 items-center justify-center rounded-xl border border-tan-dark/15 bg-white text-tan-dark shadow-xs">
-                <FileCode2 className="size-5" aria-hidden />
+                <Building2 className="size-5" aria-hidden />
               </div>
               <div className="min-w-0 space-y-1">
                 <div className="flex items-center gap-2">
                   <CardTitle className="text-xl font-bold text-slate-900">
-                    {values.code}
+                    {values.name}
                   </CardTitle>
-                  {values.name ? (
+                  {values.fullName ? (
                     <Badge variant="secondary" className="font-medium">
-                      {values.name}
+                      {values.fullName}
                     </Badge>
                   ) : null}
                 </div>
@@ -269,7 +291,7 @@ export function CoverageCodeDetailView({
 
           {/* Integrated Actions Bar */}
           <DetailViewActionsBar
-            idPrefix="coverage-code-view"
+            idPrefix="parent-company-view"
             deleteLabel={copy.deleteButton}
             backLabel={copy.backButton}
             editLabel={copy.editButton}

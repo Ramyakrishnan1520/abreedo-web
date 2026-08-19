@@ -1,15 +1,4 @@
 export const EMPLOYER_CONTENT = {
-  list: {
-    kicker: 'Site Manager',
-    title: 'Employers Table',
-    description:
-      'Manage employer records with reusable TanStack Table columns, pagination, and action controls.',
-    selectParentCompanyLabel: 'Select Parent Company',
-    selectParentCompanyPlaceholder: 'Select a parent company...',
-    allParentCompaniesOption: 'All Parent Companies',
-    loadErrorFallback: 'Unable to load employers. Please try again.',
-    retry: 'Retry',
-  },
   pages: {
     index: {
       kicker: 'Administration',
@@ -18,10 +7,6 @@ export const EMPLOYER_CONTENT = {
         'Select an action below to set up a new employer or manage existing employers.',
       chooseHeading: 'Please Choose',
       cards: {
-        list: {
-          title: 'List Employer',
-          description: 'View available employers table',
-        },
         new: {
           title: 'New Employer',
           description: 'Guided Employer Setup',
@@ -42,7 +27,7 @@ export const EMPLOYER_CONTENT = {
         'Select an employer to load its details, then update using the same guided steps as new setup.',
       selectLabel: 'Select Employer',
       selectCardDescription:
-        'Search the list below and choose an employer to load its profile for editing.',
+        'Search by employer name and choose to view or edit.',
       selectPlaceholder: 'Choose an employer',
       selectLoadingPlaceholder: 'Loading employers...',
       selectSearchPlaceholder: 'Search employers...',
@@ -51,6 +36,20 @@ export const EMPLOYER_CONTENT = {
       emptyStateTitle: 'Ready when you are',
       editingLabel: 'Editing:',
       loadingDetails: 'Loading employer details...',
+      searchPlaceholder: 'Search by employer name...',
+      searchButton: 'Search',
+      clearButton: 'Clear',
+      viewTitle: 'Employer Information',
+      viewDescription:
+        'View complete details for the selected employer record.',
+      deleteButton: 'Delete',
+      backButton: 'Back',
+      editButton: 'Edit',
+      confirmDeleteTitle: 'Delete Employer',
+      confirmDeletePrompt:
+        'Are you sure you want to delete this employer? This action cannot be undone.',
+      cancel: 'Cancel',
+      confirmDelete: 'Delete Employer',
       errors: {
         listLoad: 'Failed to load employers. Please try again.',
         detailLoad: 'Failed to load employer details. Please try again.',
@@ -62,9 +61,11 @@ export const EMPLOYER_CONTENT = {
     columns: {
       name: 'Name',
       parentCompany: 'Parent Company',
+      view: 'View',
       edit: 'Edit',
       delete: 'Delete',
     },
+    viewAria: (name: string) => `View ${name}`,
     editAria: (name: string) => `Edit ${name}`,
     deleteAria: (name: string) => `Delete ${name}`,
   },
@@ -228,5 +229,7 @@ export const EMPLOYER_CONTENT = {
     createError: 'Failed to create employer. Please try again.',
     updateSuccess: 'Employer updated successfully!',
     updateError: 'Failed to update employer. Please try again.',
+    deleteSuccess: 'Employer deleted successfully!',
+    deleteError: 'Failed to delete employer. Please try again.',
   },
 } as const

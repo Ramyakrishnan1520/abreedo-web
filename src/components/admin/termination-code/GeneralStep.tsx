@@ -6,6 +6,7 @@ import {
   LABEL_COL,
   REQUIRED_LABEL_CLASS,
 } from '#/components/admin/common/form-styles'
+import { cn } from '#/lib/utils'
 import { Checkbox } from '#/components/ui/checkbox.tsx'
 import {
   FormControl,
@@ -15,7 +16,7 @@ import {
   FormMessage,
 } from '#/components/ui/Form'
 import { Input } from '#/components/ui/input.tsx'
-import { NumberStepper } from '#/components/ui/number-stepper.tsx'
+import { NumberStepper } from '#/components/admin/common/NumberStepper'
 import { Separator } from '#/components/ui/separator.tsx'
 import { TERMINATION_CODE_CONTENT } from '#/utils/termination-code-content.ts'
 
@@ -143,7 +144,7 @@ export function GeneralStep() {
           name="cobraNotice"
           render={({ field }) => (
             <FormItem className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-center sm:gap-4">
-              <FormLabel className={LABEL_COL}>
+              <FormLabel className={cn(LABEL_COL,REQUIRED_LABEL_CLASS)}>
                 {copy.cobraNoticeLabel}
               </FormLabel>
               <div className="flex items-center gap-6">
@@ -234,7 +235,7 @@ export function GeneralStep() {
                 name="cobraMonths"
                 render={({ field }) => (
                   <FormItem className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-start sm:gap-4">
-                    <FormLabel className={LABEL_COL}>
+                    <FormLabel className={cn(LABEL_COL,REQUIRED_LABEL_CLASS)}>
                       {copy.cobraMonthsLabel}
                     </FormLabel>
                     <div className="space-y-1">

@@ -2,9 +2,9 @@ import { useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
 import { AlertCircle, Building2, Search, X } from 'lucide-react'
 
-import { ParentCompanyDetailView } from '#/components/admin/parent-company/ParentCompanyDetailView.tsx'
-import { ParentCompanyForm } from '#/components/admin/parent-company/ParentCompanyForm.tsx'
-import { getParentCompanyTableColumns } from '#/components/admin/parent-company/parent-company-table-columns.tsx'
+import { EmployerDetailView } from '#/components/admin/employer/EmployerDetailView.tsx'
+import { EmployerForm } from '#/components/admin/employer/EmployerForm.tsx'
+import { getEmployerTableColumns } from '#/components/admin/employer/employer-table-columns.tsx'
 import { FORM_INPUT_CLASS } from '#/components/admin/common/form-styles.ts'
 import { ReusableTable } from '#/components/table'
 import { Button } from '#/components/ui/button.tsx'
@@ -15,23 +15,23 @@ import {
   CardTitle,
 } from '#/components/ui/card.tsx'
 import { Input } from '#/components/ui/input.tsx'
-import { useParentCompanies } from '#/hooks/parent-company/use-parent-companies.ts'
-import { useParentCompany } from '#/hooks/parent-company/useParentCompany.ts'
-import { PARENT_COMPANY_CONTENT } from '#/utils/parent-company-content.ts'
-import { mapParentCompanyDetailToFormValues } from '#/utils/mapParentCompanyDetailToFormValues.ts'
+import { useEmployers } from '#/hooks/employer/use-employers.ts'
+import { useEmployer } from '#/hooks/employer/useEmployerById.ts'
+import { EMPLOYER_CONTENT } from '#/utils/employer-content.ts'
+import { mapEmployerDetailToFormValues } from '#/utils/mapEmployerDetailToFormValues.ts'
 
 import type { PaginationState } from '@tanstack/react-table'
-import type { ParentCompany } from '#/types/parent-company.ts'
+import type { Employer } from '#/types/employer.ts'
 
-const copy = PARENT_COMPANY_CONTENT.pages.edit
+const copy = EMPLOYER_CONTENT.pages.edit
 
 type ViewMode = 'table' | 'view' | 'edit'
 
-export function EditParentCompanyPage() {
+export function EditEmployerPage() {
   const [viewMode, setViewMode] = useState<ViewMode>('table')
-  const [selectedParentCompanyId, setSelectedParentCompanyId] = useState<
-    string | null
-  >(null)
+  const [selectedEmployerId, setSelectedEmployerId] = useState<string | null>(
+    null,
+  )
   const [searchTerm, setSearchTerm] = useState('')
   const [activeSearch, setActiveSearch] = useState('')
 
@@ -41,13 +41,14 @@ export function EditParentCompanyPage() {
   })
 
   const {
-    data: parentCompaniesResult,
+    data: employersResult,
     isLoading: isLoadingList,
     isError: isListError,
     error: listError,
     isFetching,
     refetch,
-  } = useParentCompanies(
+  } = useEmployers(
+    undefined,
     {
       pageIndex: pagination.pageIndex,
       pageSize: pagination.pageSize,
@@ -56,20 +57,22 @@ export function EditParentCompanyPage() {
   )
 
   const {
-    data: parentCompanyDetail,
+    data: employerDetail,
     isLoading: isLoadingDetail,
     isError: isDetailError,
-  } = useParentCompany(selectedParentCompanyId ?? undefined)
+  } = useEmployer(selectedEmployerId ?? undefined)
 
-  const allParentCompanies = parentCompaniesResult?.items ?? []
+  const allEmployers = employersResult?.items ?? []
 
-  const filteredParentCompanies = useMemo(() => {
-    if (!activeSearch.trim()) return allParentCompanies
+  const filteredEmployers = useMemo(() => {
+    if (!activeSearch.trim()) return allEmployers
     const term = activeSearch.trim().toLowerCase()
-    return allParentCompanies.filter((company) =>
-      company.name.toLowerCase().includes(term),
+    return allEmployers.filter(
+      (employer) =>
+        employer.name.toLowerCase().includes(term) ||
+        employer.parentCompanyName.toLowerCase().includes(term),
     )
-  }, [allParentCompanies, activeSearch])
+  }, [allEmployers, activeSearch])
 
   const handleSearchSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -85,13 +88,13 @@ export function EditParentCompanyPage() {
 
   const columns = useMemo(
     () =>
-      getParentCompanyTableColumns({
-        onView: (company: ParentCompany) => {
-          setSelectedParentCompanyId(String(company.id))
+      getEmployerTableColumns({
+        onView: (employer: Employer) => {
+          setSelectedEmployerId(String(employer.id))
           setViewMode('view')
         },
-        onEdit: (company: ParentCompany) => {
-          setSelectedParentCompanyId(String(company.id))
+        onEdit: (employer: Employer) => {
+          setSelectedEmployerId(String(employer.id))
           setViewMode('edit')
         },
       }),
@@ -100,15 +103,15 @@ export function EditParentCompanyPage() {
 
   const handleBackToTable = () => {
     setViewMode('table')
-    setSelectedParentCompanyId(null)
+    setSelectedEmployerId(null)
   }
 
   const handleEditFromView = () => {
     setViewMode('edit')
   }
 
-  const initialValues = parentCompanyDetail
-    ? mapParentCompanyDetailToFormValues(parentCompanyDetail)
+  const initialValues = employerDetail
+    ? mapEmployerDetailToFormValues(employerDetail)
     : undefined
 
   return (
@@ -118,7 +121,7 @@ export function EditParentCompanyPage() {
         <p className="island-kicker">{copy.kicker}</p>
       </div>
 
-      {/* Mode 1: Table View with Search */}
+      {/* Table View with Search */}
       {viewMode === 'table' ? (
         <div className="space-y-6">
           {/* Search Card */}
@@ -145,7 +148,7 @@ export function EditParentCompanyPage() {
               >
                 <div className="relative flex-1">
                   <Input
-                    id="parent-company-search-input"
+                    id="employer-search-input"
                     type="text"
                     placeholder={copy.searchPlaceholder}
                     value={searchTerm}
@@ -164,7 +167,7 @@ export function EditParentCompanyPage() {
                   ) : null}
                 </div>
                 <Button
-                  id="parent-company-search-btn"
+                  id="employer-search-btn"
                   type="submit"
                   className="h-10 gap-2 bg-tan-dark font-semibold text-white shadow-xs hover:bg-tan-dark/90"
                 >
@@ -198,35 +201,35 @@ export function EditParentCompanyPage() {
             </div>
           ) : null}
 
-          {/* Parent Company Table */}
+          {/* Employer Table */}
           <ReusableTable
-            data={filteredParentCompanies}
+            data={filteredEmployers}
             columns={columns}
             loading={isLoadingList}
             pagination={pagination}
             onPaginationChange={setPagination}
-            pageCount={parentCompaniesResult?.totalPages}
+            pageCount={employersResult?.totalPages}
             rowCount={
               activeSearch
-                ? filteredParentCompanies.length
-                : (parentCompaniesResult?.totalCount ?? 0)
+                ? filteredEmployers.length
+                : (employersResult?.totalCount ?? 0)
             }
           />
         </div>
       ) : null}
 
-      {/* Mode 2: View Detail Page */}
-      {viewMode === 'view' && selectedParentCompanyId ? (
-        <ParentCompanyDetailView
-          parentCompanyId={selectedParentCompanyId}
+      {/* View Detail Page */}
+      {viewMode === 'view' && selectedEmployerId ? (
+        <EmployerDetailView
+          employerId={selectedEmployerId}
           onBack={handleBackToTable}
           onEdit={handleEditFromView}
           onDeleteSuccess={handleBackToTable}
         />
       ) : null}
 
-      {/* Mode 3: Multi-Step Edit Form */}
-      {viewMode === 'edit' && selectedParentCompanyId ? (
+      {/* Multi-Step Edit Form */}
+      {viewMode === 'edit' && selectedEmployerId ? (
         isLoadingDetail ? (
           <Card className="border-slate-200 shadow-xs">
             <CardContent className="flex items-center justify-center gap-3 py-16 text-sm text-slate-600">
@@ -252,10 +255,10 @@ export function EditParentCompanyPage() {
             </CardContent>
           </Card>
         ) : initialValues ? (
-          <ParentCompanyForm
-            key={selectedParentCompanyId}
+          <EmployerForm
+            key={selectedEmployerId}
             mode="edit"
-            parentCompanyId={selectedParentCompanyId}
+            employerId={selectedEmployerId}
             initialValues={initialValues}
             onBack={handleBackToTable}
             onSuccess={handleBackToTable}

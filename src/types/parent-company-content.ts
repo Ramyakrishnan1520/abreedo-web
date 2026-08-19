@@ -26,11 +26,37 @@ export interface ParentCompanyContent {
       emptyStateTitle: string
       editingLabel: string
       loadingDetails: string
+      searchPlaceholder: string
+      searchButton: string
+      clearButton: string
+      viewTitle: string
+      viewDescription: string
+      deleteButton: string
+      backButton: string
+      editButton: string
+      confirmDeleteTitle: string
+      confirmDeletePrompt: string
+      cancel: string
+      confirmDelete: string
       errors: {
         listLoad: string
         detailLoad: string
       }
     }
+  }
+  table: {
+    emptyValue: string
+    columns: {
+      name: string
+      contactName: string
+      email: string
+      view: string
+      edit: string
+      delete: string
+    }
+    viewAria: (name: string) => string
+    editAria: (name: string) => string
+    deleteAria: (name: string) => string
   }
   form: {
     kicker: string
@@ -58,7 +84,7 @@ export interface ParentCompanyContent {
     }
     fields: {
       name: string
-      fullName:String
+      fullName: string
       address1: string
       address2: string
       city: string
@@ -77,5 +103,6 @@ export interface ParentCompanyContent {
   toasts: {
     create: { success: string; error: string }
     update: { success: string; error: string }
+    delete: { success: string; error: string }
   }
 }
