@@ -2,14 +2,14 @@ import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { AlertCircle, Loader2 } from 'lucide-react'
+import { AlertCircle } from 'lucide-react'
 
-import { Button } from '#/components/ui/button.tsx'
 import { Form } from '#/components/ui/Form'
 import { GeneralStep } from '#/components/admin/carrier/GeneralStep.tsx'
 import { ContactStep } from '#/components/admin/carrier/ContactStep.tsx'
 import { ReviewStep } from '#/components/admin/carrier/ReviewStep.tsx'
 import { Stepper } from '#/components/admin/common/Stepper'
+import { FormNavigationActions } from '#/components/admin/common/FormNavigationActions.tsx'
 import {
   CARRIER_DEFAULT_VALUES,
   CARRIER_STEPS,
@@ -22,6 +22,8 @@ import { useCreateCarrier } from '#/hooks/carrier/useCreateCarrier.ts'
 import { useUpdateCarrier } from '#/hooks/carrier/useUpdateCarrier.ts'
 import { CARRIER_CONTENT } from '#/utils/carrier-content.ts'
 import { getCarrierStepValidationFields } from '#/utils/getCarrierStepValidationFields.ts'
+
+import type { CreateCarrierRequest } from '#/types/carrier.ts'
 
 const { form: formCopy } = CARRIER_CONTENT
 
@@ -92,20 +94,20 @@ export function CarrierForm({
   }
 
   const onSubmit = (data: CarrierFormValues) => {
-    const payload = {
+    const payload: CreateCarrierRequest = {
       name: data.name,
-      groupNumber: data.groupTitle,
-      contactFirst: data.contactFirstName ?? '',
-      contactLast: data.contactLastName ?? '',
-      address1: data.address1 ?? '',
-      address2: data.address2 ?? '',
-      city: data.city ?? '',
-      state: data.state ?? '',
-      zip: data.zip ?? '',
-      phone: data.phone ?? '',
-      fax: data.fax ?? '',
-      email: data.email ?? '',
-      allowFlexibleDates: data.allowFlexibleDates ?? false,
+      groupNumber: data.groupTitle || '',
+      contactFirst: data.contactFirstName || '',
+      contactLast: data.contactLastName || '',
+      address1: data.address1 || '',
+      address2: data.address2 || '',
+      city: data.city || '',
+      state: data.state || '',
+      zip: data.zip || '',
+      phone: data.phone || '',
+      fax: data.fax || '',
+      email: data.email || '',
+      allowFlexibleDates: data.allowFlexibleDates,
     }
 
     if (mode === 'edit' && carrierId) {
@@ -183,45 +185,17 @@ export function CarrierForm({
           </div>
 
           {/* Sticky Bottom Navigation */}
-          <div className="sticky bottom-0 border-t border-slate-200 bg-white/95 px-6 py-4 backdrop-blur-sm sm:px-8">
-            <div className="flex items-center justify-between gap-3">
-              <Button
-                id="carrier-back-btn"
-                type="button"
-                variant="outline"
-                onClick={handleBack}
-                disabled={isPending}
-                className="h-9 rounded-md border-slate-200 px-6 font-semibold text-slate-700 shadow-xs hover:bg-slate-100"
-              >
-                {formCopy.navigation.back}
-              </Button>
-
-              {isLastStep ? (
-                <Button
-                  id="carrier-save-btn"
-                  type="button"
-                  onClick={handleSave}
-                  disabled={isPending}
-                  className="h-9 rounded-md bg-tan-dark px-6 font-semibold text-white shadow-xs hover:bg-tan-dark/90 disabled:opacity-70"
-                >
-                  {isPending ? (
-                    <Loader2 className="size-4 animate-spin" />
-                  ) : (
-                    saveLabel
-                  )}
-                </Button>
-              ) : (
-                <Button
-                  id="carrier-next-btn"
-                  type="button"
-                  onClick={() => void handleNext()}
-                  className="h-9 rounded-md bg-tan-dark px-6 font-semibold text-white shadow-xs hover:bg-tan-dark/90"
-                >
-                  {formCopy.navigation.next}
-                </Button>
-              )}
-            </div>
-          </div>
+          <FormNavigationActions
+            idPrefix="carrier"
+            backLabel={formCopy.navigation.back}
+            nextLabel={formCopy.navigation.next}
+            saveLabel={saveLabel}
+            isLastStep={isLastStep}
+            isPending={isPending}
+            onBack={handleBack}
+            onNext={() => void handleNext()}
+            onSave={handleSave}
+          />
         </form>
       </Form>
     </div>

@@ -1,18 +1,18 @@
 import { useMemo } from 'react'
 import { useFormContext } from 'react-hook-form'
 
-import ReviewSection from '#/components/admin/common/ReviwSection'
+import { ReviewStep as CommonReviewStep } from '#/components/admin/common/ReviewSection'
 import { useGetCoverageClasses } from '#/hooks/coverage-code/useGetCoverageClasses.ts'
 import { useGetCoverageTypes } from '#/hooks/coverage-code/useGetCoverageTypes.ts'
 import { useInfiniteCarrierOptions } from '#/hooks/carrier/use-infinite-carrier-options.ts'
 import { COVERAGE_CODE_CONTENT } from '#/utils/coverage-code-content.ts'
-import type { CoverageCodeFormValues } from '#/components/admin/coverage-code/coverage-code.schema.ts'
 
+import type { CoverageCodeFormValues } from '#/components/admin/coverage-code/coverage-code.schema.ts'
+import type { ReviewSectionConfig } from '#/types/review-steps.ts'
 
 export function ReviewStep() {
   const form = useFormContext<CoverageCodeFormValues>()
   const copy = COVERAGE_CODE_CONTENT.reviewStep
-
   const values = form.getValues()
 
   const { carriers } = useInfiniteCarrierOptions()
@@ -43,49 +43,92 @@ export function ReviewStep() {
     return match ? match.name || match.code : values.remittanceTypeId
   }, [coverageTypes, values.remittanceTypeId])
 
-  const generalItems = [
-    { label: copy.fields.code, value: values.code },
-    { label: copy.fields.name, value: values.name },
-    { label: copy.fields.carrier, value: carrierName },
-    { label: copy.fields.coverageClass, value: coverageClassName },
-    { label: copy.fields.remittanceType, value: remittanceTypeName },
-  ]
-
-  const processingItems = [
-    { label: copy.fields.combinationForBill, value: values.codeInvoice },
-    { label: copy.fields.combinationForReports, value: values.codeReport },
-    {
-      label: copy.fields.useForBill,
-      value: values.invoiceInclude ? copy.yes : copy.no,
-    },
-    { label: copy.fields.description, value: values.title },
-    { label: copy.fields.shortDescription, value: values.shortTitle },
-    { label: copy.fields.invoiceGroup, value: values.invoiceGroup },
-  ]
-
-  const notesItems = [{ label: copy.fields.notes, value: values.notes }]
+  const sections: ReviewSectionConfig[] = useMemo(
+    () => [
+      {
+        id: 'general',
+        title: copy.sections.general,
+        items: [
+          { type: 'text', label: copy.fields.code, value: values.code },
+          { type: 'text', label: copy.fields.name, value: values.name },
+          { type: 'text', label: copy.fields.carrier, value: carrierName },
+          {
+            type: 'text',
+            label: copy.fields.coverageClass,
+            value: coverageClassName,
+          },
+          {
+            type: 'text',
+            label: copy.fields.remittanceType,
+            value: remittanceTypeName,
+          },
+        ],
+      },
+      {
+        id: 'processing',
+        title: copy.sections.processing,
+        items: [
+          {
+            type: 'text',
+            label: copy.fields.combinationForBill,
+            value: values.codeInvoice,
+          },
+          {
+            type: 'text',
+            label: copy.fields.combinationForReports,
+            value: values.codeReport,
+          },
+          {
+            type: 'text',
+            label: copy.fields.useForBill,
+            value: values.invoiceInclude ? copy.yes : copy.no,
+          },
+          {
+            type: 'text',
+            label: copy.fields.description,
+            value: values.title,
+          },
+          {
+            type: 'text',
+            label: copy.fields.shortDescription,
+            value: values.shortTitle,
+          },
+          {
+            type: 'text',
+            label: copy.fields.invoiceGroup,
+            value: values.invoiceGroup,
+          },
+        ],
+      },
+      {
+        id: 'notes',
+        title: copy.sections.notes,
+        items: [
+          {
+            type: 'multiline',
+            value: values.notes,
+          },
+        ],
+      },
+    ],
+    [
+      copy,
+      values,
+      carrierName,
+      coverageClassName,
+      remittanceTypeName,
+    ],
+  )
 
   return (
-    <div className="space-y-6">
-      <div className="space-y-1">
-        <h3 className="text-base font-bold text-slate-900">{copy.heading}</h3>
-        <p className="text-sm text-slate-500">{copy.description}</p>
-      </div>
-
-      <div className="space-y-4">
-        <ReviewSection
-          title={copy.sections.general}
-          items={generalItems}
-        />
-        <ReviewSection
-          title={copy.sections.processing}
-          items={processingItems}
-        />
-        <ReviewSection
-          title={copy.sections.notes}
-          items={notesItems}
-        />
-      </div>
-    </div>
+    <CommonReviewStep
+      copy={{
+        heading: copy.heading,
+        description: copy.description,
+        emptyValue: '—',
+      }}
+      sections={sections}
+      layout="cards"
+    />
   )
 }

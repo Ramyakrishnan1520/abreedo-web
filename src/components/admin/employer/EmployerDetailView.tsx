@@ -1,15 +1,9 @@
 import { useMemo, useState } from 'react'
-import {
-  AlertCircle,
-  ArrowLeft,
-  Building2,
-  Loader2,
-  Pencil,
-  Trash2,
-} from 'lucide-react'
+import { AlertCircle, ArrowLeft, Building2, Loader2 } from 'lucide-react'
 
 import { DeleteConfirmBanner } from '#/components/admin/common/DeleteConfirmBanner.tsx'
-import ReviewSection from '#/components/admin/common/ReviwSection.tsx'
+import { DetailViewActionsBar } from '#/components/admin/common/DetailViewActionsBar.tsx'
+import { ReviewStep } from '#/components/admin/common/ReviewSection'
 import { Badge } from '#/components/ui/badge.tsx'
 import { Button } from '#/components/ui/button.tsx'
 import {
@@ -26,6 +20,8 @@ import { useParentCompanies } from '#/hooks/parent-company/useParentCompanies.ts
 import { EMPLOYER_CONTENT } from '#/utils/employer-content.ts'
 import { mapEmployerDetailToFormValues } from '#/utils/mapEmployerDetailToFormValues.ts'
 import { resolveSelectedCarrierOptions } from '#/utils/resolveSelectedCarrierOptions.ts'
+
+import type { ReviewSectionConfig } from '#/types/review-steps.ts'
 
 interface EmployerDetailViewProps {
   employerId: string
@@ -72,112 +68,190 @@ export function EmployerDetailView({
     () =>
       values
         ? resolveSelectedCarrierOptions(
-            values.carrierIds ?? [],
-            carriers,
-            values.linkedCarriers ?? [],
-          )
+          values.carrierIds ?? [],
+          carriers,
+          values.linkedCarriers ?? [],
+        )
         : [],
     [carriers, values],
   )
 
-  const generalItems = useMemo(
+  const sections: ReviewSectionConfig[] = useMemo(
     () =>
       values
         ? [
-            { label: reviewCopy.fields.name, value: values.name },
-            { label: reviewCopy.fields.parentCompany, value: parentCompanyName },
-          ]
+          {
+            id: 'general',
+            title: reviewCopy.sections.general,
+            items: [
+              {
+                type: 'text',
+                label: reviewCopy.fields.name,
+                value: values.name,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.parentCompany,
+                value: parentCompanyName,
+              },
+            ],
+          },
+          {
+            id: 'address',
+            title: reviewCopy.sections.primaryAddress,
+            items: [
+              {
+                type: 'text',
+                label: reviewCopy.fields.address1,
+                value: values.address1,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.address2,
+                value: values.address2,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.city,
+                value: values.city,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.state,
+                value: stateName,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.zip,
+                value: values.zip,
+              },
+            ],
+          },
+          {
+            id: 'contact',
+            title: reviewCopy.sections.contact,
+            items: [
+              {
+                type: 'text',
+                label: reviewCopy.fields.contactFirstName,
+                value: values.contactFirst,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.contactLastName,
+                value: values.contactLast,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.contactTitle,
+                value: values.contactTitle,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.phone,
+                value: values.phone,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.fax,
+                value: values.fax,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.email,
+                value: values.email,
+              },
+            ],
+          },
+          {
+            id: 'carriers',
+            title: reviewCopy.sections.carriers,
+            items: [
+              {
+                type: 'badges',
+                items: selectedCarrierNames,
+                emptyMessage: reviewCopy.noCarriersSelected,
+              },
+            ],
+          },
+          {
+            id: 'group',
+            title: reviewCopy.sections.groupDetails,
+            items: [
+              {
+                type: 'text',
+                label: reviewCopy.fields.groupNumber,
+                value: values.groupNumber,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.policyNumber,
+                value: values.policyNumber,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.tpacNumber,
+                value: values.tpacNumber,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.monthlyAdminFee,
+                value:
+                  values.monthlyAdminFee !== undefined
+                    ? `$${values.monthlyAdminFee}`
+                    : undefined,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.status,
+                value:
+                  values.status === 1 ? reviewCopy.yes : reviewCopy.no,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.isPaper,
+                value: values.isPaper ? reviewCopy.yes : reviewCopy.no,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.allowCobra,
+                value: values.allowCobra ? reviewCopy.yes : reviewCopy.no,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.isPano,
+                value: values.isPano ? reviewCopy.yes : reviewCopy.no,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.renewalDate,
+                value: values.renewalDate,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.initialNotificationStartOn,
+                value: values.initialNotificationStartOn,
+              },
+            ],
+          },
+          {
+            id: 'notes',
+            title: reviewCopy.sections.notes,
+            items: [
+              {
+                type: 'text',
+                label: reviewCopy.fields.notesTitle,
+                value: values.notesTitle,
+              },
+              {
+                type: 'multiline',
+                value: values.notes,
+              },
+            ],
+          },
+        ]
         : [],
-    [values, parentCompanyName],
-  )
-
-  const addressItems = useMemo(
-    () =>
-      values
-        ? [
-            { label: reviewCopy.fields.address1, value: values.address1 },
-            { label: reviewCopy.fields.address2, value: values.address2 },
-            { label: reviewCopy.fields.city, value: values.city },
-            { label: reviewCopy.fields.state, value: stateName },
-            { label: reviewCopy.fields.zip, value: values.zip },
-          ]
-        : [],
-    [values, stateName],
-  )
-
-  const contactItems = useMemo(
-    () =>
-      values
-        ? [
-            {
-              label: reviewCopy.fields.contactFirstName,
-              value: values.contactFirst,
-            },
-            {
-              label: reviewCopy.fields.contactLastName,
-              value: values.contactLast,
-            },
-            {
-              label: reviewCopy.fields.contactTitle,
-              value: values.contactTitle,
-            },
-            { label: reviewCopy.fields.phone, value: values.phone },
-            { label: reviewCopy.fields.fax, value: values.fax },
-            { label: reviewCopy.fields.email, value: values.email },
-          ]
-        : [],
-    [values],
-  )
-
-  const groupItems = useMemo(
-    () =>
-      values
-        ? [
-            { label: reviewCopy.fields.groupNumber, value: values.groupNumber },
-            { label: reviewCopy.fields.policyNumber, value: values.policyNumber },
-            { label: reviewCopy.fields.tpacNumber, value: values.tpacNumber },
-            {
-              label: reviewCopy.fields.monthlyAdminFee,
-              value:
-                values.monthlyAdminFee !== undefined
-                  ? `$${values.monthlyAdminFee}`
-                  : undefined,
-            },
-            {
-              label: reviewCopy.fields.status,
-              value: values.status === 1 ? reviewCopy.yes : reviewCopy.no,
-            },
-            {
-              label: reviewCopy.fields.isPaper,
-              value: values.isPaper ? reviewCopy.yes : reviewCopy.no,
-            },
-            {
-              label: reviewCopy.fields.allowCobra,
-              value: values.allowCobra ? reviewCopy.yes : reviewCopy.no,
-            },
-            {
-              label: reviewCopy.fields.isPano,
-              value: values.isPano ? reviewCopy.yes : reviewCopy.no,
-            },
-            { label: reviewCopy.fields.renewalDate, value: values.renewalDate },
-            {
-              label: reviewCopy.fields.initialNotificationStartOn,
-              value: values.initialNotificationStartOn,
-            },
-          ]
-        : [],
-    [values],
-  )
-
-  const notesItems = useMemo(
-    () =>
-      values
-        ? [
-            { label: reviewCopy.fields.notesTitle, value: values.notesTitle },
-            { label: reviewCopy.fields.notes, value: values.notes },
-          ]
-        : [],
-    [values],
+    [values, parentCompanyName, stateName, selectedCarrierNames],
   )
 
   const handleDelete = () => {
@@ -257,46 +331,11 @@ export function EmployerDetailView({
           </div>
         </CardHeader>
         <CardContent className="space-y-5 pt-6">
-          <ReviewSection
-            title={reviewCopy.sections.general}
-            items={generalItems}
-          />
-          <ReviewSection
-            title={reviewCopy.sections.primaryAddress}
-            items={addressItems}
-          />
-          <ReviewSection
-            title={reviewCopy.sections.contact}
-            items={contactItems}
-          />
-
-          {/* Carriers Section */}
-          <div className="space-y-3 rounded-xl border border-slate-200 bg-slate-50/50 p-4 sm:p-5">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-tan-dark">
-              {reviewCopy.sections.carriers}
-            </h4>
-            {selectedCarrierNames.length === 0 ? (
-              <p className="text-sm text-slate-500">
-                {reviewCopy.noCarriersSelected}
-              </p>
-            ) : (
-              <div className="flex flex-wrap gap-2 pt-1">
-                {selectedCarrierNames.map((carrier) => (
-                  <Badge key={carrier.id} variant="secondary">
-                    {carrier.name}
-                  </Badge>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <ReviewSection
-            title={reviewCopy.sections.groupDetails}
-            items={groupItems}
-          />
-          <ReviewSection
-            title={reviewCopy.sections.notes}
-            items={notesItems}
+          <ReviewStep
+            copy={{ emptyValue: '—' }}
+            sections={sections}
+            layout="accordion"
+            defaultOpenSection="general"
           />
 
           {/* Delete Confirmation Banner */}
@@ -313,43 +352,17 @@ export function EmployerDetailView({
           ) : null}
 
           {/* Integrated Actions Bar */}
-          <div className="flex items-center justify-between gap-3 border-t border-slate-200 pt-5 mt-6">
-            <Button
-              id="employer-view-delete-btn"
-              type="button"
-              variant="destructive"
-              onClick={() => setShowConfirmDelete(true)}
-              disabled={isDeleting || showConfirmDelete}
-              className="h-9 gap-1.5 rounded-md px-5 font-semibold shadow-xs"
-            >
-              <Trash2 className="size-4" />
-              {copy.deleteButton}
-            </Button>
-
-            <div className="flex items-center gap-3">
-              <Button
-                id="employer-view-back-btn"
-                type="button"
-                variant="outline"
-                onClick={onBack}
-                disabled={isDeleting}
-                className="h-9 gap-1.5 rounded-md border-slate-200 px-5 font-semibold text-slate-700 shadow-xs hover:bg-slate-100"
-              >
-                <ArrowLeft className="size-4" />
-                {copy.backButton}
-              </Button>
-              <Button
-                id="employer-view-edit-btn"
-                type="button"
-                onClick={onEdit}
-                disabled={isDeleting}
-                className="h-9 gap-1.5 rounded-md bg-tan-dark px-5 font-semibold text-white shadow-xs hover:bg-tan-dark/90"
-              >
-                <Pencil className="size-4" />
-                {copy.editButton}
-              </Button>
-            </div>
-          </div>
+          <DetailViewActionsBar
+            idPrefix="employer-view"
+            deleteLabel={copy.deleteButton}
+            backLabel={copy.backButton}
+            editLabel={copy.editButton}
+            isDeleting={isDeleting}
+            isDeleteDisabled={showConfirmDelete}
+            onDelete={() => setShowConfirmDelete(true)}
+            onBack={onBack}
+            onEdit={onEdit}
+          />
         </CardContent>
       </Card>
     </div>

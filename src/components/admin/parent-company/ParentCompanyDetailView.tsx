@@ -1,15 +1,9 @@
 import { useMemo, useState } from 'react'
-import {
-  AlertCircle,
-  ArrowLeft,
-  Building2,
-  Loader2,
-  Pencil,
-  Trash2,
-} from 'lucide-react'
+import { AlertCircle, ArrowLeft, Building2, Loader2 } from 'lucide-react'
 
 import { DeleteConfirmBanner } from '#/components/admin/common/DeleteConfirmBanner.tsx'
-import ReviewSection from '#/components/admin/common/ReviwSection.tsx'
+import { DetailViewActionsBar } from '#/components/admin/common/DetailViewActionsBar.tsx'
+import { ReviewStep } from '#/components/admin/common/ReviewSection'
 import { Badge } from '#/components/ui/badge.tsx'
 import { Button } from '#/components/ui/button.tsx'
 import {
@@ -25,6 +19,8 @@ import { useParentCompany } from '#/hooks/parent-company/useParentCompany.ts'
 import { PARENT_COMPANY_CONTENT } from '#/utils/parent-company-content.ts'
 import { mapParentCompanyDetailToFormValues } from '#/utils/mapParentCompanyDetailToFormValues.ts'
 import { resolveSelectedCarrierOptions } from '#/utils/resolveSelectedCarrierOptions.ts'
+
+import type { ReviewSectionConfig } from '#/types/review-steps.ts'
 
 interface ParentCompanyDetailViewProps {
   parentCompanyId: string
@@ -43,9 +39,12 @@ export function ParentCompanyDetailView({
   onDeleteSuccess,
 }: ParentCompanyDetailViewProps) {
   const [showConfirmDelete, setShowConfirmDelete] = useState(false)
-  const { data: parentCompanyDetail, isLoading, isError } =
-    useParentCompany(parentCompanyId)
-  const { data: states = [] } = useGetStates()
+  const {
+    data: parentCompanyDetail,
+    isLoading,
+    isError,
+  } = useParentCompany(parentCompanyId)
+  const { data: states } = useGetStates()
   const { carriers } = useAvailableCarriers()
   const { mutate: deleteParentCompany, isPending: isDeleting } =
     useDeleteParentCompany()
@@ -60,89 +59,142 @@ export function ParentCompanyDetailView({
 
   const stateName = useMemo(() => {
     if (!values?.state) return undefined
-    return states.find((s) => s.id === values.state)?.name ?? values.state
+    return states?.find((s) => s.id === values.state)?.name ?? values.state
   }, [states, values?.state])
 
   const selectedCarrierNames = useMemo(
     () =>
       values
         ? resolveSelectedCarrierOptions(
-            values.carrierIds,
-            carriers,
-            values.linkedCarriers ?? [],
-          )
+          values.carrierIds,
+          carriers,
+          values.linkedCarriers ?? [],
+        )
         : [],
     [carriers, values],
   )
 
-  const generalItems = useMemo(
+  const sections: ReviewSectionConfig[] = useMemo(
     () =>
       values
         ? [
-            { label: reviewCopy.fields.name, value: values.name },
-            { label: reviewCopy.fields.fullName, value: values.fullName },
-            {
-              label: PARENT_COMPANY_CONTENT.notesStep.allowCobraLabel,
-              value: values.allowCobra ? 'Yes' : 'No',
-            },
-          ]
+          {
+            id: 'general',
+            title: reviewCopy.sections.general,
+            items: [
+              {
+                type: 'text',
+                label: reviewCopy.fields.name,
+                value: values.name,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.fullName,
+                value: values.fullName,
+              },
+              {
+                type: 'text',
+                label: PARENT_COMPANY_CONTENT.notesStep.allowCobraLabel,
+                value: values.allowCobra ? 'Yes' : 'No',
+              },
+            ],
+          },
+          {
+            id: 'address',
+            title: reviewCopy.sections.primaryAddress,
+            items: [
+              {
+                type: 'text',
+                label: reviewCopy.fields.address1,
+                value: values.address1,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.address2,
+                value: values.address2,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.city,
+                value: values.city,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.state,
+                value: stateName,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.zipCode,
+                value: values.zipCode,
+              },
+            ],
+          },
+          {
+            id: 'contact',
+            title: reviewCopy.sections.contact,
+            items: [
+              {
+                type: 'text',
+                label: reviewCopy.fields.firstName,
+                value: values.contact.firstName,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.lastName,
+                value: values.contact.lastName,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.phone,
+                value: values.contact.phoneNumber,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.alternativePhone,
+                value: values.contact.alternativePhoneNumber,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.fax,
+                value: values.contact.fax,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.email,
+                value: values.contact.email,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.website,
+                value: values.contact.website,
+              },
+            ],
+          },
+          {
+            id: 'carriers',
+            title: reviewCopy.sections.carriers,
+            items: [
+              {
+                type: 'badges',
+                items: selectedCarrierNames,
+                emptyMessage: reviewCopy.noCarriersSelected,
+              },
+            ],
+          },
+          {
+            id: 'notes',
+            title: reviewCopy.sections.notes,
+            items: [
+              {
+                type: 'multiline',
+                value: values.notes,
+              },
+            ],
+          },
+        ]
         : [],
-    [values],
-  )
-
-  const addressItems = useMemo(
-    () =>
-      values
-        ? [
-            { label: reviewCopy.fields.address1, value: values.address1 },
-            { label: reviewCopy.fields.address2, value: values.address2 },
-            { label: reviewCopy.fields.city, value: values.city },
-            { label: reviewCopy.fields.state, value: stateName },
-            { label: reviewCopy.fields.zipCode, value: values.zipCode },
-          ]
-        : [],
-    [values, stateName],
-  )
-
-  const contactItems = useMemo(
-    () =>
-      values
-        ? [
-            {
-              label: reviewCopy.fields.firstName,
-              value: values.contact.firstName,
-            },
-            {
-              label: reviewCopy.fields.lastName,
-              value: values.contact.lastName,
-            },
-            {
-              label: reviewCopy.fields.phone,
-              value: values.contact.phoneNumber,
-            },
-            {
-              label: reviewCopy.fields.alternativePhone,
-              value: values.contact.alternativePhoneNumber,
-            },
-            { label: reviewCopy.fields.fax, value: values.contact.fax },
-            { label: reviewCopy.fields.email, value: values.contact.email },
-            { label: reviewCopy.fields.website, value: values.contact.website },
-          ]
-        : [],
-    [values],
-  )
-
-  const notesItems = useMemo(
-    () =>
-      values
-        ? [
-            {
-              label: reviewCopy.sections.notes,
-              value: values.notes,
-            },
-          ]
-        : [],
-    [values],
+    [values, stateName, selectedCarrierNames],
   )
 
   const handleDelete = () => {
@@ -217,42 +269,11 @@ export function ParentCompanyDetailView({
           </div>
         </CardHeader>
         <CardContent className="space-y-5 pt-6">
-          <ReviewSection
-            title={reviewCopy.sections.general}
-            items={generalItems}
-          />
-          <ReviewSection
-            title={reviewCopy.sections.primaryAddress}
-            items={addressItems}
-          />
-          <ReviewSection
-            title={reviewCopy.sections.contact}
-            items={contactItems}
-          />
-
-          {/* Carriers Section */}
-          <div className="space-y-3 rounded-xl border border-slate-200 bg-slate-50/50 p-4 sm:p-5">
-            <h4 className="text-xs font-bold uppercase tracking-wider text-tan-dark">
-              {reviewCopy.sections.carriers}
-            </h4>
-            {selectedCarrierNames.length === 0 ? (
-              <p className="text-sm text-slate-500">
-                {reviewCopy.noCarriersSelected}
-              </p>
-            ) : (
-              <div className="flex flex-wrap gap-2 pt-1">
-                {selectedCarrierNames.map((carrier) => (
-                  <Badge key={carrier.id} variant="secondary">
-                    {carrier.name}
-                  </Badge>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <ReviewSection
-            title={reviewCopy.sections.notes}
-            items={notesItems}
+          <ReviewStep
+            copy={{ emptyValue: '—' }}
+            sections={sections}
+            layout="accordion"
+            defaultOpenSection="general"
           />
 
           {/* Delete Confirmation Banner */}
@@ -269,43 +290,17 @@ export function ParentCompanyDetailView({
           ) : null}
 
           {/* Integrated Actions Bar */}
-          <div className="flex items-center justify-between gap-3 border-t border-slate-200 pt-5 mt-6">
-            <Button
-              id="parent-company-view-delete-btn"
-              type="button"
-              variant="destructive"
-              onClick={() => setShowConfirmDelete(true)}
-              disabled={isDeleting || showConfirmDelete}
-              className="h-9 gap-1.5 rounded-md px-5 font-semibold shadow-xs"
-            >
-              <Trash2 className="size-4" />
-              {copy.deleteButton}
-            </Button>
-
-            <div className="flex items-center gap-3">
-              <Button
-                id="parent-company-view-back-btn"
-                type="button"
-                variant="outline"
-                onClick={onBack}
-                disabled={isDeleting}
-                className="h-9 gap-1.5 rounded-md border-slate-200 px-5 font-semibold text-slate-700 shadow-xs hover:bg-slate-100"
-              >
-                <ArrowLeft className="size-4" />
-                {copy.backButton}
-              </Button>
-              <Button
-                id="parent-company-view-edit-btn"
-                type="button"
-                onClick={onEdit}
-                disabled={isDeleting}
-                className="h-9 gap-1.5 rounded-md bg-tan-dark px-5 font-semibold text-white shadow-xs hover:bg-tan-dark/90"
-              >
-                <Pencil className="size-4" />
-                {copy.editButton}
-              </Button>
-            </div>
-          </div>
+          <DetailViewActionsBar
+            idPrefix="parent-company-view"
+            deleteLabel={copy.deleteButton}
+            backLabel={copy.backButton}
+            editLabel={copy.editButton}
+            isDeleting={isDeleting}
+            isDeleteDisabled={showConfirmDelete}
+            onDelete={() => setShowConfirmDelete(true)}
+            onBack={onBack}
+            onEdit={onEdit}
+          />
         </CardContent>
       </Card>
     </div>

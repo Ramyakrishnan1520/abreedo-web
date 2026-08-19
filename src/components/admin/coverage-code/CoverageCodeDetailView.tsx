@@ -1,15 +1,9 @@
 import { useMemo, useState } from 'react'
-import {
-  AlertCircle,
-  ArrowLeft,
-  FileCode2,
-  Loader2,
-  Pencil,
-  Trash2,
-} from 'lucide-react'
+import { AlertCircle, ArrowLeft, FileCode2, Loader2 } from 'lucide-react'
 
 import { DeleteConfirmBanner } from '#/components/admin/common/DeleteConfirmBanner.tsx'
-import ReviewSection from '#/components/admin/common/ReviwSection.tsx'
+import { DetailViewActionsBar } from '#/components/admin/common/DetailViewActionsBar.tsx'
+import { ReviewStep } from '#/components/admin/common/ReviewSection'
 import { Badge } from '#/components/ui/badge.tsx'
 import { Button } from '#/components/ui/button.tsx'
 import {
@@ -25,6 +19,8 @@ import { useGetCoverageClasses } from '#/hooks/coverage-code/useGetCoverageClass
 import { useGetCoverageTypes } from '#/hooks/coverage-code/useGetCoverageTypes.ts'
 import { COVERAGE_CODE_CONTENT } from '#/utils/coverage-code-content.ts'
 import { mapCoverageCodeDetailToFormValues } from '#/utils/mapCoverageCodeDetailToFormValues.ts'
+
+import type { ReviewSectionConfig } from '#/types/review-steps.ts'
 
 interface CoverageCodeDetailViewProps {
   coverageCodeId: string
@@ -48,7 +44,6 @@ export function CoverageCodeDetailView({
     isLoading,
     isError,
   } = useCoverageCodeById(coverageCodeId)
-
   const { carriers } = useInfiniteCarrierOptions()
   const { data: coverageClasses = [] } = useGetCoverageClasses()
   const { data: coverageTypes = [] } = useGetCoverageTypes()
@@ -87,41 +82,97 @@ export function CoverageCodeDetailView({
     return match ? match.name || match.code : values.remittanceTypeId
   }, [coverageTypes, values?.remittanceTypeId])
 
-  const generalItems = useMemo(
+  const sections: ReviewSectionConfig[] = useMemo(
     () =>
       values
         ? [
-            { label: reviewCopy.fields.code, value: values.code },
-            { label: reviewCopy.fields.name, value: values.name },
-            { label: reviewCopy.fields.carrier, value: carrierName },
-            { label: reviewCopy.fields.coverageClass, value: coverageClassName },
-            { label: reviewCopy.fields.remittanceType, value: coverageTypeName },
-          ]
+          {
+            id: 'general',
+            title: reviewCopy.sections.general,
+            items: [
+              {
+                type: 'text',
+                label: reviewCopy.fields.code,
+                value: values.code,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.name,
+                value: values.name,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.carrier,
+                value: carrierName,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.coverageClass,
+                value: coverageClassName,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.remittanceType,
+                value: coverageTypeName,
+              },
+            ],
+          },
+          {
+            id: 'processing',
+            title: reviewCopy.sections.processing,
+            items: [
+              {
+                type: 'text',
+                label: reviewCopy.fields.combinationForBill,
+                value: values.codeInvoice,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.combinationForReports,
+                value: values.codeReport,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.useForBill,
+                value: values.invoiceInclude
+                  ? reviewCopy.yes
+                  : reviewCopy.no,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.description,
+                value: values.title,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.shortDescription,
+                value: values.shortTitle,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.invoiceGroup,
+                value: values.invoiceGroup,
+              },
+            ],
+          },
+          {
+            id: 'notes',
+            title: reviewCopy.sections.notes,
+            items: [
+              {
+                type: 'multiline',
+                value: values.notes,
+              },
+            ],
+          },
+        ]
         : [],
-    [values, carrierName, coverageClassName, coverageTypeName],
-  )
-
-  const processingItems = useMemo(
-    () =>
-      values
-        ? [
-            { label: reviewCopy.fields.combinationForBill, value: values.codeInvoice },
-            { label: reviewCopy.fields.combinationForReports, value: values.codeReport },
-            {
-              label: reviewCopy.fields.useForBill,
-              value: values.invoiceInclude ? reviewCopy.yes : reviewCopy.no,
-            },
-            { label: reviewCopy.fields.description, value: values.title },
-            { label: reviewCopy.fields.shortDescription, value: values.shortTitle },
-            { label: reviewCopy.fields.invoiceGroup, value: values.invoiceGroup },
-          ]
-        : [],
-    [values],
-  )
-
-  const notesItems = useMemo(
-    () => (values ? [{ label: reviewCopy.fields.notes, value: values.notes }] : []),
-    [values],
+    [
+      values,
+      carrierName,
+      coverageClassName,
+      coverageTypeName,
+    ],
   )
 
   const handleDelete = () => {
@@ -196,17 +247,11 @@ export function CoverageCodeDetailView({
           </div>
         </CardHeader>
         <CardContent className="space-y-5 pt-6">
-          <ReviewSection
-            title={reviewCopy.sections.general}
-            items={generalItems}
-          />
-          <ReviewSection
-            title={reviewCopy.sections.processing}
-            items={processingItems}
-          />
-          <ReviewSection
-            title={reviewCopy.sections.notes}
-            items={notesItems}
+          <ReviewStep
+            copy={{ emptyValue: '—' }}
+            sections={sections}
+            layout="accordion"
+            defaultOpenSection="general"
           />
 
           {/* Delete Confirmation Banner */}
@@ -223,43 +268,17 @@ export function CoverageCodeDetailView({
           ) : null}
 
           {/* Integrated Actions Bar */}
-          <div className="flex items-center justify-between gap-3 border-t border-slate-200 pt-5 mt-6">
-            <Button
-              id="coverage-code-view-delete-btn"
-              type="button"
-              variant="destructive"
-              onClick={() => setShowConfirmDelete(true)}
-              disabled={isDeleting || showConfirmDelete}
-              className="h-9 gap-1.5 rounded-md px-5 font-semibold shadow-xs"
-            >
-              <Trash2 className="size-4" />
-              {copy.deleteButton}
-            </Button>
-
-            <div className="flex items-center gap-3">
-              <Button
-                id="coverage-code-view-back-btn"
-                type="button"
-                variant="outline"
-                onClick={onBack}
-                disabled={isDeleting}
-                className="h-9 gap-1.5 rounded-md border-slate-200 px-5 font-semibold text-slate-700 shadow-xs hover:bg-slate-100"
-              >
-                <ArrowLeft className="size-4" />
-                {copy.backButton}
-              </Button>
-              <Button
-                id="coverage-code-view-edit-btn"
-                type="button"
-                onClick={onEdit}
-                disabled={isDeleting}
-                className="h-9 gap-1.5 rounded-md bg-tan-dark px-5 font-semibold text-white shadow-xs hover:bg-tan-dark/90"
-              >
-                <Pencil className="size-4" />
-                {copy.editButton}
-              </Button>
-            </div>
-          </div>
+          <DetailViewActionsBar
+            idPrefix="coverage-code-view"
+            deleteLabel={copy.deleteButton}
+            backLabel={copy.backButton}
+            editLabel={copy.editButton}
+            isDeleting={isDeleting}
+            isDeleteDisabled={showConfirmDelete}
+            onDelete={() => setShowConfirmDelete(true)}
+            onBack={onBack}
+            onEdit={onEdit}
+          />
         </CardContent>
       </Card>
     </div>

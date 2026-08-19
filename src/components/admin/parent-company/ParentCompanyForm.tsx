@@ -2,9 +2,8 @@ import { useEffect, useState } from 'react'
 import type { FormEvent } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { AlertCircle, Loader2 } from 'lucide-react'
+import { AlertCircle } from 'lucide-react'
 
-import { Button } from '#/components/ui/button.tsx'
 import { Form } from '#/components/ui/Form'
 import { CarriersStep } from '#/components/admin/parent-company/CarriersStep.tsx'
 import { ContactStep } from '#/components/admin/parent-company/ContactStep.tsx'
@@ -12,6 +11,7 @@ import { GeneralStep } from '#/components/admin/parent-company/GeneralStep.tsx'
 import { NotesStep } from '#/components/admin/parent-company/NotesStep.tsx'
 import { ReviewStep } from '#/components/admin/parent-company/ReviewStep.tsx'
 import { Stepper } from '#/components/admin/common/Stepper'
+import { FormNavigationActions } from '#/components/admin/common/FormNavigationActions.tsx'
 import {
   PARENT_COMPANY_DEFAULT_VALUES,
   PARENT_COMPANY_STEPS,
@@ -177,43 +177,18 @@ export function ParentCompanyForm({
               )}
           </div>
 
-          <div className="sticky bottom-0 border-t border-slate-200 bg-white/95 px-6 py-4 backdrop-blur-sm sm:px-8">
-            <div className="flex items-center justify-between gap-3">
-              <Button
-                id="parent-company-form-back-btn"
-                type="button"
-                variant="outline"
-                onClick={handleBack}
-                disabled={(!onBack && isFirstStep) || isPending}
-                className="h-9 rounded-md border-slate-200 px-6 font-semibold text-slate-700 shadow-xs hover:bg-slate-100"
-              >
-                {formCopy.navigation.back}
-              </Button>
-
-              {isLastStep ? (
-                <Button
-                  type="button"
-                  onClick={handleSave}
-                  disabled={isPending}
-                  className="h-9 rounded-md bg-tan-dark px-6 font-semibold text-white shadow-xs hover:bg-tan-dark/90 disabled:opacity-70"
-                >
-                  {isPending ? (
-                    <Loader2 className="size-4 animate-spin" />
-                  ) : (
-                    saveLabel
-                  )}
-                </Button>
-              ) : (
-                <Button
-                  type="button"
-                  onClick={() => void handleNext()}
-                  className="h-9 rounded-md bg-tan-dark px-6 font-semibold text-white shadow-xs hover:bg-tan-dark/90"
-                >
-                  {formCopy.navigation.next}
-                </Button>
-              )}
-            </div>
-          </div>
+          {/* Sticky Bottom Navigation */}
+          <FormNavigationActions
+            idPrefix="parent-company"
+            backLabel={formCopy.navigation.back}
+            nextLabel={formCopy.navigation.next}
+            saveLabel={saveLabel}
+            isLastStep={isLastStep}
+            isPending={isPending}
+            onBack={handleBack}
+            onNext={() => void handleNext()}
+            onSave={handleSave}
+          />
         </form>
       </Form>
     </div>

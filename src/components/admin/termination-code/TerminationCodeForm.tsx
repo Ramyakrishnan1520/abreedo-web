@@ -2,7 +2,7 @@ import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { AlertCircle, Loader2 } from 'lucide-react'
+import { AlertCircle } from 'lucide-react'
 
 import { GeneralStep } from '#/components/admin/termination-code/GeneralStep.tsx'
 import { ReviewStep } from '#/components/admin/termination-code/ReviewStep.tsx'
@@ -15,7 +15,7 @@ import {
   type TerminationCodeFormValues,
 } from '#/components/admin/termination-code/termination-code.schema.ts'
 import { Stepper } from '#/components/admin/common/Stepper'
-import { Button } from '#/components/ui/button.tsx'
+import { FormNavigationActions } from '#/components/admin/common/FormNavigationActions.tsx'
 import { Form } from '#/components/ui/Form'
 import { useCreateTerminationCode } from '#/hooks/termination-code/useCreateTerminationCode.ts'
 import { useUpdateTerminationCode } from '#/hooks/termination-code/useUpdateTerminationCode.ts'
@@ -182,45 +182,17 @@ export function TerminationCodeForm({
           </div>
 
           {/* Sticky Bottom Navigation */}
-          <div className="sticky bottom-0 border-t border-slate-200 bg-white/95 px-6 py-4 backdrop-blur-sm sm:px-8">
-            <div className="flex items-center justify-between gap-3">
-              <Button
-                id="termination-code-back-btn"
-                type="button"
-                variant="outline"
-                onClick={handleBack}
-                disabled={isPending}
-                className="h-9 rounded-md border-slate-200 px-6 font-semibold text-slate-700 shadow-xs hover:bg-slate-100"
-              >
-                {formCopy.navigation.back}
-              </Button>
-
-              {isLastStep ? (
-                <Button
-                  id="termination-code-save-btn"
-                  type="button"
-                  onClick={handleSave}
-                  disabled={isPending}
-                  className="h-9 rounded-md bg-tan-dark px-6 font-semibold text-white shadow-xs hover:bg-tan-dark/90 disabled:opacity-70"
-                >
-                  {isPending ? (
-                    <Loader2 className="size-4 animate-spin" />
-                  ) : (
-                    saveLabel
-                  )}
-                </Button>
-              ) : (
-                <Button
-                  id="termination-code-next-btn"
-                  type="button"
-                  onClick={() => void handleNext()}
-                  className="h-9 rounded-md bg-tan-dark px-6 font-semibold text-white shadow-xs hover:bg-tan-dark/90"
-                >
-                  {formCopy.navigation.next}
-                </Button>
-              )}
-            </div>
-          </div>
+          <FormNavigationActions
+            idPrefix="termination-code"
+            backLabel={formCopy.navigation.back}
+            nextLabel={formCopy.navigation.next}
+            saveLabel={saveLabel}
+            isLastStep={isLastStep}
+            isPending={isPending}
+            onBack={handleBack}
+            onNext={() => void handleNext()}
+            onSave={handleSave}
+          />
         </form>
       </Form>
     </div>

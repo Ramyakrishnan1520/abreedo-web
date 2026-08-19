@@ -2,15 +2,15 @@ import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { AlertCircle, Loader2 } from 'lucide-react'
+import { AlertCircle } from 'lucide-react'
 
-import { Button } from '#/components/ui/button.tsx'
 import { Form } from '#/components/ui/Form'
 import { GeneralStep } from '#/components/admin/coverage-code/GeneralStep.tsx'
 import { ProcessingStep } from '#/components/admin/coverage-code/ProcessingStep.tsx'
 import { NotesStep } from '#/components/admin/coverage-code/NotesStep.tsx'
 import { ReviewStep } from '#/components/admin/coverage-code/ReviewStep.tsx'
 import { Stepper } from '#/components/admin/common/Stepper'
+import { FormNavigationActions } from '#/components/admin/common/FormNavigationActions.tsx'
 import {
   COVERAGE_CODE_DEFAULT_VALUES,
   COVERAGE_CODE_STEPS,
@@ -191,45 +191,17 @@ export function CoverageCodeForm({
           </div>
 
           {/* Sticky Bottom Navigation */}
-          <div className="sticky bottom-0 border-t border-slate-200 bg-white/95 px-6 py-4 backdrop-blur-sm sm:px-8">
-            <div className="flex items-center justify-between gap-3">
-              <Button
-                id="coverage-back-btn"
-                type="button"
-                variant="outline"
-                onClick={handleBack}
-                disabled={isPending}
-                className="h-9 rounded-md border-slate-200 px-6 font-semibold text-slate-700 shadow-xs hover:bg-slate-100"
-              >
-                {formCopy.navigation.back}
-              </Button>
-
-              {isLastStep ? (
-                <Button
-                  id="coverage-save-btn"
-                  type="button"
-                  onClick={handleSave}
-                  disabled={isPending}
-                  className="h-9 rounded-md bg-tan-dark px-6 font-semibold text-white shadow-xs hover:bg-tan-dark/90 disabled:opacity-70"
-                >
-                  {isPending ? (
-                    <Loader2 className="size-4 animate-spin" />
-                  ) : (
-                    saveLabel
-                  )}
-                </Button>
-              ) : (
-                <Button
-                  id="coverage-next-btn"
-                  type="button"
-                  onClick={() => void handleNext()}
-                  className="h-9 rounded-md bg-tan-dark px-6 font-semibold text-white shadow-xs hover:bg-tan-dark/90"
-                >
-                  {formCopy.navigation.next}
-                </Button>
-              )}
-            </div>
-          </div>
+          <FormNavigationActions
+            idPrefix="coverage"
+            backLabel={formCopy.navigation.back}
+            nextLabel={formCopy.navigation.next}
+            saveLabel={saveLabel}
+            isLastStep={isLastStep}
+            isPending={isPending}
+            onBack={handleBack}
+            onNext={() => void handleNext()}
+            onSave={handleSave}
+          />
         </form>
       </Form>
     </div>

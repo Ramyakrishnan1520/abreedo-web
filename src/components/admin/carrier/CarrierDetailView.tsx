@@ -1,15 +1,9 @@
 import { useMemo, useState } from 'react'
-import {
-  AlertCircle,
-  ArrowLeft,
-  Building2,
-  Loader2,
-  Pencil,
-  Trash2,
-} from 'lucide-react'
+import { AlertCircle, ArrowLeft, Building2, Loader2 } from 'lucide-react'
 
 import { DeleteConfirmBanner } from '#/components/admin/common/DeleteConfirmBanner.tsx'
-import ReviewSection from '#/components/admin/common/ReviwSection.tsx'
+import { DetailViewActionsBar } from '#/components/admin/common/DetailViewActionsBar.tsx'
+import { ReviewStep } from '#/components/admin/common/ReviewSection'
 import { Badge } from '#/components/ui/badge.tsx'
 import { Button } from '#/components/ui/button.tsx'
 import {
@@ -23,6 +17,8 @@ import { useDeleteCarrier } from '#/hooks/carrier/useDeleteCarrier'
 import { useGetStates } from '#/hooks/carrier/useGetStates'
 import { CARRIER_CONTENT } from '#/utils/carrier-content.ts'
 import { mapCarrierDetailToFormValues } from '#/utils/mapCarrierDetailToFormValues.ts'
+
+import type { ReviewSectionConfig } from '#/types/review-steps.ts'
 
 interface CarrierDetailViewProps {
   carrierId: string
@@ -55,54 +51,98 @@ export function CarrierDetailView({
     return states.find((s) => s.id === values.state)?.name ?? values.state
   }, [states, values?.state])
 
-
-  const generalItems = useMemo(
+  const sections: ReviewSectionConfig[] = useMemo(
     () =>
       values
         ? [
-            { label: reviewCopy.fields.name, value: values.name },
-            { label: reviewCopy.fields.groupTitle, value: values.groupTitle },
-            {
-              label: reviewCopy.fields.allowFlexibleDates,
-              value: values.allowFlexibleDates ? reviewCopy.yes : reviewCopy.no,
-            },
-          ]
-        : [],
-    [values],
-  )
-
-  const addressItems = useMemo(
-    () =>
-      values
-        ? [
-            { label: reviewCopy.fields.address1, value: values.address1 },
-            { label: reviewCopy.fields.address2, value: values.address2 },
-            { label: reviewCopy.fields.city, value: values.city },
-            { label: reviewCopy.fields.state, value: stateName },
-            { label: reviewCopy.fields.zip, value: values.zip },
-          ]
+          {
+            id: 'general',
+            title: reviewCopy.sections.general,
+            items: [
+              {
+                type: 'text',
+                label: reviewCopy.fields.name,
+                value: values.name,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.groupTitle,
+                value: values.groupTitle,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.allowFlexibleDates,
+                value: values.allowFlexibleDates
+                  ? reviewCopy.yes
+                  : reviewCopy.no,
+              },
+            ],
+          },
+          {
+            id: 'address',
+            title: reviewCopy.sections.primaryAddress,
+            items: [
+              {
+                type: 'text',
+                label: reviewCopy.fields.address1,
+                value: values.address1,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.address2,
+                value: values.address2,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.city,
+                value: values.city,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.state,
+                value: stateName,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.zip,
+                value: values.zip,
+              },
+            ],
+          },
+          {
+            id: 'contact',
+            title: reviewCopy.sections.contact,
+            items: [
+              {
+                type: 'text',
+                label: reviewCopy.fields.contactFirstName,
+                value: values.contactFirstName,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.contactLastName,
+                value: values.contactLastName,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.phone,
+                value: values.phone,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.fax,
+                value: values.fax,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.email,
+                value: values.email,
+              },
+            ],
+          },
+        ]
         : [],
     [values, stateName],
-  )
-
-  const contactItems = useMemo(
-    () =>
-      values
-        ? [
-            {
-              label: reviewCopy.fields.contactFirstName,
-              value: values.contactFirstName,
-            },
-            {
-              label: reviewCopy.fields.contactLastName,
-              value: values.contactLastName,
-            },
-            { label: reviewCopy.fields.phone, value: values.phone },
-            { label: reviewCopy.fields.fax, value: values.fax },
-            { label: reviewCopy.fields.email, value: values.email },
-          ]
-        : [],
-    [values],
   )
 
   const handleDelete = () => {
@@ -177,17 +217,11 @@ export function CarrierDetailView({
           </div>
         </CardHeader>
         <CardContent className="space-y-5 pt-6">
-          <ReviewSection
-            title={reviewCopy.sections.general}
-            items={generalItems}
-          />
-          <ReviewSection
-            title={reviewCopy.sections.primaryAddress}
-            items={addressItems}
-          />
-          <ReviewSection
-            title={reviewCopy.sections.contact}
-            items={contactItems}
+          <ReviewStep
+            copy={{ emptyValue: '-' }}
+            sections={sections}
+            layout="accordion"
+            defaultOpenSection="general"
           />
 
           {/* Delete Confirmation Banner */}
@@ -204,43 +238,17 @@ export function CarrierDetailView({
           ) : null}
 
           {/* Integrated Actions Bar */}
-          <div className="flex items-center justify-between gap-3 border-t border-slate-200 pt-5 mt-6">
-            <Button
-              id="carrier-view-delete-btn"
-              type="button"
-              variant="destructive"
-              onClick={() => setShowConfirmDelete(true)}
-              disabled={isDeleting || showConfirmDelete}
-              className="h-9 gap-1.5 rounded-md px-5 font-semibold shadow-xs"
-            >
-              <Trash2 className="size-4" />
-              {copy.deleteButton}
-            </Button>
-
-            <div className="flex items-center gap-3">
-              <Button
-                id="carrier-view-back-btn"
-                type="button"
-                variant="outline"
-                onClick={onBack}
-                disabled={isDeleting}
-                className="h-9 gap-1.5 rounded-md border-slate-200 px-5 font-semibold text-slate-700 shadow-xs hover:bg-slate-100"
-              >
-                <ArrowLeft className="size-4" />
-                {copy.backButton}
-              </Button>
-              <Button
-                id="carrier-view-edit-btn"
-                type="button"
-                onClick={onEdit}
-                disabled={isDeleting}
-                className="h-9 gap-1.5 rounded-md bg-tan-dark px-5 font-semibold text-white shadow-xs hover:bg-tan-dark/90"
-              >
-                <Pencil className="size-4" />
-                {copy.editButton}
-              </Button>
-            </div>
-          </div>
+          <DetailViewActionsBar
+            idPrefix="carrier-view"
+            deleteLabel={copy.deleteButton}
+            backLabel={copy.backButton}
+            editLabel={copy.editButton}
+            isDeleting={isDeleting}
+            isDeleteDisabled={showConfirmDelete}
+            onDelete={() => setShowConfirmDelete(true)}
+            onBack={onBack}
+            onEdit={onEdit}
+          />
         </CardContent>
       </Card>
     </div>

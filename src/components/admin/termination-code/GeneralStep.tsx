@@ -16,7 +16,7 @@ import {
   FormMessage,
 } from '#/components/ui/Form'
 import { Input } from '#/components/ui/input.tsx'
-import { NumberStepper } from '#/components/ui/number-stepper.tsx'
+import { NumberStepper } from '#/components/admin/common/NumberStepper'
 import { Separator } from '#/components/ui/separator.tsx'
 import { TERMINATION_CODE_CONTENT } from '#/utils/termination-code-content.ts'
 
