@@ -40,8 +40,6 @@ export const ROUTES = {
   ADMIN_EMPLOYERS: '/admin/employers',
   ADMIN_EMPLOYERS_SETUP: '/admin/employers/employer',
   ADMIN_EMPLOYERS_USERS: '/admin/employers/users',
-  ADMIN_EMPLOYERS_MANAGE: '/admin/employers/employer/selection',
-  ADMIN_EMPLOYERS_GROUPS: '/admin/employers/employer-groups',
   ADMIN_EMPLOYERS_NEW: '/admin/employers/employer/new',
   ADMIN_EMPLOYERS_EDIT: '/admin/employers/employer/edit',
   ADMIN_ENROLLMENT_EVENTS: '/admin/open-enrollment/events',

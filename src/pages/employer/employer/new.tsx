@@ -8,7 +8,7 @@ export function NewEmployerPage() {
   const navigate = useNavigate()
 
   const handleNavigateBack = () => {
-    navigate({ to: ROUTES.ADMIN_EMPLOYERS_MANAGE })
+    navigate({ to: ROUTES.ADMIN_EMPLOYERS_SETUP })
   }
 
   return (

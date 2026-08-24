@@ -21,15 +21,15 @@ export function EmployerSetupTaskPage() {
 
         <div className="flex flex-col gap-4">
           <SelectionCard
-            title={employerSetup.cards.employerSetup.title}
-            description={employerSetup.cards.employerSetup.description}
-            to={ROUTES.ADMIN_EMPLOYERS_MANAGE}
+            title={employerSetup.cards.new.title}
+            description={employerSetup.cards.new.description}
+            to={ROUTES.ADMIN_EMPLOYERS_NEW}
           />
 
           <SelectionCard
-            title={employerSetup.cards.employerGroupSetup.title}
-            description={employerSetup.cards.employerGroupSetup.description}
-            to={ROUTES.ADMIN_EMPLOYERS_GROUPS}
+            title={employerSetup.cards.update.title}
+            description={employerSetup.cards.update.description}
+            to={ROUTES.ADMIN_EMPLOYERS_EDIT}
           />
         </div>
       </div>

@@ -20,21 +20,6 @@ export const EMPLOYER_CONTENT = {
       title: 'Employer Setup',
       chooseHeading: 'Select a Task:',
       cards: {
-        employerSetup: {
-          title: 'Employer Setup',
-          description: 'Add, edit, and remove a parent company’s employers',
-        },
-        employerGroupSetup: {
-          title: 'Employer Group Setup',
-          description: 'Add, edit, and remove groups of members inside an employer',
-        },
-      },
-    },
-    updateEmployers: {
-      kicker: 'Administration \u203a Employer Setup',
-      title: 'Update Employers',
-      chooseHeading: 'Select a Task:',
-      cards: {
         new: {
           title: 'New Employer Setup',
           description: 'Add a New Employer to a Parent Company',
@@ -49,28 +34,6 @@ export const EMPLOYER_CONTENT = {
       kicker: 'Administration',
       title: 'Users Setup',
       description: 'Manage users that have access to the AMCA Platform.',
-    },
-    employerGroupSetup: {
-      kicker: 'Administration',
-      title: 'Employer Group Setup',
-      description: 'Add, edit, and remove groups of members inside an employer.',
-    },
-    index: {
-      kicker: 'Administration \u203a Employer Setup',
-      title: 'Update Employers',
-      description:
-        'Select an action below to set up a new employer or manage existing employers.',
-      chooseHeading: 'Select a Task:',
-      cards: {
-        new: {
-          title: 'New Employer Setup',
-          description: 'Add a New Employer to a Parent Company',
-        },
-        update: {
-          title: 'Update Current Employer',
-          description: 'Update available Employers',
-        },
-      },
     },
     new: {
       formTitle: 'New Employer',

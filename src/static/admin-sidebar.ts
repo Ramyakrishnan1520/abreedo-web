@@ -92,7 +92,7 @@ export const adminSidebar: SidebarSection[] = [
       {
         id: 'admin-employer-setup',
         title: 'Employer Setup',
-        route: ROUTES.ADMIN_EMPLOYERS,
+        route: ROUTES.ADMIN_EMPLOYERS_SETUP,
       },
       {
         id: 'admin-cobra-notifications',
