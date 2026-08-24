@@ -114,6 +114,7 @@ export function Sidebar({ role, onLogout, className }: SidebarProps) {
   const { pathname } = useLocation()
   const normalizedRole = normalizeRole(role)
   const sections = sidebarByRole[normalizedRole]
+  const navigate = useNavigate()
 
   return (
     <aside
@@ -127,25 +128,60 @@ export function Sidebar({ role, onLogout, className }: SidebarProps) {
         className="flex-1 overflow-y-auto px-4 py-5"
       >
         <div className="space-y-6">
-          {sections.map((section) => (
-            <section key={section.id} aria-labelledby={`${section.id}-heading`}>
-              <h2
-                id={`${section.id}-heading`}
-                className="mb-2 px-2 text-xs font-bold uppercase tracking-[0.14em] text-tan-accent"
-              >
-                {section.title}
-              </h2>
-              <ul className="space-y-1">
-                {section.items.map((item) => (
-                  <SidebarNavItem
-                    key={item.id}
-                    item={item}
-                    pathname={pathname}
-                  />
-                ))}
-              </ul>
-            </section>
-          ))}
+          {sections.map((section) => {
+            const SectionIcon = section.icon
+            const isClickableSection = Boolean(section.route && !section.items.length)
+            const active = section.route
+              ? pathname === section.route || pathname.startsWith(`${section.route}/`)
+              : false
+
+            if (isClickableSection && section.route) {
+              return (
+                <section key={section.id}>
+                  <button
+                    type="button"
+                    onClick={() => void navigate({ to: section.route! })}
+                    className={cn(
+                      'group flex w-full items-center gap-2 rounded-xl px-2 py-1 text-xs font-bold uppercase tracking-[0.14em] text-tan-accent transition-colors',
+                      'hover:bg-sidebar-accent/60 hover:text-white cursor-pointer',
+                      active && 'text-white font-bold ring-1 ring-slate-600 bg-sidebar-accent shadow-xs',
+                    )}
+                    aria-current={active ? 'page' : undefined}
+                  >
+                    {SectionIcon ? (
+                      <SectionIcon className="size-3.5 shrink-0 text-tan-accent" aria-hidden="true" />
+                    ) : null}
+                    <span>{section.title}</span>
+                  </button>
+                </section>
+              )
+            }
+
+            return (
+              <section key={section.id} aria-labelledby={`${section.id}-heading`}>
+                <h2
+                  id={`${section.id}-heading`}
+                  className="mb-2 flex items-center gap-2 px-2 text-xs font-bold uppercase tracking-[0.14em] text-tan-accent"
+                >
+                  {SectionIcon ? (
+                    <SectionIcon className="size-3.5 shrink-0 text-tan-accent" aria-hidden="true" />
+                  ) : null}
+                  <span>{section.title}</span>
+                </h2>
+                {section.items.length ? (
+                  <ul className="space-y-1">
+                    {section.items.map((item) => (
+                      <SidebarNavItem
+                        key={item.id}
+                        item={item}
+                        pathname={pathname}
+                      />
+                    ))}
+                  </ul>
+                ) : null}
+              </section>
+            )
+          })}
         </div>
       </nav>
 

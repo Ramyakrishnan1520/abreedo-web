@@ -1,19 +1,74 @@
 export const EMPLOYER_CONTENT = {
   pages: {
-    index: {
+    employerAndUsers: {
       kicker: 'Administration',
+      title: 'Employer & Users',
+      chooseHeading: 'Select a Task:',
+      cards: {
+        employerSetup: {
+          title: 'Employer Setup',
+          description: 'Manage Employers and Employer Groups',
+        },
+        usersSetup: {
+          title: 'Users Setup',
+          description: 'Manage users that have access to the AMCA Platform',
+        },
+      },
+    },
+    employerSetup: {
+      kicker: 'Administration',
+      title: 'Employer Setup',
+      chooseHeading: 'Select a Task:',
+      cards: {
+        employerSetup: {
+          title: 'Employer Setup',
+          description: 'Add, edit, and remove a parent company’s employers',
+        },
+        employerGroupSetup: {
+          title: 'Employer Group Setup',
+          description: 'Add, edit, and remove groups of members inside an employer',
+        },
+      },
+    },
+    updateEmployers: {
+      kicker: 'Administration \u203a Employer Setup',
       title: 'Update Employers',
-      description:
-        'Select an action below to set up a new employer or manage existing employers.',
-      chooseHeading: 'Please Choose',
+      chooseHeading: 'Select a Task:',
       cards: {
         new: {
-          title: 'New Employer',
-          description: 'Guided Employer Setup',
+          title: 'New Employer Setup',
+          description: 'Add a New Employer to a Parent Company',
         },
         update: {
           title: 'Update Current Employer',
-          description: 'Update Available Employers',
+          description: 'Update available Employers',
+        },
+      },
+    },
+    usersSetup: {
+      kicker: 'Administration',
+      title: 'Users Setup',
+      description: 'Manage users that have access to the AMCA Platform.',
+    },
+    employerGroupSetup: {
+      kicker: 'Administration',
+      title: 'Employer Group Setup',
+      description: 'Add, edit, and remove groups of members inside an employer.',
+    },
+    index: {
+      kicker: 'Administration \u203a Employer Setup',
+      title: 'Update Employers',
+      description:
+        'Select an action below to set up a new employer or manage existing employers.',
+      chooseHeading: 'Select a Task:',
+      cards: {
+        new: {
+          title: 'New Employer Setup',
+          description: 'Add a New Employer to a Parent Company',
+        },
+        update: {
+          title: 'Update Current Employer',
+          description: 'Update available Employers',
         },
       },
     },

@@ -13,7 +13,7 @@ export const PARENT_COMPANY_CONTENT = {
       cards: {
         newSetup: {
           title: 'New Parent Setup',
-          description: 'Guided Parent Setup',
+          description: 'Guided Parent Company Setup',
         },
         update: {
           title: 'Update Current Parent Company',

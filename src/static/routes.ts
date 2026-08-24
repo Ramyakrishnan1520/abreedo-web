@@ -4,29 +4,46 @@ export const ROUTES = {
 
   ADMIN_ROOT: '/admin',
   ADMIN_USERS: '/admin/users',
-  ADMIN_CARRIER: '/admin/carrier',
-  ADMIN_CARRIERS: '/admin/carriers',
-  ADMIN_CARRIERS_NEW: '/admin/carriers/new',
-  ADMIN_CARRIERS_EDIT: '/admin/carriers/edit',
-  ADMIN_COVERAGE_CODES: '/admin/coverage-codes',
-  ADMIN_COVERAGE_CODES_NEW: '/admin/coverage-codes/new',
-  ADMIN_COVERAGE_CODES_EDIT: '/admin/coverage-codes/edit',
-  ADMIN_PARENT_COMPANIES: '/admin/parent-companies',
-  ADMIN_PARENT_COMPANIES_NEW: '/admin/parent-companies/new',
-  ADMIN_PARENT_COMPANIES_EDIT: '/admin/parent-companies/edit',
-  ADMIN_TERMINATION_CODES: '/admin/termination-codes',
-  ADMIN_TERMINATION_CODES_NEW: '/admin/termination-codes/new',
-  ADMIN_TERMINATION_CODES_EDIT: '/admin/termination-codes/edit',
-  ADMIN_EMPLOYERS: '/admin/employers',
-  ADMIN_EMPLOYERS_NEW: '/admin/employers/new',
-  ADMIN_EMPLOYERS_EDIT: '/admin/employers/edit',
-  ADMIN_PLANS: '/admin/plan',
-  ADMIN_PLANS_NEW: '/admin/plan/new',
   ADMIN_MEMBER_SEARCH: '/admin/member-search',
-  ADMIN_LIFE_INSURANCE: '/admin/life-insurance',
-  ADMIN_EMPLOYER_CONTACTS: '/admin/employers/contacts',
-  ADMIN_EMPLOYER_PLANS: '/admin/employers/plans',
+  ADMIN_MEMBERS_NEW: '/admin/members/new',
+  ADMIN_MEMBERS_EDIT: '/admin/members/edit',
+  ADMIN_MEMBERS_TERMINATE: '/admin/members/terminate',
   ADMIN_COBRA_NOTIFICATION: '/admin/cobra-notification',
+
+  // Administration -> Parent Setup Domain
+  ADMIN_PARENT_SETUP: '/admin/parent-setup',
+
+  // 1. Parent Company Setup
+  ADMIN_PARENT_COMPANIES: '/admin/parent-setup/parent-company',
+  ADMIN_PARENT_COMPANIES_NEW: '/admin/parent-setup/parent-company/new',
+  ADMIN_PARENT_COMPANIES_EDIT: '/admin/parent-setup/parent-company/edit',
+
+  // 2. Carriers & Coverage Code Setup
+  ADMIN_CARRIER: '/admin/parent-setup/carriers',
+  ADMIN_CARRIERS: '/admin/parent-setup/carriers',
+  ADMIN_CARRIERS_NEW: '/admin/parent-setup/carriers/new',
+  ADMIN_CARRIERS_EDIT: '/admin/parent-setup/carriers/edit',
+  ADMIN_COVERAGE_CODES: '/admin/parent-setup/carriers',
+  ADMIN_COVERAGE_CODES_NEW: '/admin/parent-setup/coverage-codes/new',
+  ADMIN_COVERAGE_CODES_EDIT: '/admin/parent-setup/coverage-codes/edit',
+
+  // 3. Termination Codes Setup
+  ADMIN_TERMINATION_CODES: '/admin/parent-setup/termination-codes',
+  ADMIN_TERMINATION_CODES_NEW: '/admin/parent-setup/termination-codes/new',
+  ADMIN_TERMINATION_CODES_EDIT: '/admin/parent-setup/termination-codes/edit',
+
+  // 4. Plans Setup
+  ADMIN_PLANS: '/admin/parent-setup/plans',
+  ADMIN_PLANS_NEW: '/admin/parent-setup/plans/new',
+
+  // Employers Flow
+  ADMIN_EMPLOYERS: '/admin/employers',
+  ADMIN_EMPLOYERS_SETUP: '/admin/employers/employer',
+  ADMIN_EMPLOYERS_USERS: '/admin/employers/users',
+  ADMIN_EMPLOYERS_MANAGE: '/admin/employers/employer/selection',
+  ADMIN_EMPLOYERS_GROUPS: '/admin/employers/employer-groups',
+  ADMIN_EMPLOYERS_NEW: '/admin/employers/employer/new',
+  ADMIN_EMPLOYERS_EDIT: '/admin/employers/employer/edit',
   ADMIN_ENROLLMENT_EVENTS: '/admin/open-enrollment/events',
   ADMIN_ENROLLMENT_SETUP: '/admin/open-enrollment/setup',
   ADMIN_ENROLLMENT_REVIEW: '/admin/open-enrollment/review',

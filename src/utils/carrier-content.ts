@@ -11,22 +11,26 @@ export const CARRIER_CONTENT = {
   pages: {
     index: {
       kicker: 'Administration',
-      title: 'Update Carriers',
+      title: 'Carriers & Coverage Code Setup',
       description:
-        'Select an action below to set up a new carrier or manage existing carriers.',
+        'Select an action below to set up new carriers, coverage codes, or manage existing records.',
       chooseHeading: 'Please Choose',
       cards: {
-        list: {
-          title: 'List Carrier',
-          description: 'View available carriers table',
-        },
-        new: {
+        newCarrier: {
           title: 'New Carrier',
-          description: 'Guided Carrier Setup',
+          description: 'Create a new insurance carrier',
         },
-        update: {
+        updateCarrier: {
           title: 'Update Current Carrier',
-          description: 'Update Available Carriers',
+          description: 'Edit or remove existing insurance carriers.',
+        },
+        newCoverageCode: {
+          title: 'New Coverage Code',
+          description: 'Create a new coverage code for benefits plans.',
+        },
+        updateCoverageCode: {
+          title: 'Update Current Coverage Code',
+          description: 'Edit or remove existing coverage codes.',
         },
       },
     },
