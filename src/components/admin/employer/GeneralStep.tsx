@@ -69,7 +69,7 @@ export function GeneralStep() {
     useGetStates()
 
   const stateOptions = useMemo(
-    () => states.map((s) => ({ value: s.name, label: s.name })),
+    () => (states ?? []).map((s) => ({ value: s.id, label: s.name })),
     [states],
   )
 

@@ -6,13 +6,13 @@ import { ROUTES } from '#/static/routes.ts'
 export function NewParentCompanyPage() {
   const navigate = useNavigate()
 
-  const handleSuccess = () => {
+  const handleNavigateBack = () => {
     navigate({ to: ROUTES.ADMIN_PARENT_COMPANIES })
   }
 
   return (
     <main className="page-wrap mx-auto max-w-5xl py-8">
-      <ParentCompanyForm mode="create" onSuccess={handleSuccess} />
+      <ParentCompanyForm mode="create" onSuccess={handleNavigateBack} onBack={handleNavigateBack} />
     </main>
   )
 }

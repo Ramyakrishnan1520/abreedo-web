@@ -4,6 +4,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { AlertCircle, Loader2 } from 'lucide-react'
 
 import { ConfigurableSelect } from '#/components/admin/common/ConfigurableSelect.tsx'
+import { DatePicker } from '#/components/admin/common/DatePicker.tsx'
 import {
   planSchema,
   type PlanFormSchemaValues,
@@ -379,7 +380,7 @@ export function PlanForm({
             )}
           />
 
-          {/* Effective Date Picker using Shadcn Input (type="date") */}
+          {/* Effective Date Picker using Shadcn Calendar & DatePicker */}
           <FormField
             control={form.control}
             name="effectiveDate"
@@ -395,11 +396,12 @@ export function PlanForm({
                 </FormLabel>
                 <div className="space-y-1">
                   <FormControl>
-                    <Input
+                    <DatePicker
                       id="plan-effective-date"
-                      type="date"
-                      className="h-9 rounded-md border-slate-200 bg-slate-50/50 text-slate-900 focus:border-tan-dark focus:bg-white sm:w-64"
-                      {...field}
+                      value={field.value}
+                      onChange={field.onChange}
+                      placeholder={copy.placeholders.effectiveDate}
+                      aria-label={copy.labels.effectiveDate}
                     />
                   </FormControl>
                   <FormMessage />

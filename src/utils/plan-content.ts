@@ -54,6 +54,7 @@ export const PLAN_CONTENT = {
       coverageCodeLoading: 'Loading coverage codes...',
       option: 'Enter option',
       name: 'Enter plan name',
+      effectiveDate: 'Select effective date...',
       groupTypeSelect: 'Select group type...',
       linkedPlanSelect: 'Select a plan...',
       linkedPlanLoading: 'Loading plans...',

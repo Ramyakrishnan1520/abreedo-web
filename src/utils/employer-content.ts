@@ -226,7 +226,9 @@ export const EMPLOYER_CONTENT = {
     allowCobraLabel: 'Allow Cobra',
     exactDayLabel: 'Exact Day?',
     renewalDateLabel: 'Renewal Date',
+    renewalDatePlaceholder: 'Select renewal date...',
     initialNotificationStartOnLabel: 'Initial Notification Start On',
+    initialNotificationStartOnPlaceholder: 'Select initial notification date...',
   },
   notesStep: {
     heading: 'Administrative Notes',
