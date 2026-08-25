@@ -69,7 +69,7 @@ export function GeneralStep() {
     useGetStates()
 
   const stateOptions = useMemo(
-    () => states.map((s) => ({ value: s.name, label: s.name })),
+    () => (states ?? []).map((s) => ({ value: s.id, label: s.name })),
     [states],
   )
 
@@ -113,8 +113,17 @@ export function GeneralStep() {
                 <ConfigurableSelect
                   id="employer-parent-company"
                   value={field.value || ''}
-                  onValueChange={field.onChange}
+                  onValueChange={(newVal) => {
+                    field.onChange(newVal)
+                    const picked = parentCompanyOptions.find(
+                      (p) => p.value === newVal,
+                    )
+                    if (picked) {
+                      form.setValue('parentCompanyName', picked.label)
+                    }
+                  }}
                   options={parentCompanyOptions}
+                  selectedLabel={form.watch('parentCompanyName')}
                   placeholder={copy.parentCompanySelectPlaceholder}
                   loading={isLoadingParentCompanies}
                   loadingPlaceholder={copy.parentCompanyLoadingPlaceholder}
@@ -125,6 +134,7 @@ export function GeneralStep() {
                   isFetchingNextPage={isFetchingNextParentCompaniesPage}
                   triggerClassName={FORM_INPUT_CLASS}
                 />
+
               </FormControl>
               <FormMessage />
             </div>

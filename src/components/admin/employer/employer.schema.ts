@@ -1,52 +1,64 @@
 import { z } from 'zod'
 
-const phoneRegex = /^\(\d{3}\)\d{3}-\d{4}$/
+import {
+  LETTERS_ONLY_REGEX,
+  optionalEmailSchema,
+  optionalNotesSchema,
+  optionalPhoneSchema,
+  optionalTextSchema,
+  requiredTextSchema,
+  zipSchema,
+} from '#/components/admin/common/form-field-schemas.ts'
+import { EMPLOYER_CONTENT } from '#/utils/employer-content.ts'
+
+const { validation: v } = EMPLOYER_CONTENT
 
 export const employerSchema = z.object({
   // General Step
-  name: z.string().min(1, 'Employer Name is required').max(100),
-  parentCompanyId: z.string().min(1, 'Parent Company is required'),
-  address1: z.string().min(1, 'Address 1 is required').max(200),
-  address2: z.string().max(200).optional().or(z.literal('')),
-  city: z
-    .string()
-    .min(1, 'City is required')
-    .max(100)
-    .regex(/^[a-zA-Z\s\-'.]*$/, 'City must contain only letters'),
-  state: z.string().optional().or(z.literal('')),
-  zip: z
-    .string()
-    .min(1, 'ZIP Code is required')
-    .regex(/^\d{5}(-\d{4})?$/, 'Enter a valid ZIP code (e.g. 12345 or 12345-6789)'),
+  name: requiredTextSchema(v.nameRequired, {
+    max: 100,
+    maxMessage: v.nameMax,
+  }),
+  parentCompanyId: requiredTextSchema(v.parentCompanyRequired),
+  parentCompanyName: optionalTextSchema(),
+  address1: requiredTextSchema(v.address1Required, {
+
+    max: 200,
+    maxMessage: v.addressMax,
+  }),
+  address2: optionalTextSchema({ max: 200, maxMessage: v.addressMax }),
+  city: requiredTextSchema(v.cityRequired, {
+    max: 100,
+    maxMessage: v.cityMax,
+    pattern: LETTERS_ONLY_REGEX,
+    patternMessage: v.cityLetters,
+  }),
+  state: optionalTextSchema(),
+  zip: zipSchema(v.zipRequired, v.zipInvalid),
 
   // Contact Step
-  contactFirst: z
-    .string()
-    .min(1, 'Contact First Name is required')
-    .max(50)
-    .regex(/^[a-zA-Z\s\-'.]*$/, 'First name must contain only letters'),
-  contactLast: z
-    .string()
-    .min(1, 'Contact Last Name is required')
-    .max(50)
-    .regex(/^[a-zA-Z\s\-'.]*$/, 'Last name must contain only letters'),
-  contactTitle: z.string().max(100).optional().or(z.literal('')),
-  phone: z
-    .string()
-    .regex(phoneRegex, 'Enter a valid phone number — (___) ___-____')
-    .optional()
-    .or(z.literal('')),
-  fax: z
-    .string()
-    .regex(phoneRegex, 'Enter a valid fax number — (___) ___-____')
-    .optional()
-    .or(z.literal('')),
-  email: z
-    .string()
-    .email('Enter a valid email address')
-    .max(254)
-    .optional()
-    .or(z.literal('')),
+  contactFirst: requiredTextSchema(v.contactFirstRequired, {
+    max: 50,
+    maxMessage: v.contactFirstMax,
+    pattern: LETTERS_ONLY_REGEX,
+    patternMessage: v.contactFirstLetters,
+  }),
+  contactLast: requiredTextSchema(v.contactLastRequired, {
+    max: 50,
+    maxMessage: v.contactLastMax,
+    pattern: LETTERS_ONLY_REGEX,
+    patternMessage: v.contactLastLetters,
+  }),
+  contactTitle: optionalTextSchema({
+    max: 100,
+    maxMessage: v.contactTitleMax,
+  }),
+  phone: optionalPhoneSchema(v.phoneInvalid),
+  fax: optionalPhoneSchema(v.faxInvalid),
+  email: optionalEmailSchema(v.emailInvalid, {
+    max: 254,
+    maxMessage: v.emailMax,
+  }),
 
   // Carriers Step
   carrierIds: z.array(z.string()),
@@ -60,20 +72,32 @@ export const employerSchema = z.object({
     .optional(),
 
   // Company Group Number Step
-  groupNumber: z.string().min(1, 'Group Number is required').max(100),
-  policyNumber: z.string().max(100).optional().or(z.literal('')),
-  tpacNumber: z.string().max(100).optional().or(z.literal('')),
+  groupNumber: requiredTextSchema(v.groupNumberRequired, {
+    max: 100,
+    maxMessage: v.groupNumberMax,
+  }),
+  policyNumber: optionalTextSchema({
+    max: 100,
+    maxMessage: v.policyNumberMax,
+  }),
+  tpacNumber: optionalTextSchema({
+    max: 100,
+    maxMessage: v.tpacNumberMax,
+  }),
   monthlyAdminFee: z.number().int().nonnegative().optional(),
   status: z.number().optional(),
   isPaper: z.boolean().optional(),
   allowCobra: z.boolean().optional(),
   isPano: z.boolean().optional(),
-  renewalDate: z.string().optional().or(z.literal('')),
-  initialNotificationStartOn: z.string().optional().or(z.literal('')),
+  renewalDate: optionalTextSchema(),
+  initialNotificationStartOn: optionalTextSchema(),
 
   // Notes Step
-  notesTitle: z.string().max(200).optional().or(z.literal('')),
-  notes: z.string().optional().or(z.literal('')),
+  notesTitle: optionalTextSchema({
+    max: 200,
+    maxMessage: v.notesTitleMax,
+  }),
+  notes: optionalNotesSchema(),
 })
 
 export type EmployerFormValues = z.infer<typeof employerSchema>

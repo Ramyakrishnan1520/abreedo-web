@@ -1,21 +1,39 @@
 export const EMPLOYER_CONTENT = {
   pages: {
-    index: {
+    employerAndUsers: {
       kicker: 'Administration',
-      title: 'Update Employers',
-      description:
-        'Select an action below to set up a new employer or manage existing employers.',
-      chooseHeading: 'Please Choose',
+      title: 'Employer & Users',
+      chooseHeading: 'Select a Task:',
+      cards: {
+        employerSetup: {
+          title: 'Employer Setup',
+          description: 'Manage Employers and Employer Groups',
+        },
+        usersSetup: {
+          title: 'Users Setup',
+          description: 'Manage users that have access to the AMCA Platform',
+        },
+      },
+    },
+    employerSetup: {
+      kicker: 'Administration',
+      title: 'Employer Setup',
+      chooseHeading: 'Select a Task:',
       cards: {
         new: {
-          title: 'New Employer',
-          description: 'Guided Employer Setup',
+          title: 'New Employer Setup',
+          description: 'Add a New Employer to a Parent Company',
         },
         update: {
           title: 'Update Current Employer',
-          description: 'Update Available Employers',
+          description: 'Update available Employers',
         },
       },
+    },
+    usersSetup: {
+      kicker: 'Administration',
+      title: 'Users Setup',
+      description: 'Manage users that have access to the AMCA Platform.',
     },
     new: {
       formTitle: 'New Employer',
@@ -171,7 +189,9 @@ export const EMPLOYER_CONTENT = {
     allowCobraLabel: 'Allow Cobra',
     exactDayLabel: 'Exact Day?',
     renewalDateLabel: 'Renewal Date',
+    renewalDatePlaceholder: 'Select renewal date...',
     initialNotificationStartOnLabel: 'Initial Notification Start On',
+    initialNotificationStartOnPlaceholder: 'Select initial notification date...',
   },
   notesStep: {
     heading: 'Administrative Notes',
@@ -232,4 +252,34 @@ export const EMPLOYER_CONTENT = {
     deleteSuccess: 'Employer deleted successfully!',
     deleteError: 'Failed to delete employer. Please try again.',
   },
+  validation: {
+    nameRequired: 'Employer Name is required',
+    nameMax: 'Employer Name must be 100 characters or fewer',
+    parentCompanyRequired: 'Parent Company is required',
+    address1Required: 'Address 1 is required',
+    addressMax: 'Address must be 200 characters or fewer',
+    cityRequired: 'City is required',
+    cityMax: 'City must be 100 characters or fewer',
+    cityLetters: 'City must contain only letters',
+    zipRequired: 'ZIP Code is required',
+    zipInvalid: 'ZIP Code must be exactly 5 digits',
+    contactFirstRequired: 'Contact First Name is required',
+    contactFirstMax: 'First name must be 50 characters or fewer',
+    contactFirstLetters: 'First name must contain only letters',
+    contactLastRequired: 'Contact Last Name is required',
+    contactLastMax: 'Last name must be 50 characters or fewer',
+    contactLastLetters: 'Last name must contain only letters',
+    contactTitleMax: 'Contact Title must be 100 characters or fewer',
+    phoneInvalid: 'Phone Number must be exactly 10 digits',
+    faxInvalid: 'Fax must be exactly 10 digits',
+    emailInvalid: 'Enter a valid email address',
+    emailMax: 'Email must be 254 characters or fewer',
+
+    groupNumberRequired: 'Group Number is required',
+    groupNumberMax: 'Group Number must be 100 characters or fewer',
+    policyNumberMax: 'Policy Number must be 100 characters or fewer',
+    tpacNumberMax: 'TPAC Number must be 100 characters or fewer',
+    notesTitleMax: 'Notes Title must be 200 characters or fewer',
+  },
 } as const
+

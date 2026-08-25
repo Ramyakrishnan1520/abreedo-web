@@ -4,8 +4,11 @@ import { useFormContext } from 'react-hook-form'
 import { ReviewStep as CommonReviewStep } from '#/components/admin/common/ReviewSection'
 import { useAvailableCarriers } from '#/hooks/parent-company/useAvailableCarriers.ts'
 import { useParentCompanies } from '#/hooks/parent-company/useParentCompanies.ts'
+import { useGetStates } from '#/hooks/carrier/useGetStates.ts'
 import { EMPLOYER_CONTENT } from '#/utils/employer-content.ts'
 import { resolveSelectedCarrierOptions } from '#/utils/resolveSelectedCarrierOptions.ts'
+
+import { resolveOptionLabel } from '#/utils/resolveOptionLabel.ts'
 
 import type { EmployerFormValues } from '#/components/admin/employer/employer.schema.ts'
 import type { ReviewSectionConfig } from '#/types/review-steps.ts'
@@ -17,14 +20,21 @@ export function ReviewStep() {
   const values = form.getValues()
   const { carriers } = useAvailableCarriers()
   const { data: parentCompanies = [] } = useParentCompanies()
+  const { data: states = [] } = useGetStates()
+
+  const stateName = useMemo(() => {
+    if (!values.state) return undefined
+    return states.find((s) => s.id === values.state)?.name ?? values.state
+  }, [states, values.state])
 
   const parentCompanyName = useMemo(() => {
-    if (!values.parentCompanyId) return undefined
-    return (
-      parentCompanies.find((company) => company.id === values.parentCompanyId)
-        ?.name ?? values.parentCompanyId
+    return resolveOptionLabel(
+      values.parentCompanyId,
+      parentCompanies,
+      values.parentCompanyName,
     )
-  }, [parentCompanies, values.parentCompanyId])
+  }, [parentCompanies, values.parentCompanyId, values.parentCompanyName])
+
 
   const selectedCarrierNames = useMemo(
     () =>
@@ -59,7 +69,7 @@ export function ReviewStep() {
           { type: 'text', label: fields.address1, value: values.address1 },
           { type: 'text', label: fields.address2, value: values.address2 },
           { type: 'text', label: fields.city, value: values.city },
-          { type: 'text', label: fields.state, value: values.state },
+          { type: 'text', label: fields.state, value: stateName },
           { type: 'text', label: fields.zip, value: values.zip },
         ],
       },

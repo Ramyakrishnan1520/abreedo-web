@@ -8,12 +8,14 @@ interface UsePlansOptions {
   pagination: PaginationState
   parentCompanyId?: string
   carrierId?: string
+  search?: string
 }
 
 export function usePlans({
   pagination,
   parentCompanyId,
   carrierId,
+  search,
 }: UsePlansOptions) {
   return useQuery({
     queryKey: [
@@ -22,6 +24,7 @@ export function usePlans({
       pagination.pageSize,
       parentCompanyId,
       carrierId,
+      search,
     ],
     queryFn: () =>
       getPlansApi({
@@ -29,7 +32,8 @@ export function usePlans({
         pageSize: pagination.pageSize,
         parentCompanyId,
         carrierId,
+        search,
       }),
-      placeholderData: keepPreviousData,
+    placeholderData: keepPreviousData,
   })
 }

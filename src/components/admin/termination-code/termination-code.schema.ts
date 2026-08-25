@@ -1,34 +1,26 @@
 import { z } from 'zod'
 
+import {
+  optionalTextSchema,
+  requiredTextSchema,
+} from '#/components/admin/common/form-field-schemas.ts'
 import { TERMINATION_CODE_CONTENT } from '#/utils/termination-code-content.ts'
 
 const val = TERMINATION_CODE_CONTENT.validation
 
 export const terminationCodeSchema = z.object({
-  code: z
-    .string()
-    .trim()
-    .min(1, val.codeRequired)
-    .max(2, val.codeMax),
-  name: z
-    .string()
-    .trim()
-    .min(1, val.nameRequired)
-    .max(100, val.nameMax),
-  bccCode: z
-    .string()
-    .trim()
-    .max(50, val.bccCodeMax)
-    .optional()
-    .or(z.literal('')),
-  nepaCode: z
-    .string()
-    .trim()
-    .max(50, val.nepaCodeMax)
-    .optional()
-    .or(z.literal('')),
+  code: requiredTextSchema(val.codeRequired, {
+    max: 2,
+    maxMessage: val.codeMax,
+  }),
+  name: requiredTextSchema(val.nameRequired, {
+    max: 100,
+    maxMessage: val.nameMax,
+  }),
+  bccCode: optionalTextSchema({ max: 50, maxMessage: val.bccCodeMax }),
+  nepaCode: optionalTextSchema({ max: 50, maxMessage: val.nepaCodeMax }),
   cobraNotice: z.boolean().optional(),
-  cobraTerm: z.string().optional(),
+  cobraTerm: optionalTextSchema(),
   cobraMonths: z
     .number()
     .int()

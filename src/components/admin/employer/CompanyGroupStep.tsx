@@ -11,6 +11,7 @@ import {
 } from '#/components/ui/Form'
 import { Input } from '#/components/ui/input.tsx'
 import { ConfigurableSelect } from '#/components/admin/common/ConfigurableSelect.tsx'
+import { DatePicker } from '#/components/admin/common/DatePicker.tsx'
 import {
   FORM_INPUT_CLASS,
   LABEL_COL,
@@ -245,11 +246,12 @@ export function CompanyGroupStep() {
             </FormLabel>
             <div className="space-y-1">
               <FormControl>
-                <Input
+                <DatePicker
                   id="employer-renewal-date"
-                  type="date"
-                  className={FORM_INPUT_CLASS}
-                  {...field}
+                  value={field.value}
+                  onChange={field.onChange}
+                  placeholder={copy.renewalDatePlaceholder}
+                  aria-label={copy.renewalDateLabel}
                 />
               </FormControl>
               <FormMessage />
@@ -269,11 +271,12 @@ export function CompanyGroupStep() {
             </FormLabel>
             <div className="space-y-1">
               <FormControl>
-                <Input
+                <DatePicker
                   id="employer-initial-notification-date"
-                  type="date"
-                  className={FORM_INPUT_CLASS}
-                  {...field}
+                  value={field.value}
+                  onChange={field.onChange}
+                  placeholder={copy.initialNotificationStartOnPlaceholder}
+                  aria-label={copy.initialNotificationStartOnLabel}
                 />
               </FormControl>
               <FormMessage />

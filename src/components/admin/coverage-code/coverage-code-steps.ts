@@ -11,7 +11,9 @@ export const COVERAGE_CODE_DEFAULT_VALUES: CoverageCodeFormValues = {
   code: '',
   name: '',
   carrierId: '',
+  carrierName: '',
   coverageClassId: '',
+
   codeInvoice: '',
   invoiceInclude: false,
   codeReport: '',

@@ -19,11 +19,13 @@ import { Input } from '#/components/ui/input.tsx'
 import { Label } from '#/components/ui/label.tsx'
 import { LOGIN_CONTENT } from '#/utils/login-content.ts'
 import { cn } from '#/lib/utils.ts'
+import { requiredTextSchema } from '#/components/admin/common/form-field-schemas.ts'
 
 const loginSchema = z.object({
-  username: z.string().min(1, LOGIN_CONTENT.validation.usernameRequired).trim(),
-  password: z.string().min(1, LOGIN_CONTENT.validation.passwordRequired),
+  username: requiredTextSchema(LOGIN_CONTENT.validation.usernameRequired),
+  password: requiredTextSchema(LOGIN_CONTENT.validation.passwordRequired),
 })
+
 
 type LoginFormValues = z.infer<typeof loginSchema>
 

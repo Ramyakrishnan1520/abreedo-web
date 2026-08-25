@@ -17,6 +17,7 @@ import {
 } from '#/components/admin/common/form-styles.ts'
 import { useGetCoverageClasses } from '#/hooks/coverage-code/useGetCoverageClasses.ts'
 import { useGetCoverageTypes } from '#/hooks/coverage-code/useGetCoverageTypes.ts'
+import { useCarrier } from '#/hooks/carrier/useCarrierById.ts'
 import { useInfiniteCarrierOptions } from '#/hooks/carrier/use-infinite-carrier-options.ts'
 import { useLoadMoreIntersection } from '#/hooks/use-load-more-intersection.ts'
 import { COVERAGE_CODE_CONTENT } from '#/utils/coverage-code-content.ts'
@@ -27,6 +28,9 @@ export function GeneralStep() {
   const form = useFormContext<CoverageCodeFormValues>()
   const copy = COVERAGE_CODE_CONTENT.generalStep
 
+  const currentCarrierId = form.watch('carrierId')
+  const formCarrierName = form.watch('carrierName')
+
   const {
     carriers,
     isLoading: carriersLoading,
@@ -35,6 +39,12 @@ export function GeneralStep() {
     hasNextPage: carriersHasNextPage,
     fetchNextPage: fetchNextCarriersPage,
   } = useInfiniteCarrierOptions()
+
+  const { data: singleCarrier } = useCarrier(
+    !formCarrierName && currentCarrierId ? currentCarrierId : undefined,
+  )
+
+  const effectiveCarrierLabel = formCarrierName || singleCarrier?.name
 
   const {
     data: coverageClasses = [],
@@ -147,8 +157,15 @@ export function GeneralStep() {
                 <ConfigurableSelect
                   id="coverage-carrier"
                   value={field.value || ''}
-                  onValueChange={field.onChange}
+                  onValueChange={(newVal) => {
+                    field.onChange(newVal)
+                    const picked = carrierOptions.find((c) => c.value === newVal)
+                    if (picked) {
+                      form.setValue('carrierName', picked.label)
+                    }
+                  }}
                   options={carrierOptions}
+                  selectedLabel={effectiveCarrierLabel}
                   placeholder={copy.carrierSelectPlaceholder}
                   loading={carriersLoading}
                   loadingPlaceholder={copy.carrierLoadingPlaceholder}

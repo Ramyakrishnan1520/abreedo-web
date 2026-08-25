@@ -21,7 +21,9 @@ export function mapEmployerDetailToFormValues(
   return {
     name: detail.name ?? '',
     parentCompanyId: detail.parentCompanyId ?? '',
+    parentCompanyName: detail.parentCompanyName ?? '',
     address1: detail.address1 ?? '',
+
     address2: detail.address2 ?? '',
     city: detail.city ?? '',
     state: detail.state ?? '',

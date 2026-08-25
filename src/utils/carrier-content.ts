@@ -11,22 +11,26 @@ export const CARRIER_CONTENT = {
   pages: {
     index: {
       kicker: 'Administration',
-      title: 'Update Carriers',
+      title: 'Carriers & Coverage Code Setup',
       description:
-        'Select an action below to set up a new carrier or manage existing carriers.',
+        'Select an action below to set up new carriers, coverage codes, or manage existing records.',
       chooseHeading: 'Please Choose',
       cards: {
-        list: {
-          title: 'List Carrier',
-          description: 'View available carriers table',
-        },
-        new: {
+        newCarrier: {
           title: 'New Carrier',
-          description: 'Guided Carrier Setup',
+          description: 'Create a new insurance carrier',
         },
-        update: {
+        updateCarrier: {
           title: 'Update Current Carrier',
-          description: 'Update Available Carriers',
+          description: 'Edit or remove existing insurance carriers.',
+        },
+        newCoverageCode: {
+          title: 'New Coverage Code',
+          description: 'Create a new coverage code for benefits plans.',
+        },
+        updateCoverageCode: {
+          title: 'Update Current Coverage Code',
+          description: 'Edit or remove existing coverage codes.',
         },
       },
     },
@@ -180,16 +184,17 @@ export const CARRIER_CONTENT = {
     addressMax: 'Address must be 200 characters or fewer',
     cityMax: 'City must be 100 characters or fewer',
     cityLetters: 'City must contain only letters',
-    zipInvalid: 'Enter a valid ZIP code (e.g. 12345 or 12345-6789)',
+    zipInvalid: 'ZIP Code must be exactly 5 digits',
     firstNameMax: 'First name must be 50 characters or fewer',
     firstNameLetters: 'First name must contain only letters',
     lastNameMax: 'Last name must be 50 characters or fewer',
     lastNameLetters: 'Last name must contain only letters',
-    phoneInvalid: 'Enter a valid phone number — (___) ___-____',
-    faxInvalid: 'Enter a valid fax number — (___) ___-____',
+    phoneInvalid: 'Phone Number must be exactly 10 digits',
+    faxInvalid: 'Fax must be exactly 10 digits',
     emailInvalid: 'Enter a valid email address',
     emailMax: 'Email must be 254 characters or fewer',
   },
+
   toasts: {
     createSuccess: 'Carrier created successfully!',
     createError: 'Failed to create carrier. Please try again.',

@@ -7,14 +7,15 @@ export function mapCoverageCodeDetailToFormValues(
   return {
     code: detail.code ?? '',
     name: detail.matrixName ?? detail.title ?? '',
-    carrierId: detail.carrierId ?? '',
-    coverageClassId: detail.coverageClassId ?? '',
+    carrierId: detail.carrierId ? String(detail.carrierId) : '',
+    carrierName: detail.carrierName ?? '',
+    coverageClassId: detail.coverageClassId ? String(detail.coverageClassId) : '',
     codeInvoice: (detail as unknown as Record<string, string>).codeInvoice ?? '',
     invoiceInclude: detail.invoiceInclude ?? false,
     codeReport: (detail as unknown as Record<string, string>).codeReport ?? '',
     title: detail.title ?? detail.description ?? '',
     shortTitle: (detail as unknown as Record<string, string>).shortTitle ?? detail.code ?? '',
-    remittanceTypeId: detail.remittanceTypeId ?? '',
+    remittanceTypeId: detail.remittanceTypeId ? String(detail.remittanceTypeId) : '',
     invoiceGroup: detail.invoiceGroup ?? '',
     notes: (detail as unknown as Record<string, string>).notes ?? '',
   }

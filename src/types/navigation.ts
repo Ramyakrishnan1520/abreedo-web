@@ -20,6 +20,8 @@ export interface SidebarItem {
 export interface SidebarSection {
   id: string
   title: string
+  icon?: ComponentType<SVGProps<SVGSVGElement>>
+  route?: AppRoute
   items: SidebarItem[]
 }
 

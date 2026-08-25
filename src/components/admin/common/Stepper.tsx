@@ -69,8 +69,7 @@ export function Stepper({ steps, currentStep, className }: StepperProps) {
               <span
                 className={cn(
                   'mt-2 hidden text-center text-xs font-semibold uppercase tracking-wide sm:block',
-                  isCurrent && 'text-tan-dark',
-                  isCompleted && 'text-slate-700',
+                  (isCurrent || isCompleted) && 'text-tan-dark',
                   isUpcoming && 'text-slate-400',
                 )}
               >
