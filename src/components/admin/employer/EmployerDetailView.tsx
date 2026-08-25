@@ -20,8 +20,10 @@ import { useParentCompanies } from '#/hooks/parent-company/useParentCompanies.ts
 import { EMPLOYER_CONTENT } from '#/utils/employer-content.ts'
 import { mapEmployerDetailToFormValues } from '#/utils/mapEmployerDetailToFormValues.ts'
 import { resolveSelectedCarrierOptions } from '#/utils/resolveSelectedCarrierOptions.ts'
+import { resolveOptionLabel } from '#/utils/resolveOptionLabel.ts'
 
 import type { ReviewSectionConfig } from '#/types/review-steps.ts'
+
 
 interface EmployerDetailViewProps {
   employerId: string
@@ -52,12 +54,13 @@ export function EmployerDetailView({
   )
 
   const parentCompanyName = useMemo(() => {
-    if (!values?.parentCompanyId) return employerDetail?.parentCompanyName ?? undefined
-    return (
-      parentCompanies.find((company) => company.id === values.parentCompanyId)
-        ?.name ?? employerDetail?.parentCompanyName ?? values.parentCompanyId
+    return resolveOptionLabel(
+      values?.parentCompanyId,
+      parentCompanies,
+      employerDetail?.parentCompanyName,
     )
   }, [parentCompanies, values?.parentCompanyId, employerDetail?.parentCompanyName])
+
 
   const stateName = useMemo(() => {
     if (!values?.state) return undefined

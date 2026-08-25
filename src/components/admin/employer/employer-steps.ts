@@ -7,7 +7,9 @@ export const EMPLOYER_STEPS = EMPLOYER_CONTENT.form.steps
 export const EMPLOYER_DEFAULT_VALUES: EmployerFormValues = {
   name: '',
   parentCompanyId: '',
+  parentCompanyName: '',
   address1: '',
+
   address2: '',
   city: '',
   state: '',

@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { Loader2 } from 'lucide-react'
 
 import { cn } from '#/lib/utils.ts'
@@ -19,6 +20,7 @@ interface ConfigurableSelectProps {
   value?: string
   onValueChange: (value: string) => void
   options: SelectOption[]
+  selectedLabel?: string
   placeholder?: string
   loading?: boolean
   loadingPlaceholder?: string
@@ -38,6 +40,7 @@ export function ConfigurableSelect({
   value,
   onValueChange,
   options,
+  selectedLabel,
   placeholder = 'Select an option...',
   loading = false,
   loadingPlaceholder = 'Loading...',
@@ -52,6 +55,15 @@ export function ConfigurableSelect({
   loadingMoreLabel = 'Loading more...',
 }: ConfigurableSelectProps) {
   const isDisabled = disabled || loading
+
+  const effectiveOptions = useMemo(() => {
+    if (!value) return options
+    const exists = options.some((opt) => String(opt.value) === String(value))
+    if (!exists && selectedLabel) {
+      return [{ value, label: selectedLabel }, ...options]
+    }
+    return options
+  }, [options, value, selectedLabel])
 
   return (
     <div className="w-full min-w-0">
@@ -71,7 +83,7 @@ export function ConfigurableSelect({
           position="popper"
           className={contentClassName}
         >
-          {options.map((option) => (
+          {effectiveOptions.map((option) => (
             <SelectItem
               key={option.value}
               value={option.value}

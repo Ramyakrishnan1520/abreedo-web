@@ -12,6 +12,7 @@ export const planSchema = z
   .object({
     parentCompanyId: z.string(),
     coverageCodeId: requiredTextSchema(val.coverageCodeRequired),
+    coverageCodeTitle: optionalTextSchema(),
     commissionCodeId: optionalTextSchema(),
     option: requiredTextSchema(val.optionRequired, {
       max: 50,
@@ -24,7 +25,9 @@ export const planSchema = z
     effectiveDate: requiredTextSchema(val.effectiveDateRequired),
     groupType: requiredTextSchema(val.groupTypeRequired),
     linkedPlanId: optionalTextSchema(),
+    linkedPlanName: optionalTextSchema(),
     linkedPlan2Id: optionalTextSchema(),
+    linkedPlan2Name: optionalTextSchema(),
   })
   .refine(
     (data) => {

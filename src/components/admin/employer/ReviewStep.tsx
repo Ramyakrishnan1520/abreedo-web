@@ -8,6 +8,8 @@ import { useGetStates } from '#/hooks/carrier/useGetStates.ts'
 import { EMPLOYER_CONTENT } from '#/utils/employer-content.ts'
 import { resolveSelectedCarrierOptions } from '#/utils/resolveSelectedCarrierOptions.ts'
 
+import { resolveOptionLabel } from '#/utils/resolveOptionLabel.ts'
+
 import type { EmployerFormValues } from '#/components/admin/employer/employer.schema.ts'
 import type { ReviewSectionConfig } from '#/types/review-steps.ts'
 
@@ -26,12 +28,13 @@ export function ReviewStep() {
   }, [states, values.state])
 
   const parentCompanyName = useMemo(() => {
-    if (!values.parentCompanyId) return undefined
-    return (
-      parentCompanies.find((company) => company.id === values.parentCompanyId)
-        ?.name ?? values.parentCompanyId
+    return resolveOptionLabel(
+      values.parentCompanyId,
+      parentCompanies,
+      values.parentCompanyName,
     )
-  }, [parentCompanies, values.parentCompanyId])
+  }, [parentCompanies, values.parentCompanyId, values.parentCompanyName])
+
 
   const selectedCarrierNames = useMemo(
     () =>

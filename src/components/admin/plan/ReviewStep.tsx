@@ -8,6 +8,8 @@ import { useInfinitePlanOptions } from '#/hooks/plan/use-infinite-plan-options.t
 import { useGroupTypeOptions } from '#/hooks/plan/useGroupTypeOptions.ts'
 import { PLAN_CONTENT } from '#/utils/plan-content.ts'
 
+import { resolveOptionLabel } from '#/utils/resolveOptionLabel.ts'
+
 import type { PlanFormSchemaValues } from '#/components/admin/plan/plan.schema.ts'
 import type { ReviewSectionConfig } from '#/types/review-steps.ts'
 
@@ -22,12 +24,12 @@ export function ReviewStep() {
   const { plans } = useInfinitePlanOptions()
 
   const coverageCodeName = useMemo(() => {
-    if (!values.coverageCodeId) return undefined
-    const match = coverageCodes.find(
-      (cc) => String(cc.id) === String(values.coverageCodeId),
+    return resolveOptionLabel(
+      values.coverageCodeId,
+      coverageCodes.map((c) => ({ id: c.id, name: c.description || c.code })),
+      values.coverageCodeTitle,
     )
-    return match ? match.description || match.code : values.coverageCodeId
-  }, [coverageCodes, values.coverageCodeId])
+  }, [coverageCodes, values.coverageCodeId, values.coverageCodeTitle])
 
   const commissionCodeName = useMemo(() => {
     if (!values.commissionCodeId) return undefined
@@ -47,22 +49,23 @@ export function ReviewStep() {
   }, [groupTypeOptions, values.groupType])
 
   const linkedPlanName = useMemo(() => {
-    if (!values.linkedPlanId) return undefined
-    return (
-      plans.find((p) => String(p.id) === String(values.linkedPlanId))?.name ??
-      values.linkedPlanId
+    return resolveOptionLabel(
+      values.linkedPlanId,
+      plans,
+      values.linkedPlanName,
     )
-  }, [plans, values.linkedPlanId])
+  }, [plans, values.linkedPlanId, values.linkedPlanName])
 
   const linkedPlan2Name = useMemo(() => {
-    if (!values.linkedPlan2Id) return undefined
-    return (
-      plans.find((p) => String(p.id) === String(values.linkedPlan2Id))?.name ??
-      values.linkedPlan2Id
+    return resolveOptionLabel(
+      values.linkedPlan2Id,
+      plans,
+      values.linkedPlan2Name,
     )
-  }, [plans, values.linkedPlan2Id])
+  }, [plans, values.linkedPlan2Id, values.linkedPlan2Name])
 
   const sections: ReviewSectionConfig[] = useMemo(
+
     () => [
       {
         id: 'general',

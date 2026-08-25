@@ -20,7 +20,9 @@ export const employerSchema = z.object({
     maxMessage: v.nameMax,
   }),
   parentCompanyId: requiredTextSchema(v.parentCompanyRequired),
+  parentCompanyName: optionalTextSchema(),
   address1: requiredTextSchema(v.address1Required, {
+
     max: 200,
     maxMessage: v.addressMax,
   }),

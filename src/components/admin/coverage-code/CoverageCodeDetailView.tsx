@@ -19,6 +19,7 @@ import { useGetCoverageClasses } from '#/hooks/coverage-code/useGetCoverageClass
 import { useGetCoverageTypes } from '#/hooks/coverage-code/useGetCoverageTypes.ts'
 import { COVERAGE_CODE_CONTENT } from '#/utils/coverage-code-content.ts'
 import { mapCoverageCodeDetailToFormValues } from '#/utils/mapCoverageCodeDetailToFormValues.ts'
+import { resolveOptionLabel } from '#/utils/resolveOptionLabel.ts'
 
 import type { ReviewSectionConfig } from '#/types/review-steps.ts'
 
@@ -26,7 +27,7 @@ interface CoverageCodeDetailViewProps {
   coverageCodeId: string
   onBack: () => void
   onEdit: () => void
-  onDeleteSuccess: () => void
+  onDeleteSuccess?: () => void
 }
 
 const copy = COVERAGE_CODE_CONTENT.pages.edit
@@ -59,12 +60,12 @@ export function CoverageCodeDetailView({
   )
 
   const carrierName = useMemo(() => {
-    if (!values?.carrierId) return undefined
-    return (
-      carriers.find((c) => String(c.id) === String(values.carrierId))?.name ??
-      values.carrierId
+    return resolveOptionLabel(
+      values?.carrierId,
+      carriers,
+      coverageCodeDetail?.carrierName,
     )
-  }, [carriers, values?.carrierId])
+  }, [carriers, values?.carrierId, coverageCodeDetail?.carrierName])
 
   const coverageClassName = useMemo(() => {
     if (!values?.coverageClassId) return undefined
@@ -178,13 +179,14 @@ export function CoverageCodeDetailView({
   const handleDelete = () => {
     deleteCoverageCode(coverageCodeId, {
       onSuccess: () => {
-        onDeleteSuccess()
+        onDeleteSuccess?.()
       },
       onError: () => {
         setShowConfirmDelete(false)
       },
     })
   }
+
 
   if (isLoading) {
     return (

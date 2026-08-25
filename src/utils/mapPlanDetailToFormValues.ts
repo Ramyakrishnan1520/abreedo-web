@@ -7,6 +7,7 @@ export function mapPlanDetailToFormValues(
   return {
     parentCompanyId: detail.parentCompanyId || DEFAULT_PARENT_COMPANY_ID,
     coverageCodeId: detail.coverageCodeId ?? '',
+    coverageCodeTitle: detail.coverageCodeTitle ?? '',
     commissionCodeId: detail.commissionCodeId ?? '',
     option: detail.option ?? '',
     name: detail.name ?? '',
@@ -15,6 +16,8 @@ export function mapPlanDetailToFormValues(
       : '',
     groupType: detail.groupTypeId ?? '',
     linkedPlanId: detail.linkedPlanId ?? '',
+    linkedPlanName: detail.linkedPlanName ?? '',
     linkedPlan2Id: detail.linkedPlan2Id ?? '',
+    linkedPlan2Name: detail.linkedPlan2Name ?? '',
   }
 }

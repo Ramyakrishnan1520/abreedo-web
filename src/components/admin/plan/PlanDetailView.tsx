@@ -19,8 +19,10 @@ import { useGroupTypeOptions } from '#/hooks/plan/useGroupTypeOptions.ts'
 import { useDeletePlan } from '#/hooks/plan/useDeletePlan.ts'
 import { usePlan } from '#/hooks/plan/usePlanById.ts'
 import { PLAN_CONTENT } from '#/utils/plan-content.ts'
+import { resolveOptionLabel } from '#/utils/resolveOptionLabel.ts'
 
 import type { ReviewSectionConfig } from '#/types/review-steps.ts'
+
 
 interface PlanDetailViewProps {
   planId: string
@@ -48,12 +50,13 @@ export function PlanDetailView({
   const { plans } = useInfinitePlanOptions()
 
   const coverageCodeName = useMemo(() => {
-    if (!planDetail?.coverageCodeId) return undefined
-    const match = coverageCodes.find(
-      (cc) => String(cc.id) === String(planDetail.coverageCodeId),
+    return resolveOptionLabel(
+      planDetail?.coverageCodeId,
+      coverageCodes.map((c) => ({ id: c.id, name: c.description || c.code })),
+      planDetail?.coverageCodeTitle,
     )
-    return match ? match.description || match.code : planDetail.coverageCodeId
-  }, [coverageCodes, planDetail?.coverageCodeId])
+  }, [coverageCodes, planDetail?.coverageCodeId, planDetail?.coverageCodeTitle])
+
 
   const commissionCodeName = useMemo(() => {
     if (!planDetail?.commissionCodeId) return undefined

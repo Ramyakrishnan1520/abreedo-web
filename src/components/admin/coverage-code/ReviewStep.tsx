@@ -7,6 +7,8 @@ import { useGetCoverageTypes } from '#/hooks/coverage-code/useGetCoverageTypes.t
 import { useInfiniteCarrierOptions } from '#/hooks/carrier/use-infinite-carrier-options.ts'
 import { COVERAGE_CODE_CONTENT } from '#/utils/coverage-code-content.ts'
 
+import { resolveOptionLabel } from '#/utils/resolveOptionLabel.ts'
+
 import type { CoverageCodeFormValues } from '#/components/admin/coverage-code/coverage-code.schema.ts'
 import type { ReviewSectionConfig } from '#/types/review-steps.ts'
 
@@ -20,12 +22,9 @@ export function ReviewStep() {
   const { data: coverageTypes = [] } = useGetCoverageTypes()
 
   const carrierName = useMemo(() => {
-    if (!values.carrierId) return undefined
-    return (
-      carriers.find((c) => String(c.id) === String(values.carrierId))?.name ??
-      values.carrierId
-    )
-  }, [carriers, values.carrierId])
+    return resolveOptionLabel(values.carrierId, carriers, values.carrierName)
+  }, [carriers, values.carrierId, values.carrierName])
+
 
   const coverageClassName = useMemo(() => {
     if (!values.coverageClassId) return undefined

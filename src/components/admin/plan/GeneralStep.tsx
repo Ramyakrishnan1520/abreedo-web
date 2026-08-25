@@ -156,8 +156,17 @@ export function GeneralStep() {
                     <ConfigurableSelect
                       id="plan-coverage-code"
                       value={field.value}
-                      onValueChange={field.onChange}
+                      onValueChange={(newVal) => {
+                        field.onChange(newVal)
+                        const picked = coverageCodeOptions.find(
+                          (c) => c.value === newVal,
+                        )
+                        if (picked) {
+                          form.setValue('coverageCodeTitle', picked.label)
+                        }
+                      }}
                       options={coverageCodeOptions}
+                      selectedLabel={form.watch('coverageCodeTitle')}
                       loading={coverageCodesLoading}
                       placeholder={copy.placeholders.coverageCodeSelect}
                       loadingPlaceholder={
@@ -172,6 +181,7 @@ export function GeneralStep() {
                       triggerClassName={FORM_INPUT_CLASS}
                       contentClassName="max-h-60"
                     />
+
                   </FormControl>
                   {coverageCodesError && (
                     <p className="text-xs font-medium text-destructive">
@@ -348,8 +358,17 @@ export function GeneralStep() {
                     <ConfigurableSelect
                       id="plan-linked-plan"
                       value={field.value || ''}
-                      onValueChange={field.onChange}
+                      onValueChange={(newVal) => {
+                        field.onChange(newVal)
+                        const picked = linkedPlan1Options.find(
+                          (p) => p.value === newVal,
+                        )
+                        if (picked) {
+                          form.setValue('linkedPlanName', picked.label)
+                        }
+                      }}
                       options={linkedPlan1Options}
+                      selectedLabel={form.watch('linkedPlanName')}
                       loading={plansLoading}
                       placeholder={copy.placeholders.linkedPlanSelect}
                       loadingPlaceholder={
@@ -390,8 +409,17 @@ export function GeneralStep() {
                     <ConfigurableSelect
                       id="plan-linked-plan-2"
                       value={field.value || ''}
-                      onValueChange={field.onChange}
+                      onValueChange={(newVal) => {
+                        field.onChange(newVal)
+                        const picked = linkedPlan2Options.find(
+                          (p) => p.value === newVal,
+                        )
+                        if (picked) {
+                          form.setValue('linkedPlan2Name', picked.label)
+                        }
+                      }}
                       options={linkedPlan2Options}
+                      selectedLabel={form.watch('linkedPlan2Name')}
                       loading={plansLoading}
                       placeholder={copy.placeholders.linkedPlanSelect}
                       loadingPlaceholder={
@@ -407,6 +435,7 @@ export function GeneralStep() {
                       contentClassName="max-h-60"
                     />
                   </FormControl>
+
                   <FormMessage />
                 </div>
               </FormItem>
