@@ -6,8 +6,9 @@ const val = PLAN_CONTENT.validation
 
 export const planSchema = z
   .object({
-    parentCompanyId: z.string().min(1, val.parentCompanyRequired),
+    parentCompanyId: z.string(),
     coverageCodeId: z.string().min(1, val.coverageCodeRequired),
+    commissionCodeId: z.string().optional(),
     option: z.string().min(1, val.optionRequired).max(50, val.optionMax),
     name: z.string().min(1, val.nameRequired).max(100, val.nameMax),
     effectiveDate: z.string().min(1, val.effectiveDateRequired),

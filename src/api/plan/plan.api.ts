@@ -80,6 +80,10 @@ export async function getPlansApi(
     queryParams.carrierId = params.carrierId
   }
 
+  if (params.search && params.search.trim() !== '') {
+    queryParams.search = params.search.trim()
+  }
+
   const { data } = await apiClient.get<PlanListResponse>('/api/v1/Plans', {
     params: queryParams,
   })
@@ -95,4 +99,20 @@ export async function getPlansApi(
 
   const items = (data.items ?? []).map(mapPlan)
   return getPaginationResult(items, request, data)
+}
+
+export async function getPlanByIdApi(id: string): Promise<PlanApiItem> {
+  const { data } = await apiClient.get<PlanApiItem>(`/api/v1/Plans/${id}`)
+  return data
+}
+
+export async function updatePlanApi(
+  id: string,
+  data: CreatePlanRequest,
+): Promise<void> {
+  await apiClient.put(`/api/v1/Plans/${id}`, data)
+}
+
+export async function deletePlanApi(id: string): Promise<void> {
+  await apiClient.delete(`/api/v1/Plans/${id}`)
 }

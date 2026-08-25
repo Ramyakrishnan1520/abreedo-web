@@ -1,3 +1,6 @@
+export const DEFAULT_PARENT_COMPANY_ID =
+  '8B374850-56B4-409C-B25D-32230F70BF81'
+
 export interface Plan {
   id: string
   name: string
@@ -18,9 +21,19 @@ export interface PlanApiItem {
   carrierName?: string | null
   coverageCodeId?: string | null
   coverageCodeTitle?: string | null
+  commissionCodeId?: string | null
+  commissionCodeName?: string | null
   effectiveDate?: string | null
   obsoleteDate?: string | null
   tobacco?: boolean | null
+  parentCompanyId?: string | null
+  parentCompanyName?: string | null
+  groupTypeId?: string | null
+  tierId?: string | null
+  linkedPlanId?: string | null
+  linkedPlanName?: string | null
+  linkedPlan2Id?: string | null
+  linkedPlan2Name?: string | null
 }
 
 export interface PlanDtoPagedResult {
@@ -36,6 +49,7 @@ export type PlanListResponse = PlanApiItem[] | PlanDtoPagedResult
 export interface GetPlansQueryParams {
   parentCompanyId?: string
   carrierId?: string
+  search?: string
   pageIndex: number
   pageSize: number
 }
@@ -63,8 +77,9 @@ export interface CreatePlanResponse {
 }
 
 export interface PlanFormValues {
-  parentCompanyId?: string
+  parentCompanyId: string
   coverageCodeId: string
+  commissionCodeId?: string
   option: string
   name: string
   effectiveDate: string

@@ -5,6 +5,7 @@ export const ROUTES = {
   ADMIN_ROOT: '/admin',
   ADMIN_USERS: '/admin/users',
   ADMIN_MEMBER_SEARCH: '/admin/member-search',
+  ADMIN_MEMBER_LOOKUP: '/admin/members/lookup',
   ADMIN_MEMBERS_NEW: '/admin/members/new',
   ADMIN_MEMBERS_EDIT: '/admin/members/edit',
   ADMIN_MEMBERS_TERMINATE: '/admin/members/terminate',
@@ -35,6 +36,7 @@ export const ROUTES = {
   // 4. Plans Setup
   ADMIN_PLANS: '/admin/parent-setup/plans',
   ADMIN_PLANS_NEW: '/admin/parent-setup/plans/new',
+  ADMIN_PLANS_EDIT: '/admin/parent-setup/plans/edit',
 
   // Employers Flow
   ADMIN_EMPLOYERS: '/admin/employers',

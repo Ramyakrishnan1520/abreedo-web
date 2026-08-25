@@ -11,7 +11,7 @@ export const adminSidebar: SidebarSection[] = [
       {
         id: 'lookup-member',
         title: 'Look Up Member',
-        route: ROUTES.ADMIN_MEMBER_SEARCH,
+        route: ROUTES.ADMIN_MEMBER_LOOKUP,
       },
       {
         id: 'add-new-member',

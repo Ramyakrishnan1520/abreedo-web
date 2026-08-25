@@ -56,6 +56,7 @@ export function ConfigurableSelect({
   return (
     <div className="w-full min-w-0">
       <Select
+        key={value || '__empty__'}
         value={value || undefined}
         onValueChange={onValueChange}
         disabled={isDisabled}

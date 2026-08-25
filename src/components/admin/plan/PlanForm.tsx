@@ -1,192 +1,105 @@
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
+import type { FormEvent } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { AlertCircle, Loader2 } from 'lucide-react'
+import { AlertCircle } from 'lucide-react'
 
-import { ConfigurableSelect } from '#/components/admin/common/ConfigurableSelect.tsx'
-import { DatePicker } from '#/components/admin/common/DatePicker.tsx'
+import { Form } from '#/components/ui/Form'
+import { GeneralStep } from '#/components/admin/plan/GeneralStep.tsx'
+import { ReviewStep } from '#/components/admin/plan/ReviewStep.tsx'
+import { Stepper } from '#/components/admin/common/Stepper'
+import { FormNavigationActions } from '#/components/admin/common/FormNavigationActions.tsx'
+import {
+  PLAN_DEFAULT_VALUES,
+  PLAN_STEPS,
+} from '#/components/admin/plan/plan-steps.ts'
 import {
   planSchema,
   type PlanFormSchemaValues,
 } from '#/components/admin/plan/plan.schema.ts'
-import { Button } from '#/components/ui/button.tsx'
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '#/components/ui/Form'
-import { Input } from '#/components/ui/input.tsx'
-import { useInfiniteCoverageCodeOptions } from '#/hooks/coverage-code/use-infinite-coverage-code-options.ts'
-import { useAvailableParentCompanies } from '#/hooks/parent-company/useAvailableParentCompanies.ts'
-import { useInfinitePlanOptions } from '#/hooks/plan/use-infinite-plan-options.ts'
 import { useCreatePlan } from '#/hooks/plan/useCreatePlan.ts'
-import { useGroupTypeOptions } from '#/hooks/plan/useGroupTypeOptions.ts'
-import { useLoadMoreIntersection } from '#/hooks/use-load-more-intersection.ts'
-import { cn } from '#/lib/utils.ts'
+import { useUpdatePlan } from '#/hooks/plan/useUpdatePlan.ts'
 import { PLAN_CONTENT } from '#/utils/plan-content.ts'
-import { LABEL_COL } from '#/components/admin/common/form-styles.ts'
-import type { CreatePlanRequest } from '#/types/plan.ts'
+import { getPlanStepValidationFields } from '#/utils/getPlanStepValidationFields.ts'
 
-const copy = PLAN_CONTENT.form
+import {
+  DEFAULT_PARENT_COMPANY_ID,
+  type CreatePlanRequest,
+} from '#/types/plan.ts'
+
+const { form: formCopy } = PLAN_CONTENT
 
 interface PlanFormProps {
+  mode?: 'create' | 'edit'
+  planId?: string
   defaultValues?: Partial<PlanFormSchemaValues>
+  initialValues?: Partial<PlanFormSchemaValues>
   onBack?: () => void
   onSuccess?: () => void
   title?: string
 }
 
+const STEP_COMPONENTS = [GeneralStep, ReviewStep] as const
+
 export function PlanForm({
+  mode = 'create',
+  planId,
   defaultValues,
+  initialValues,
   onBack,
   onSuccess,
-  title = PLAN_CONTENT.form.defaultTitle,
+  title,
 }: PlanFormProps) {
-  const { mutate: createPlan, isPending } = useCreatePlan()
+  const [currentStep, setCurrentStep] = useState(0)
+  const { mutate: createPlan, isPending: isCreating } = useCreatePlan()
+  const { mutate: updatePlan, isPending: isUpdating } = useUpdatePlan()
+  const isPending = isCreating || isUpdating
 
-  // Parent Company infinite scroll setup
-  const {
-    parentCompanies,
-    isLoading: parentCompaniesLoading,
-    isError: parentCompaniesError,
-    isFetchingNextPage: parentCompaniesFetchingNextPage,
-    hasNextPage: parentCompaniesHasNextPage,
-    fetchNextPage: fetchNextParentCompaniesPage,
-  } = useAvailableParentCompanies()
-
-  const [parentCompanySelectContent, setParentCompanySelectContent] =
-    useState<HTMLDivElement | null>(null)
-  const [parentCompanySelectOpen, setParentCompanySelectOpen] = useState(false)
-  const parentCompanyLoadMoreRef = useLoadMoreIntersection({
-    hasNextPage: parentCompaniesHasNextPage,
-    isFetchingNextPage: parentCompaniesFetchingNextPage,
-    fetchNextPage: fetchNextParentCompaniesPage,
-    enabled: parentCompanySelectOpen,
-    root: parentCompanySelectContent,
-  })
-
-  // Coverage Code infinite scroll setup
-  const {
-    coverageCodes,
-    isLoading: coverageCodesLoading,
-    isError: coverageCodesError,
-    isFetchingNextPage: coverageCodesFetchingNextPage,
-    hasNextPage: coverageCodesHasNextPage,
-    fetchNextPage: fetchNextCoverageCodesPage,
-  } = useInfiniteCoverageCodeOptions()
-
-  const [coverageCodeSelectContent, setCoverageCodeSelectContent] =
-    useState<HTMLDivElement | null>(null)
-  const [coverageCodeSelectOpen, setCoverageCodeSelectOpen] = useState(false)
-  const coverageCodeLoadMoreRef = useLoadMoreIntersection({
-    hasNextPage: coverageCodesHasNextPage,
-    isFetchingNextPage: coverageCodesFetchingNextPage,
-    fetchNextPage: fetchNextCoverageCodesPage,
-    enabled: coverageCodeSelectOpen,
-    root: coverageCodeSelectContent,
-  })
-
-  // Group Type options setup
-  const { options: groupTypeOptions, isLoading: groupTypeLoading } =
-    useGroupTypeOptions()
-
-  // Linked Plans infinite scroll setup
-  const {
-    plans,
-    isLoading: plansLoading,
-    isError: plansError,
-    isFetchingNextPage: plansFetchingNextPage,
-    hasNextPage: plansHasNextPage,
-    fetchNextPage: fetchNextPlansPage,
-  } = useInfinitePlanOptions()
-
-  const [linkedPlanSelectContent, setLinkedPlanSelectContent] =
-    useState<HTMLDivElement | null>(null)
-  const [linkedPlanSelectOpen, setLinkedPlanSelectOpen] = useState(false)
-  const linkedPlanLoadMoreRef = useLoadMoreIntersection({
-    hasNextPage: plansHasNextPage,
-    isFetchingNextPage: plansFetchingNextPage,
-    fetchNextPage: fetchNextPlansPage,
-    enabled: linkedPlanSelectOpen,
-    root: linkedPlanSelectContent,
-  })
-
-  const [linkedPlan2SelectContent, setLinkedPlan2SelectContent] =
-    useState<HTMLDivElement | null>(null)
-  const [linkedPlan2SelectOpen, setLinkedPlan2SelectOpen] = useState(false)
-  const linkedPlan2LoadMoreRef = useLoadMoreIntersection({
-    hasNextPage: plansHasNextPage,
-    isFetchingNextPage: plansFetchingNextPage,
-    fetchNextPage: fetchNextPlansPage,
-    enabled: linkedPlan2SelectOpen,
-    root: linkedPlan2SelectContent,
-  })
+  const resolvedTitle =
+    title ??
+    (mode === 'edit'
+      ? formCopy.titles.edit
+      : formCopy.titles.create)
 
   const form = useForm<PlanFormSchemaValues>({
     resolver: zodResolver(planSchema),
     defaultValues: {
-      parentCompanyId: '',
-      coverageCodeId: '',
-      option: '',
-      name: '',
-      effectiveDate: '',
-      groupType: '',
-      linkedPlanId: '',
-      linkedPlan2Id: '',
+      ...PLAN_DEFAULT_VALUES,
       ...defaultValues,
+      ...initialValues,
     },
+    mode: 'onSubmit',
+    reValidateMode: 'onSubmit',
   })
 
-  const selectedLinkedPlanId = form.watch('linkedPlanId')
-  const selectedLinkedPlan2Id = form.watch('linkedPlan2Id')
+  const isFirstStep = currentStep === 0
+  const isLastStep = currentStep === PLAN_STEPS.length - 1
+  const StepComponent = STEP_COMPONENTS[currentStep]
 
-  const parentCompanyOptions = useMemo(
-    () =>
-      parentCompanies.map((pc) => ({
-        value: String(pc.id),
-        label: pc.name,
-      })),
-    [parentCompanies],
-  )
+  const handleBack = () => {
+    if (!isFirstStep) {
+      setCurrentStep((step) => step - 1)
+      return
+    }
+    if (onBack) {
+      onBack()
+    }
+  }
 
-  const coverageCodeOptions = useMemo(
-    () =>
-      coverageCodes.map((c) => ({
-        value: String(c.id),
-        label: c.description || c.code,
-      })),
-    [coverageCodes],
-  )
+  const handleNext = async () => {
+    const fields = getPlanStepValidationFields(currentStep)
+    const isValid = await form.trigger(fields)
 
-  const linkedPlan1Options = useMemo(
-    () =>
-      plans
-        .filter((p) => String(p.id) !== selectedLinkedPlan2Id)
-        .map((p) => ({
-          value: String(p.id),
-          label: p.name,
-        })),
-    [plans, selectedLinkedPlan2Id],
-  )
-
-  const linkedPlan2Options = useMemo(
-    () =>
-      plans
-        .filter((p) => String(p.id) !== selectedLinkedPlanId)
-        .map((p) => ({
-          value: String(p.id),
-          label: p.name,
-        })),
-    [plans, selectedLinkedPlanId],
-  )
+    if (isValid) {
+      setCurrentStep((step) => step + 1)
+    }
+  }
 
   const onSubmit = (data: PlanFormSchemaValues) => {
     const payload: CreatePlanRequest = {
       code: null,
-      parentCompanyId: data.parentCompanyId || null,
+      parentCompanyId: data.parentCompanyId || DEFAULT_PARENT_COMPANY_ID,
+      commissionCodeId: data.commissionCodeId || null,
       name: data.name,
       option: data.option,
       effectiveDate: data.effectiveDate
@@ -198,350 +111,92 @@ export function PlanForm({
       linkedPlan2Id: data.linkedPlan2Id || null,
     }
 
-    createPlan(payload, {
-      onSuccess: () => {
-        onSuccess?.()
-      },
-    })
+    if (mode === 'edit' && planId) {
+      updatePlan(
+        { id: planId, data: payload },
+        {
+          onSuccess: () => {
+            onSuccess?.()
+          },
+        },
+      )
+    } else {
+      createPlan(payload, {
+        onSuccess: () => {
+          onSuccess?.()
+        },
+      })
+    }
   }
 
-  const hasFormErrors = Object.keys(form.formState.errors).length > 0
+  const handleSave = () => {
+    void form.handleSubmit(onSubmit)()
+  }
+
+  const handleFormSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+  }
+
+  const saveLabel =
+    mode === 'edit'
+      ? formCopy.saveLabels.edit
+      : formCopy.saveLabels.create
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-      <h2 className="mb-6 text-xl font-bold text-slate-900">{title}</h2>
+    <div className="flex min-h-[calc(100vh-8rem)] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xs">
+      {/* Header with Kicker & Stepper */}
+      <div className="border-b border-slate-200 bg-sidebar px-6 py-5">
+        <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-tan-accent">
+              {formCopy.kicker}
+            </p>
+            <h1 className="display-title mt-1 text-2xl font-bold text-sidebar-foreground">
+              {resolvedTitle}
+            </h1>
+          </div>
+        </div>
 
+        <Stepper
+          steps={PLAN_STEPS}
+          currentStep={currentStep}
+          className="rounded-xl bg-white/5 px-2 py-4 sm:px-4"
+        />
+      </div>
+
+      {/* Form Content */}
       <Form {...form}>
         <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-4"
+          onSubmit={handleFormSubmit}
           noValidate
+          className="flex min-h-0 flex-1 flex-col"
         >
-          {/* Validation summary banner */}
-          {hasFormErrors && (
-            <div
-              className="flex items-center gap-2 rounded-lg border border-destructive/20 bg-destructive/10 p-3 text-xs font-medium text-destructive"
-              role="alert"
-            >
-              <AlertCircle className="size-4 shrink-0" />
-              <span>{copy.validationSummary}</span>
-            </div>
-          )}
+          <div className="flex-1 overflow-y-auto px-6 py-6 sm:px-8">
+            <StepComponent />
 
-          {/* Parent Company Dropdown */}
-          <FormField
-            control={form.control}
-            name="parentCompanyId"
-            render={({ field }) => (
-              <FormItem className="grid grid-cols-1 items-start gap-x-4 gap-y-1 border-b border-slate-100 py-3 sm:grid-cols-[200px_1fr]">
-                <FormLabel
-                  className={cn(
-                    LABEL_COL,
-                    'after:ml-0.5 after:text-destructive after:content-["*"]',
-                  )}
-                >
-                  {copy.labels.parentCompany}
-                </FormLabel>
-                <div className="space-y-1">
-                  <FormControl>
-                    <ConfigurableSelect
-                      id="plan-parent-company"
-                      value={field.value}
-                      onValueChange={field.onChange}
-                      options={parentCompanyOptions}
-                      loading={parentCompaniesLoading}
-                      placeholder={copy.placeholders.parentCompanySelect}
-                      loadingPlaceholder={
-                        copy.placeholders.parentCompanyLoading
-                      }
-                      open={parentCompanySelectOpen}
-                      onOpenChange={setParentCompanySelectOpen}
-                      onContentRef={setParentCompanySelectContent}
-                      loadMoreRef={parentCompanyLoadMoreRef}
-                      isFetchingNextPage={parentCompaniesFetchingNextPage}
-                      loadingMoreLabel={copy.loadingMore}
-                      triggerClassName="h-9 rounded-md border-slate-200 bg-slate-50/50 text-slate-900 focus:border-tan-dark focus:bg-white"
-                      contentClassName="max-h-60"
-                    />
-                  </FormControl>
-                  {parentCompaniesError && (
-                    <p className="text-xs font-medium text-destructive">
-                      {copy.placeholders.parentCompanyLoading}
-                    </p>
-                  )}
-                  <FormMessage />
+            {Object.keys(form.formState.errors).length > 0 &&
+              form.formState.isSubmitted && (
+                <div className="mt-6 flex items-start gap-2 rounded-lg border border-destructive/30 bg-destructive/10 px-4 py-3">
+                  <AlertCircle className="mt-0.5 size-4 shrink-0 text-destructive" />
+                  <p className="text-xs font-medium text-destructive">
+                    {formCopy.validationSummary}
+                  </p>
                 </div>
-              </FormItem>
-            )}
-          />
-
-          {/* Coverage Code Dropdown */}
-          <FormField
-            control={form.control}
-            name="coverageCodeId"
-            render={({ field }) => (
-              <FormItem className="grid grid-cols-1 items-start gap-x-4 gap-y-1 border-b border-slate-100 py-3 sm:grid-cols-[200px_1fr]">
-                <FormLabel
-                  className={cn(
-                    LABEL_COL,
-                    'after:ml-0.5 after:text-destructive after:content-["*"]',
-                  )}
-                >
-                  {copy.labels.coverageCode}
-                </FormLabel>
-                <div className="space-y-1">
-                  <FormControl>
-                    <ConfigurableSelect
-                      id="plan-coverage-code"
-                      value={field.value}
-                      onValueChange={field.onChange}
-                      options={coverageCodeOptions}
-                      loading={coverageCodesLoading}
-                      placeholder={copy.placeholders.coverageCodeSelect}
-                      loadingPlaceholder={
-                        copy.placeholders.coverageCodeLoading
-                      }
-                      open={coverageCodeSelectOpen}
-                      onOpenChange={setCoverageCodeSelectOpen}
-                      onContentRef={setCoverageCodeSelectContent}
-                      loadMoreRef={coverageCodeLoadMoreRef}
-                      isFetchingNextPage={coverageCodesFetchingNextPage}
-                      loadingMoreLabel={copy.loadingMore}
-                      triggerClassName="h-9 rounded-md border-slate-200 bg-slate-50/50 text-slate-900 focus:border-tan-dark focus:bg-white"
-                      contentClassName="max-h-60"
-                    />
-                  </FormControl>
-                  {coverageCodesError && (
-                    <p className="text-xs font-medium text-destructive">
-                      {copy.placeholders.coverageCodeLoading}
-                    </p>
-                  )}
-                  <FormMessage />
-                </div>
-              </FormItem>
-            )}
-          />
-
-          {/* Option Input */}
-          <FormField
-            control={form.control}
-            name="option"
-            render={({ field }) => (
-              <FormItem className="grid grid-cols-1 items-start gap-x-4 gap-y-1 border-b border-slate-100 py-3 sm:grid-cols-[200px_1fr]">
-                <FormLabel
-                  className={cn(
-                    LABEL_COL,
-                    'after:ml-0.5 after:text-destructive after:content-["*"]',
-                  )}
-                >
-                  {copy.labels.option}
-                </FormLabel>
-                <div className="space-y-1">
-                  <FormControl>
-                    <Input
-                      id="plan-option"
-                      placeholder={copy.placeholders.option}
-                      className="h-9 rounded-md border-slate-200 bg-slate-50/50 text-slate-900 focus:border-tan-dark focus:bg-white"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </div>
-              </FormItem>
-            )}
-          />
-
-          {/* Name Input */}
-          <FormField
-            control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem className="grid grid-cols-1 items-start gap-x-4 gap-y-1 border-b border-slate-100 py-3 sm:grid-cols-[200px_1fr]">
-                <FormLabel
-                  className={cn(
-                    LABEL_COL,
-                    'after:ml-0.5 after:text-destructive after:content-["*"]',
-                  )}
-                >
-                  {copy.labels.name}
-                </FormLabel>
-                <div className="space-y-1">
-                  <FormControl>
-                    <Input
-                      id="plan-name"
-                      placeholder={copy.placeholders.name}
-                      className="h-9 rounded-md border-slate-200 bg-slate-50/50 text-slate-900 focus:border-tan-dark focus:bg-white"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </div>
-              </FormItem>
-            )}
-          />
-
-          {/* Effective Date Picker using Shadcn Calendar & DatePicker */}
-          <FormField
-            control={form.control}
-            name="effectiveDate"
-            render={({ field }) => (
-              <FormItem className="grid grid-cols-1 items-start gap-x-4 gap-y-1 border-b border-slate-100 py-3 sm:grid-cols-[200px_1fr]">
-                <FormLabel
-                  className={cn(
-                    LABEL_COL,
-                    'after:ml-0.5 after:text-destructive after:content-["*"]',
-                  )}
-                >
-                  {copy.labels.effectiveDate}
-                </FormLabel>
-                <div className="space-y-1">
-                  <FormControl>
-                    <DatePicker
-                      id="plan-effective-date"
-                      value={field.value}
-                      onChange={field.onChange}
-                      placeholder={copy.placeholders.effectiveDate}
-                      aria-label={copy.labels.effectiveDate}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </div>
-              </FormItem>
-            )}
-          />
-
-          {/* Group Type Dropdown */}
-          <FormField
-            control={form.control}
-            name="groupType"
-            render={({ field }) => (
-              <FormItem className="grid grid-cols-1 items-start gap-x-4 gap-y-1 border-b border-slate-100 py-3 sm:grid-cols-[200px_1fr]">
-                <FormLabel
-                  className={cn(
-                    LABEL_COL,
-                    'after:ml-0.5 after:text-destructive after:content-["*"]',
-                  )}
-                >
-                  {copy.labels.groupType}
-                </FormLabel>
-                <div className="space-y-1">
-                  <FormControl>
-                    <ConfigurableSelect
-                      id="plan-group-type"
-                      value={field.value}
-                      onValueChange={field.onChange}
-                      options={groupTypeOptions}
-                      loading={groupTypeLoading}
-                      placeholder={copy.placeholders.groupTypeSelect}
-                      triggerClassName="h-9 rounded-md border-slate-200 bg-slate-50/50 text-slate-900 focus:border-tan-dark focus:bg-white sm:w-64"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </div>
-              </FormItem>
-            )}
-          />
-
-          {/* Linked Plan Dropdown */}
-          <FormField
-            control={form.control}
-            name="linkedPlanId"
-            render={({ field }) => (
-              <FormItem className="grid grid-cols-1 items-start gap-x-4 gap-y-1 border-b border-slate-100 py-3 sm:grid-cols-[200px_1fr]">
-                <FormLabel className={LABEL_COL}>
-                  {copy.labels.linkedPlan}
-                </FormLabel>
-                <div className="space-y-1">
-                  <FormControl>
-                    <ConfigurableSelect
-                      id="plan-linked-plan"
-                      value={field.value}
-                      onValueChange={field.onChange}
-                      options={linkedPlan1Options}
-                      loading={plansLoading}
-                      placeholder={copy.placeholders.linkedPlanSelect}
-                      loadingPlaceholder={copy.placeholders.linkedPlanLoading}
-                      open={linkedPlanSelectOpen}
-                      onOpenChange={setLinkedPlanSelectOpen}
-                      onContentRef={setLinkedPlanSelectContent}
-                      loadMoreRef={linkedPlanLoadMoreRef}
-                      isFetchingNextPage={plansFetchingNextPage}
-                      loadingMoreLabel={copy.loadingMore}
-                      triggerClassName="h-9 rounded-md border-slate-200 bg-slate-50/50 text-slate-900 focus:border-tan-dark focus:bg-white"
-                      contentClassName="max-h-60"
-                    />
-                  </FormControl>
-                  {plansError && (
-                    <p className="text-xs font-medium text-destructive">
-                      {copy.placeholders.linkedPlanLoading}
-                    </p>
-                  )}
-                  <FormMessage />
-                </div>
-              </FormItem>
-            )}
-          />
-
-          {/* Linked Plan 2 Dropdown */}
-          <FormField
-            control={form.control}
-            name="linkedPlan2Id"
-            render={({ field }) => (
-              <FormItem className="grid grid-cols-1 items-start gap-x-4 gap-y-1 border-b border-slate-100 py-3 sm:grid-cols-[200px_1fr]">
-                <FormLabel className={LABEL_COL}>
-                  {copy.labels.linkedPlan2}
-                </FormLabel>
-                <div className="space-y-1">
-                  <FormControl>
-                    <ConfigurableSelect
-                      id="plan-linked-plan-2"
-                      value={field.value}
-                      onValueChange={field.onChange}
-                      options={linkedPlan2Options}
-                      loading={plansLoading}
-                      placeholder={copy.placeholders.linkedPlanSelect}
-                      loadingPlaceholder={copy.placeholders.linkedPlanLoading}
-                      open={linkedPlan2SelectOpen}
-                      onOpenChange={setLinkedPlan2SelectOpen}
-                      onContentRef={setLinkedPlan2SelectContent}
-                      loadMoreRef={linkedPlan2LoadMoreRef}
-                      isFetchingNextPage={plansFetchingNextPage}
-                      loadingMoreLabel={copy.loadingMore}
-                      triggerClassName="h-9 rounded-md border-slate-200 bg-slate-50/50 text-slate-900 focus:border-tan-dark focus:bg-white"
-                      contentClassName="max-h-60"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </div>
-              </FormItem>
-            )}
-          />
-
-          {/* Footer actions */}
-          <div className="flex items-center justify-end gap-3 pt-6 border-t border-slate-100 mt-4">
-            <Button
-              id="plan-back-btn"
-              type="button"
-              variant="outline"
-              onClick={onBack}
-              disabled={isPending}
-              className="border-slate-200 text-slate-700 hover:bg-slate-100 rounded-md px-6 h-9 font-semibold shadow-xs transition-colors"
-            >
-              {copy.actions.back}
-            </Button>
-            <Button
-              id="plan-save-btn"
-              type="submit"
-              disabled={isPending}
-              className="bg-tan-dark hover:bg-tan-dark/90 text-white rounded-md px-6 h-9 font-semibold shadow-xs transition-colors disabled:opacity-70"
-            >
-              {isPending ? (
-                <Loader2 className="size-4 animate-spin" />
-              ) : (
-                copy.actions.save
               )}
-            </Button>
           </div>
+
+          {/* Sticky Bottom Navigation */}
+          <FormNavigationActions
+            idPrefix="plan"
+            backLabel={formCopy.navigation.back}
+            nextLabel={formCopy.navigation.next}
+            saveLabel={saveLabel}
+            isLastStep={isLastStep}
+            isPending={isPending}
+            onBack={handleBack}
+            onNext={() => void handleNext()}
+            onSave={handleSave}
+          />
         </form>
       </Form>
     </div>
