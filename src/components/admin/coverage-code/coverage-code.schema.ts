@@ -10,8 +10,9 @@ import { COVERAGE_CODE_CONTENT } from '#/utils/coverage-code-content.ts'
 const { validation: v } = COVERAGE_CODE_CONTENT
 
 export const coverageCodeSchema = z.object({
-  code: requiredTextSchema(v.codeRequired, { max: 50, maxMessage: v.codeMax }),
+  code: requiredTextSchema(v.codeRequired, { max: 3, maxMessage: v.codeMax }),
   name: requiredTextSchema(v.nameRequired, { max: 100, maxMessage: v.nameMax }),
+
   carrierId: requiredTextSchema(v.carrierRequired),
   carrierName: optionalTextSchema(),
   coverageClassId: requiredTextSchema(v.coverageClassRequired),

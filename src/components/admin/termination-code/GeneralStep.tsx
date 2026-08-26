@@ -50,11 +50,13 @@ export function GeneralStep() {
                 <FormControl>
                   <Input
                     id="termination-code-input"
+                    maxLength={2}
                     placeholder={copy.codePlaceholder}
                     className={FORM_INPUT_CLASS}
                     {...field}
                   />
                 </FormControl>
+
                 <FormMessage />
               </div>
             </FormItem>

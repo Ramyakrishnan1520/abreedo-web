@@ -1,6 +1,7 @@
 import { useFormContext } from 'react-hook-form'
 
 import { Input } from '#/components/ui/input.tsx'
+import { PhoneInput } from '#/components/admin/common/PhoneInput.tsx'
 import {
   FormControl,
   FormField,
@@ -8,6 +9,7 @@ import {
   FormLabel,
   FormMessage,
 } from '#/components/ui/Form'
+
 import { FORM_INPUT_CLASS, LABEL_COL } from '#/components/admin/common/form-styles'
 import { CARRIER_CONTENT } from '#/utils/carrier-content.ts'
 import type { CarrierFormValues } from '#/components/admin/carrier/carrier.schema.ts'
@@ -78,9 +80,8 @@ export function ContactStep() {
               <FormLabel className={LABEL_COL}>{copy.phoneLabel}</FormLabel>
               <div className="space-y-1">
                 <FormControl>
-                  <Input
+                  <PhoneInput
                     id="carrier-phone"
-                    type="tel"
                     placeholder={copy.phonePlaceholder}
                     className={FORM_INPUT_CLASS}
                     {...field}
@@ -101,9 +102,8 @@ export function ContactStep() {
               <FormLabel className={LABEL_COL}>{copy.faxLabel}</FormLabel>
               <div className="space-y-1">
                 <FormControl>
-                  <Input
+                  <PhoneInput
                     id="carrier-fax"
-                    type="tel"
                     placeholder={copy.faxPlaceholder}
                     className={FORM_INPUT_CLASS}
                     {...field}
@@ -114,6 +114,7 @@ export function ContactStep() {
             </FormItem>
           )}
         />
+
 
         {/* Email */}
         <FormField

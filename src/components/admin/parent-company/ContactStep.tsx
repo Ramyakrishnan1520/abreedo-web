@@ -1,6 +1,7 @@
 import { useFormContext } from 'react-hook-form'
 
 import { Input } from '#/components/ui/input.tsx'
+import { PhoneInput } from '#/components/admin/common/PhoneInput.tsx'
 import { Separator } from '#/components/ui/separator.tsx'
 import {
   FormControl,
@@ -18,14 +19,8 @@ import type { ParentCompanyFormValues } from '#/types/parent-company.ts'
 
 const copy = PARENT_COMPANY_CONTENT.contactStep
 
-function handleTenDigitInput(
-  value: string,
-  onChange: (value: string) => void,
-) {
-  onChange(value.replace(/\D/g, '').slice(0, 10))
-}
-
 export function ContactStep() {
+
   const form = useFormContext<ParentCompanyFormValues>()
 
   return (
@@ -91,16 +86,10 @@ export function ContactStep() {
             </FormLabel>
             <div className="space-y-1">
               <FormControl>
-                <Input
-                  type="tel"
-                  inputMode="numeric"
-                  maxLength={10}
+                <PhoneInput
                   placeholder={copy.phonePlaceholder}
                   className={FORM_INPUT_CLASS}
                   {...field}
-                  onChange={(event) =>
-                    handleTenDigitInput(event.target.value, field.onChange)
-                  }
                 />
               </FormControl>
               <FormMessage />
@@ -119,16 +108,10 @@ export function ContactStep() {
             </FormLabel>
             <div className="space-y-1">
               <FormControl>
-                <Input
-                  type="tel"
-                  inputMode="numeric"
-                  maxLength={10}
+                <PhoneInput
                   placeholder={copy.phonePlaceholder}
                   className={FORM_INPUT_CLASS}
                   {...field}
-                  onChange={(event) =>
-                    handleTenDigitInput(event.target.value, field.onChange)
-                  }
                 />
               </FormControl>
               <FormMessage />
@@ -145,16 +128,10 @@ export function ContactStep() {
             <FormLabel className={FORM_LABEL_CLASS}>{copy.faxLabel}</FormLabel>
             <div className="space-y-1">
               <FormControl>
-                <Input
-                  type="tel"
-                  inputMode="numeric"
-                  maxLength={10}
+                <PhoneInput
                   placeholder={copy.phonePlaceholder}
                   className={FORM_INPUT_CLASS}
                   {...field}
-                  onChange={(event) =>
-                    handleTenDigitInput(event.target.value, field.onChange)
-                  }
                 />
               </FormControl>
               <FormMessage />
@@ -162,6 +139,7 @@ export function ContactStep() {
           </FormItem>
         )}
       />
+
 
       <FormField
         control={form.control}

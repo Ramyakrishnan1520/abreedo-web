@@ -179,8 +179,9 @@ export const CARRIER_CONTENT = {
   validation: {
     nameRequired: 'Name is required',
     nameMax: 'Name must be 100 characters or fewer',
-    groupTitleRequired: 'Group Title is required',
-    groupTitleMax: 'Group Title must be 100 characters or fewer',
+    groupTitleRequired: 'Short description is required',
+    groupTitleMax: 'Short description must be 10 characters or fewer',
+
     addressMax: 'Address must be 200 characters or fewer',
     cityMax: 'City must be 100 characters or fewer',
     cityLetters: 'City must contain only letters',
@@ -189,8 +190,8 @@ export const CARRIER_CONTENT = {
     firstNameLetters: 'First name must contain only letters',
     lastNameMax: 'Last name must be 50 characters or fewer',
     lastNameLetters: 'Last name must contain only letters',
-    phoneInvalid: 'Phone Number must be exactly 10 digits',
-    faxInvalid: 'Fax must be exactly 10 digits',
+    phoneInvalid: 'Enter a valid phone number — (___) ___-____',
+    faxInvalid: 'Enter a valid fax number — (___) ___-____',
     emailInvalid: 'Enter a valid email address',
     emailMax: 'Email must be 254 characters or fewer',
   },

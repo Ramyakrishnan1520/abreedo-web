@@ -75,11 +75,13 @@ export function GeneralStep() {
               <FormControl>
                 <Input
                   id="carrier-group-title"
+                  maxLength={10}
                   placeholder={copy.shortDescriptionPlaceholder}
                   className={FORM_INPUT_CLASS}
                   {...field}
                 />
               </FormControl>
+
               <FormMessage />
             </div>
           </FormItem>

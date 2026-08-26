@@ -175,8 +175,9 @@ export const COVERAGE_CODE_CONTENT = {
   },
   validation: {
     codeRequired: 'Code is required',
-    codeMax: 'Code must be 50 characters or fewer',
+    codeMax: 'Code must be 3 characters or fewer',
     nameRequired: 'Name is required',
+
     nameMax: 'Name must be 100 characters or fewer',
     carrierRequired: 'Carrier is required',
     coverageClassRequired: 'Coverage Class is required',

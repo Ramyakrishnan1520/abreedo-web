@@ -39,6 +39,7 @@ export function ProcessingStep() {
               <FormControl>
                 <Input
                   id="coverage-code-invoice"
+                  maxLength={3}
                   placeholder={copy.combinationForBillPlaceholder}
                   className={FORM_INPUT_CLASS}
                   {...field}
@@ -65,11 +66,13 @@ export function ProcessingStep() {
               <FormControl>
                 <Input
                   id="coverage-code-report"
+                  maxLength={3}
                   placeholder={copy.combinationForReportsPlaceholder}
                   className={FORM_INPUT_CLASS}
                   {...field}
                 />
               </FormControl>
+
               <FormMessage />
             </div>
           </FormItem>
