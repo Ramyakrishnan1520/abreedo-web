@@ -118,8 +118,8 @@ export const CARRIER_CONTENT = {
   generalStep: {
     nameLabel: 'Name',
     namePlaceholder: 'Enter carrier name',
-    shortDescriptionLabel: 'Short Description',
-    shortDescriptionPlaceholder: 'Enter short description',
+    groupNumberLabel: 'Group Number',
+    groupNumberPlaceholder: 'Enter group number',
     allowFlexibleDatesLabel: 'Allow Flexible Dates',
     additionalDetailsHeading: 'Additional Details',
     address1Label: 'Address 1',

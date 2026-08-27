@@ -94,18 +94,24 @@ export function TerminationCodeForm({
 
   const onSubmit = (data: TerminationCodeFormValues) => {
     const actionCode = data.cobraNotice ? 1 : 2
+    const cobraMonths =
+      data.cobraTerm === '18months'
+        ? 18
+        : data.cobraTerm === '36months'
+          ? 36
+          : (data.cobraMonths ?? 0)
+
     const payload = {
       code: data.code,
       name: data.name,
       title: data.name,
-      bccCode: data.bccCode ?? '',
+      bcCode: data.bcCode ?? '',
       nepaCode: data.nepaCode ?? '',
       actionCode,
       cobraNotice: data.cobraNotice,
-      cobraTerm: data.cobraTerm,
-      cobraMonths: data.cobraNotice ? data.cobraMonths : 0,
-      coverageMonths: data.cobraNotice ? data.cobraMonths : 0,
+      coverageMonth: data.cobraNotice ? cobraMonths : 0,
     }
+
 
     if (mode === 'edit' && terminationCodeId) {
       updateTerminationCode(

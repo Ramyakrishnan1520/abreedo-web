@@ -17,7 +17,7 @@ export const terminationCodeSchema = z.object({
     max: 100,
     maxMessage: val.nameMax,
   }),
-  bccCode: optionalTextSchema({ max: 50, maxMessage: val.bccCodeMax }),
+  bcCode: optionalTextSchema({ max: 50, maxMessage: val.bcCodeMax }),
   nepaCode: optionalTextSchema({ max: 50, maxMessage: val.nepaCodeMax }),
   cobraNotice: z.boolean().optional(),
   cobraTerm: optionalTextSchema(),

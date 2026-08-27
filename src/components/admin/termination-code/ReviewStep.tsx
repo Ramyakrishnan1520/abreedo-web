@@ -35,7 +35,9 @@ export function ReviewStep() {
         id: 'additional',
         title: copy.sections.additional,
         items: [
-          { type: 'text', label: copy.fields.bccCode, value: values.bccCode },
+          { type: 'text', label: copy.fields.bcCode, value: values.bcCode },
+
+
           {
             type: 'text',
             label: copy.fields.nepaCode,

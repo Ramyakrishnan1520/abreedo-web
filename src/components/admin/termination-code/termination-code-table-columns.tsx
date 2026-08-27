@@ -62,10 +62,11 @@ export function getTerminationCodeTableColumns({
       cell: ({ row }) =>
         formatCobraTerm(
           row.original.cobraTerm,
-          row.original.coverageMonths ?? row.original.cobraMonths,
+          row.original.coverageMonth ?? row.original.cobraMonths,
           row.original.actionCode,
           row.original.cobraNotice,
         ),
+
     },
     {
       accessorKey: 'actionCode',

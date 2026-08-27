@@ -96,27 +96,29 @@ export function GeneralStep() {
           )}
         />
 
-        {/* BCC Code */}
+        {/* BC Code */}
         <FormField
           control={form.control}
-          name="bccCode"
+          name="bcCode"
           render={({ field }) => (
             <FormItem className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-start sm:gap-4">
-              <FormLabel className={LABEL_COL}>{copy.bccCodeLabel}</FormLabel>
+              <FormLabel className={LABEL_COL}>{copy.bcCodeLabel}</FormLabel>
               <div className="space-y-1">
                 <FormControl>
                   <Input
-                    id="termination-bcc-input"
-                    placeholder={copy.bccCodePlaceholder}
+                    id="termination-bc-input"
+                    placeholder={copy.bcCodePlaceholder}
                     className={FORM_INPUT_CLASS}
                     {...field}
                   />
                 </FormControl>
+
                 <FormMessage />
               </div>
             </FormItem>
           )}
         />
+
 
         {/* NEPA Code */}
         <FormField

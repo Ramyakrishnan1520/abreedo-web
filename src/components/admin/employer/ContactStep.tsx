@@ -165,6 +165,10 @@ export function ContactStep() {
                   placeholder={copy.emailPlaceholder}
                   className={FORM_INPUT_CLASS}
                   {...field}
+                  onBlur={() => {
+                      field.onBlur()
+                      void form.trigger('email')
+                    }}
                 />
               </FormControl>
               <FormMessage />
