@@ -79,7 +79,7 @@ export const CARRIER_CONTENT = {
       name: 'Name',
       contactName: 'Contact Name',
       email: 'Email',
-      groupTitle: 'Group Title',
+      groupNumber: 'Group Number',
       phone: 'Phone',
       view: 'View',
       edit: 'Edit',
@@ -162,7 +162,7 @@ export const CARRIER_CONTENT = {
     },
     fields: {
       name: 'Name',
-      groupTitle: 'Group Title',
+      groupNumber: 'Group Number',
       allowFlexibleDates: 'Allow Flexible Dates',
       address1: 'Address 1',
       address2: 'Address 2',
@@ -179,8 +179,9 @@ export const CARRIER_CONTENT = {
   validation: {
     nameRequired: 'Name is required',
     nameMax: 'Name must be 100 characters or fewer',
-    groupTitleRequired: 'Short description is required',
-    groupTitleMax: 'Short description must be 10 characters or fewer',
+    groupNumberRequired: 'Group number is required',
+    groupNumberMax: 'Group number must be 10 characters or fewer',
+    groupNumberExists: 'Group number already exist',
 
     addressMax: 'Address must be 200 characters or fewer',
     cityMax: 'City must be 100 characters or fewer',

@@ -67,9 +67,13 @@ export function FormNavigationActions({
             type="button"
             onClick={onNext}
             disabled={isPending}
-            className="h-9 rounded-md bg-tan-dark px-6 font-semibold text-white shadow-xs hover:bg-tan-dark/90"
+            className="h-9 rounded-md bg-tan-dark px-6 font-semibold text-white shadow-xs hover:bg-tan-dark/90 disabled:opacity-70"
           >
-            {nextLabel}
+            {isPending ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              nextLabel
+            )}
           </Button>
         )}
       </div>

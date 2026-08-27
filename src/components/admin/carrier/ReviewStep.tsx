@@ -29,8 +29,8 @@ export function ReviewStep() {
           { type: 'text', label: copy.fields.name, value: values.name },
           {
             type: 'text',
-            label: copy.fields.groupTitle,
-            value: values.groupTitle,
+            label: copy.fields.groupNumber,
+            value: values.groupNumber,
           },
           {
             type: 'text',

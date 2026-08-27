@@ -1,7 +1,7 @@
 export interface Carrier {
   id: number | string
   name: string
-  groupTitle?: string
+  groupNumber?: string
   phone?: string
   contactFirst?: string
   contactLast?: string

@@ -6,7 +6,7 @@ export function mapCarrierDetailToFormValues(
 ): CarrierFormValues {
   return {
     name: detail.name ?? '',
-    groupTitle: detail.groupNumber ?? '',
+    groupNumber: detail.groupNumber ?? '',
     contactFirstName: detail.contactFirst ?? '',
     contactLastName: detail.contactLast ?? '',
     address1: detail.address1 ?? '',

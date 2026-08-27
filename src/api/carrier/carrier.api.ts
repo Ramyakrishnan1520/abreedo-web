@@ -22,7 +22,7 @@ function mapCarrier(item: CarrierApiItem): Carrier {
   return {
     id: item.carrierId,
     name: item.name,
-    groupTitle: item.groupNumber,
+    groupNumber: item.groupNumber,
     phone: item.phone,
     contactFirst: item.contactFirst,
     contactLast: item.contactLast,
@@ -110,5 +110,35 @@ export async function deleteCarrierApi(id: string): Promise<void> {
   await apiClient.delete(`/api/v1/Carriers/${id}`)
 }
 
+function parseExistsResponse(data: unknown): boolean {
+  if (typeof data === 'boolean') {
+    return data
+  }
 
+  if (typeof data === 'string') {
+    return data.toLowerCase() === 'true'
+  }
 
+  if (typeof data === 'number') {
+    return data === 1
+  }
+
+  if (data && typeof data === 'object') {
+    const record = data as Record<string, unknown>
+    return parseExistsResponse(
+      record.exists ?? record.data ?? record.value ?? record.result,
+    )
+  }
+
+  return false
+}
+
+export async function checkCarrierGroupNumberExistsApi(
+  groupNumber: string,
+): Promise<boolean> {
+  const { data } = await apiClient.get<
+    boolean | { exists?: boolean; data?: boolean }
+  >(`/api/v1/Carriers/groupNumber/${encodeURIComponent(groupNumber)}/exists`)
+
+  return parseExistsResponse(data)
+}
