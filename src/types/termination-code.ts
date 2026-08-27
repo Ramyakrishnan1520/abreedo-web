@@ -2,26 +2,24 @@ export interface TerminationCode {
   id: number | string
   code: string
   name: string
-  bccCode?: string
+  bcCode?: string
   nepaCode?: string
   cobraNotice: boolean
   actionCode?: number
   cobraTerm?: '18months' | '36months' | 'non-standard' | string
   cobraMonths?: number
-  coverageMonths?: number | string
+  coverageMonth?: number | string
 }
 
 export interface CreateTerminationCodeRequest {
   code: string
   name: string
   title?: string
-  bccCode?: string
+  bcCode?: string
   nepaCode?: string
   actionCode?: number
   cobraNotice?: boolean
-  cobraTerm?: string
-  cobraMonths?: number
-  coverageMonths?: number
+  coverageMonth?: number
 }
 
 export interface TerminationCodeApiItem {
@@ -30,12 +28,10 @@ export interface TerminationCodeApiItem {
   code: string
   name?: string
   title?: string
-  bccCode?: string
+  bcCode?: string
   nepaCode?: string
   actionCode?: number
-  coverageMonths?: number | string
-  cobraMonths?: number
-  cobraTerm?: string
+  coverageMonth?: number | string
 }
 
 export type TerminationCodePaginatedListResponse = {

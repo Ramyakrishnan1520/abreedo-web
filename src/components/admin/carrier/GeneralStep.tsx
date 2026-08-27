@@ -64,22 +64,30 @@ export function GeneralStep() {
         )}
       />
 
-      {/* Short description*/}
+      {/* Group Number */}
       <FormField
         control={form.control}
-        name="groupTitle"
+        name="groupNumber"
         render={({ field }) => (
           <FormItem className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-start sm:gap-4">
-            <FormLabel className={cn(LABEL_COL, REQUIRED_LABEL_CLASS)}>{copy.shortDescriptionLabel}</FormLabel>
+            <FormLabel className={cn(LABEL_COL, REQUIRED_LABEL_CLASS)}>{copy.groupNumberLabel}</FormLabel>
             <div className="space-y-1">
               <FormControl>
                 <Input
-                  id="carrier-group-title"
-                  placeholder={copy.shortDescriptionPlaceholder}
+                  id="carrier-group-number"
+                  maxLength={10}
+                  placeholder={copy.groupNumberPlaceholder}
                   className={FORM_INPUT_CLASS}
                   {...field}
+                  onChange={(e) => {
+                    if (form.formState.errors.groupNumber) {
+                      form.clearErrors('groupNumber')
+                    }
+                    field.onChange(e)
+                  }}
                 />
               </FormControl>
+
               <FormMessage />
             </div>
           </FormItem>

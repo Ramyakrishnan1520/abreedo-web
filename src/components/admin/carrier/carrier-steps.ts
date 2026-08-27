@@ -9,7 +9,7 @@ export interface CarrierStep {
 
 export const CARRIER_DEFAULT_VALUES: CarrierFormValues = {
   name: '',
-  groupTitle: '',
+  groupNumber: '',
   allowFlexibleDates: false,
   address1: '',
   address2: '',

@@ -8,6 +8,9 @@ import {
   FormMessage,
 } from '#/components/ui/Form'
 import { Input } from '#/components/ui/input.tsx'
+import { PhoneInput } from '#/components/admin/common/PhoneInput.tsx'
+
+
 import {
   FORM_INPUT_CLASS,
   LABEL_COL,
@@ -107,7 +110,7 @@ export function ContactStep() {
             </FormLabel>
             <div className="space-y-1">
               <FormControl>
-                <Input
+                <PhoneInput
                   id="employer-contact-phone"
                   placeholder={copy.phonePlaceholder}
                   className={FORM_INPUT_CLASS}
@@ -131,7 +134,7 @@ export function ContactStep() {
             </FormLabel>
             <div className="space-y-1">
               <FormControl>
-                <Input
+                <PhoneInput
                   id="employer-contact-fax"
                   placeholder={copy.faxPlaceholder}
                   className={FORM_INPUT_CLASS}
@@ -143,6 +146,7 @@ export function ContactStep() {
           </FormItem>
         )}
       />
+
 
       {/* Email */}
       <FormField
@@ -161,6 +165,10 @@ export function ContactStep() {
                   placeholder={copy.emailPlaceholder}
                   className={FORM_INPUT_CLASS}
                   {...field}
+                  onBlur={() => {
+                      field.onBlur()
+                      void form.trigger('email')
+                    }}
                 />
               </FormControl>
               <FormMessage />

@@ -8,9 +8,10 @@ import type {
   RequiredTextSchemaOptions,
 } from '#/types/form-field-schemas.ts'
 
-export const PHONE_REGEX = /^\d{10}$/
+export const PHONE_REGEX = /^\(\d{3}\) \d{3}-\d{4}$/
 export const ZIP_REGEX = /^\d{5}$/
 export const LETTERS_ONLY_REGEX = /^[a-zA-Z\s\-'.]*$/
+
 
 // Backward-compatible regex aliases
 export const FORMATTED_PHONE_REGEX = PHONE_REGEX

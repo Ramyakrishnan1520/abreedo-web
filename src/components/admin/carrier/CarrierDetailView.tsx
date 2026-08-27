@@ -66,8 +66,8 @@ export function CarrierDetailView({
               },
               {
                 type: 'text',
-                label: reviewCopy.fields.groupTitle,
-                value: values.groupTitle,
+                label: reviewCopy.fields.groupNumber,
+                value: values.groupNumber,
               },
               {
                 type: 'text',
@@ -205,9 +205,9 @@ export function CarrierDetailView({
                   <CardTitle className="text-xl font-bold text-slate-900">
                     {values.name}
                   </CardTitle>
-                  {values.groupTitle ? (
+                  {values.groupNumber ? (
                     <Badge variant="secondary" className="font-medium">
-                      {values.groupTitle}
+                      {values.groupNumber}
                     </Badge>
                   ) : null}
                 </div>

@@ -108,10 +108,12 @@ export function GeneralStep() {
               <FormControl>
                 <Input
                   id="coverage-code"
+                  maxLength={3}
                   placeholder={copy.codePlaceholder}
                   className={FORM_INPUT_CLASS}
                   {...field}
                 />
+
               </FormControl>
               <FormMessage />
             </div>

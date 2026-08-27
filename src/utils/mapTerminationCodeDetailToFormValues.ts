@@ -5,19 +5,27 @@ export function mapTerminationCodeDetailToFormValues(
   item: TerminationCodeApiItem,
 ): Partial<TerminationCodeFormValues> {
   const isCobraNotice = item.actionCode === 1
+  const coverageMonthNum =
+    typeof item.coverageMonth === 'number'
+      ? item.coverageMonth
+      : Number(item.coverageMonth) || 0
+
+  const cobraTerm =
+    coverageMonthNum === 18
+      ? '18months'
+      : coverageMonthNum === 36
+        ? '36months'
+        : coverageMonthNum > 0
+          ? 'non-standard'
+          : '18months'
 
   return {
     code: item.code ?? '',
     name: item.name ?? item.title ?? '',
-    bccCode: item.bccCode ?? '',
+    bcCode: item.bcCode ?? '',
     nepaCode: item.nepaCode ?? '',
     cobraNotice: isCobraNotice,
-    cobraTerm: item.cobraTerm ?? '18months',
-    cobraMonths:
-      typeof item.cobraMonths === 'number'
-        ? item.cobraMonths
-        : typeof item.coverageMonths === 'number'
-          ? item.coverageMonths
-          : Number(item.coverageMonths) || 0,
+    cobraTerm,
+    cobraMonths: coverageMonthNum,
   }
 }

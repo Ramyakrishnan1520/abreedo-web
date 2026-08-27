@@ -78,8 +78,8 @@ export function TerminationCodeDetailView({
             items: [
               {
                 type: 'text',
-                label: reviewCopy.fields.bccCode,
-                value: values.bccCode,
+                label: reviewCopy.fields.bcCode,
+                value: values.bcCode,
               },
               {
                 type: 'text',

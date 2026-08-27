@@ -270,8 +270,8 @@ export const EMPLOYER_CONTENT = {
     contactLastMax: 'Last name must be 50 characters or fewer',
     contactLastLetters: 'Last name must contain only letters',
     contactTitleMax: 'Contact Title must be 100 characters or fewer',
-    phoneInvalid: 'Phone Number must be exactly 10 digits',
-    faxInvalid: 'Fax must be exactly 10 digits',
+    phoneInvalid: 'Enter a valid phone number — (___) ___-____',
+    faxInvalid: 'Enter a valid fax number — (___) ___-____',
     emailInvalid: 'Enter a valid email address',
     emailMax: 'Email must be 254 characters or fewer',
 

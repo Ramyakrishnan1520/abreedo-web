@@ -14,10 +14,11 @@ const { validation: v } = CARRIER_CONTENT
 
 export const carrierSchema = z.object({
   name: requiredTextSchema(v.nameRequired, { max: 100, maxMessage: v.nameMax }),
-  groupTitle: requiredTextSchema(v.groupTitleRequired, {
-    max: 100,
-    maxMessage: v.groupTitleMax,
+  groupNumber: requiredTextSchema(v.groupNumberRequired, {
+    max: 10,
+    maxMessage: v.groupNumberMax,
   }),
+
   address1: optionalTextSchema({ max: 200, maxMessage: v.addressMax }),
   address2: optionalTextSchema({ max: 200, maxMessage: v.addressMax }),
   city: optionalTextSchema({

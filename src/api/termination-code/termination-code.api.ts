@@ -14,20 +14,33 @@ import type {
 
 function mapTerminationCode(item: TerminationCodeApiItem): TerminationCode {
   const isNotice = item.actionCode === 1
+  const coverageMonthNum =
+    typeof item.coverageMonth === 'number'
+      ? item.coverageMonth
+      : Number(item.coverageMonth) || 0
 
   return {
     id: item.terminationCodeId ?? item.id ?? item.code,
     code: item.code,
     name: item.name ?? item.title ?? '',
-    bccCode: item.bccCode,
+    bcCode: item.bcCode,
     nepaCode: item.nepaCode,
     cobraNotice: isNotice,
     actionCode: item.actionCode,
-    cobraTerm: item.cobraTerm ?? '18months',
-    cobraMonths: item.cobraMonths,
-    coverageMonths: item.coverageMonths,
+    cobraTerm:
+      coverageMonthNum === 18
+        ? '18months'
+        : coverageMonthNum === 36
+          ? '36months'
+          : coverageMonthNum > 0
+            ? 'non-standard'
+            : '18months',
+    cobraMonths: coverageMonthNum,
+    coverageMonth: coverageMonthNum,
   }
 }
+
+
 
 function getPaginationResult(
   items: TerminationCode[],

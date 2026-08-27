@@ -8,8 +8,9 @@ export const TERMINATION_CODE_STEPS =
 export const TERMINATION_CODE_DEFAULT_VALUES: TerminationCodeFormValues = {
   code: '',
   name: '',
-  bccCode: '',
+  bcCode: '',
   nepaCode: '',
+
   cobraNotice: false,
   cobraTerm: '18months',
   cobraMonths: 0,

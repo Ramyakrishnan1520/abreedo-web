@@ -18,6 +18,7 @@ import {
   carrierSchema,
   type CarrierFormValues,
 } from '#/components/admin/carrier/carrier.schema.ts'
+import { useCheckCarrierGroupNumberExists } from '#/hooks/carrier/useCheckCarrierGroupNumberExists.ts'
 import { useCreateCarrier } from '#/hooks/carrier/useCreateCarrier.ts'
 import { useUpdateCarrier } from '#/hooks/carrier/useUpdateCarrier.ts'
 import { CARRIER_CONTENT } from '#/utils/carrier-content.ts'
@@ -49,9 +50,13 @@ export function CarrierForm({
   title,
 }: CarrierFormProps) {
   const [currentStep, setCurrentStep] = useState(0)
+  const {
+    checkGroupNumberExists,
+    isPending: isValidatingGroupNumber,
+  } = useCheckCarrierGroupNumberExists()
   const { mutate: createCarrier, isPending: isCreating } = useCreateCarrier()
   const { mutate: updateCarrier, isPending: isUpdating } = useUpdateCarrier()
-  const isPending = isCreating || isUpdating
+  const isPending = isCreating || isUpdating || isValidatingGroupNumber
 
   const resolvedTitle =
     title ??
@@ -88,15 +93,44 @@ export function CarrierForm({
     const fields = getCarrierStepValidationFields(currentStep)
     const isValid = await form.trigger(fields)
 
-    if (isValid) {
-      setCurrentStep((step) => step + 1)
+    if (!isValid) {
+      return
     }
+
+    if (currentStep === 0) {
+      const groupNumber = form.getValues('groupNumber')?.trim()
+      const isCreate = mode === 'create'
+      const initialGroupNumber = (
+        initialValues?.groupNumber ??
+        defaultValues?.groupNumber ??
+        ''
+      ).trim()
+      const hasGroupNumberChanged =
+        groupNumber.toLowerCase() !== initialGroupNumber.toLowerCase()
+
+      if (groupNumber && (isCreate || hasGroupNumberChanged)) {
+        try {
+          const exists = await checkGroupNumberExists(groupNumber)
+          if (exists) {
+            form.setError('groupNumber', {
+              type: 'manual',
+              message: CARRIER_CONTENT.validation.groupNumberExists,
+            })
+            return
+          }
+        } catch (error) {
+          console.error('Failed to validate group number existence:', error)
+        }
+      }
+    }
+
+    setCurrentStep((step) => step + 1)
   }
 
   const onSubmit = (data: CarrierFormValues) => {
     const payload: CreateCarrierRequest = {
       name: data.name,
-      groupNumber: data.groupTitle || '',
+      groupNumber: data.groupNumber || '',
       contactFirst: data.contactFirstName || '',
       contactLast: data.contactLastName || '',
       address1: data.address1 || '',

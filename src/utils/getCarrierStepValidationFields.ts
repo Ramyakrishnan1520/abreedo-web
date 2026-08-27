@@ -9,7 +9,7 @@ export function getCarrierStepValidationFields(
     case 0:
       return [
         'name',
-        'groupTitle',
+        'groupNumber',
         'allowFlexibleDates',
         'address1',
         'address2',

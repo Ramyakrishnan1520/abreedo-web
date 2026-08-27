@@ -8,7 +8,7 @@ export function getTerminationCodeStepValidationFields(
     return [
       'code',
       'name',
-      'bccCode',
+      'bcCode',
       'nepaCode',
       'cobraNotice',
       'cobraTerm',
