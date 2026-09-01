@@ -272,7 +272,7 @@ export function ParentCompanyDetailView({
           <ReviewStep
             copy={{ emptyValue: '—' }}
             sections={sections}
-            layout="accordion"
+            layout="cards"
             defaultOpenSection="general"
           />
 

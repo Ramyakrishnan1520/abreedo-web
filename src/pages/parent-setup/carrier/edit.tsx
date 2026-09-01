@@ -66,8 +66,10 @@ export function EditCarrierPage() {
   const filteredCarriers = useMemo(() => {
     if (!activeSearch.trim()) return allCarriers
     const term = activeSearch.trim().toLowerCase()
-    return allCarriers.filter((carrier) =>
-      carrier.name.toLowerCase().includes(term),
+    return allCarriers.filter(
+      (carrier) =>
+        carrier.name.toLowerCase().includes(term) ||
+        (carrier.groupNumber?.toLowerCase().includes(term) ?? false),
     )
   }, [allCarriers, activeSearch])
 

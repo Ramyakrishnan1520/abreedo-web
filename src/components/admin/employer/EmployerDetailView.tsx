@@ -337,7 +337,7 @@ export function EmployerDetailView({
           <ReviewStep
             copy={{ emptyValue: '—' }}
             sections={sections}
-            layout="accordion"
+            layout="cards"
             defaultOpenSection="general"
           />
 

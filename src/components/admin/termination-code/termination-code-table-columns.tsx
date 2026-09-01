@@ -52,9 +52,14 @@ export function getTerminationCodeTableColumns({
 }: TerminationCodeTableColumnActions): ColumnDef<TerminationCode>[] {
   const columns: ColumnDef<TerminationCode>[] = [
     {
+      accessorKey: 'code',
+      header: tableCopy.columns.code,
+      cell: ({ row }) => displayValue(row.original.code),
+    },
+    {
       accessorKey: 'name',
       header: tableCopy.columns.name,
-      cell: ({ row }) => displayValue(row.original.name || row.original.code),
+      cell: ({ row }) => displayValue(row.original.name),
     },
     {
       accessorKey: 'cobraTerm',
@@ -85,7 +90,7 @@ export function getTerminationCodeTableColumns({
           type="button"
           variant="outline"
           size="icon-sm"
-          aria-label={tableCopy.viewAria(row.original.name || row.original.code)}
+          aria-label={tableCopy.viewAria(row.original.code || row.original.name)}
           onClick={() => onView(row.original)}
         >
           <Eye className="size-4" />
@@ -103,7 +108,7 @@ export function getTerminationCodeTableColumns({
           type="button"
           variant="outline"
           size="icon-sm"
-          aria-label={tableCopy.editAria(row.original.name || row.original.code)}
+          aria-label={tableCopy.editAria(row.original.code || row.original.name)}
           onClick={() => onEdit(row.original)}
         >
           <Pencil className="size-4" />
@@ -121,7 +126,7 @@ export function getTerminationCodeTableColumns({
           type="button"
           variant="destructive"
           size="icon-sm"
-          aria-label={tableCopy.deleteAria(row.original.name || row.original.code)}
+          aria-label={tableCopy.deleteAria(row.original.code || row.original.name)}
           onClick={() => onDelete(row.original)}
         >
           <Trash2 className="size-4" />
