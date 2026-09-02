@@ -2,6 +2,7 @@ import { Outlet, useNavigate } from '@tanstack/react-router'
 
 import { Header } from '#/components/Header.tsx'
 import { Sidebar } from '#/components/Sidebar.tsx'
+import { AdminBreadcrumb } from '#/components/admin/common/AdminBreadcrumb.tsx'
 import { useAuth } from '#/hooks/auth/useAuth.ts'
 import { ROUTES } from '#/static/routes.ts'
 import type { NavigationRoleInput } from '#/types/navigation.ts'
@@ -36,6 +37,7 @@ export function Layout({ role, companyName = 'ABREEDO Benefits' }: LayoutProps) 
         />
 
         <div className="min-w-0 px-4 py-6 md:px-8 md:py-8">
+          <AdminBreadcrumb />
           <Outlet />
         </div>
       </div>

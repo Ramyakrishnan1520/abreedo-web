@@ -11,7 +11,7 @@ export function NewParentCompanyPage() {
   }
 
   return (
-    <main className="page-wrap mx-auto max-w-5xl py-8">
+    <main className="page-wrap mx-auto max-w-5xl">
       <ParentCompanyForm mode="create" onSuccess={handleNavigateBack} onBack={handleNavigateBack} />
     </main>
   )
