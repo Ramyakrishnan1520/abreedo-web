@@ -38,4 +38,15 @@ export const EMPLOYER_DEFAULT_VALUES: EmployerFormValues = {
 
   notesTitle: '',
   notes: '',
+
+  planId: '',
+  planName: '',
+  cgnGroupNumber: '',
+  billerAccountNumber: '',
+  cgnCustomerNumber: '',
+  brokerCodeId: '',
+  brokerCodeName: '',
+  isActive: true,
+
+  planRates: [],
 }

@@ -69,18 +69,18 @@ export const TERMINATION_CODE_CONTENT = {
   table: {
     emptyValue: '-',
     columns: {
+      code: 'Code',
       name: 'Name',
       cobraTerm: 'COBRA Term',
       coverageMonths: 'COBRA Term',
       cobraNotice: 'COBRA Notice',
-      code: 'Termination Code',
       view: 'View',
       edit: 'Edit',
       delete: 'Delete',
     },
-    viewAria: (name: string) => `View ${name}`,
-    editAria: (name: string) => `Edit ${name}`,
-    deleteAria: (name: string) => `Delete ${name}`,
+    viewAria: (code: string) => `View ${code}`,
+    editAria: (code: string) => `Edit ${code}`,
+    deleteAria: (code: string) => `Delete ${code}`,
   },
   form: {
     kicker: 'Site Manager',

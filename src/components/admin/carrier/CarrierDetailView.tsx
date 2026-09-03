@@ -220,7 +220,7 @@ export function CarrierDetailView({
           <ReviewStep
             copy={{ emptyValue: '-' }}
             sections={sections}
-            layout="accordion"
+            layout="cards"
             defaultOpenSection="general"
           />
 

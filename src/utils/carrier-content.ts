@@ -44,7 +44,7 @@ export const CARRIER_CONTENT = {
         'Select a carrier to load its details, then update using the same guided steps as new setup.',
       selectLabel: 'Select Carrier',
       selectCardDescription:
-        'Search by carrier name and choose to view or editing.',
+        'Search by carrier name or group number and choose to view or edit.',
       selectPlaceholder: 'Choose a carrier',
       selectLoadingPlaceholder: 'Loading carriers...',
       selectSearchPlaceholder: 'Search carriers...',
@@ -53,7 +53,7 @@ export const CARRIER_CONTENT = {
       emptyStateTitle: 'Ready when you are',
       editingLabel: 'Editing:',
       loadingDetails: 'Loading carrier details...',
-      searchPlaceholder: 'Search by carrier name...',
+      searchPlaceholder: 'Search by carrier name or group number...',
       searchButton: 'Search',
       clearButton: 'Clear',
       viewTitle: 'Carrier Information',

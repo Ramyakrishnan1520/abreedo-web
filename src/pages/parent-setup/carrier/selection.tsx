@@ -6,10 +6,9 @@ const { pages } = CARRIER_CONTENT
 
 export function CarrierSelectionPage() {
   return (
-    <main className="page-wrap py-8">
+    <main className="page-wrap">
       <div className="mb-8">
-        <p className="island-kicker">{pages.index.kicker}</p>
-        <h1 className="display-title mt-3 text-4xl font-bold text-slate-900">
+        <h1 className="display-title text-4xl font-bold text-slate-900">
           {pages.index.title}
         </h1>
         <p className="mt-3 max-w-2xl text-slate-600">

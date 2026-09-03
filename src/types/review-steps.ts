@@ -17,10 +17,23 @@ export interface ReviewBadgeItem {
   emptyMessage: string
 }
 
+export interface ReviewSubheadingItem {
+  type: 'subheading'
+  title: string
+}
+
+export interface ReviewRowItem {
+  type: 'row'
+  label: string
+  value: string | null | undefined
+}
+
 export type ReviewItem =
   | ReviewTextItem
   | ReviewMultilineItem
   | ReviewBadgeItem
+  | ReviewSubheadingItem
+  | ReviewRowItem
 
 export interface ReviewSectionConfig {
   id: string

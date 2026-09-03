@@ -115,12 +115,7 @@ export function EditEmployerPage() {
     : undefined
 
   return (
-    <main className="page-wrap mx-auto max-w-5xl space-y-6 py-8">
-      {/* Top Header */}
-      <div className="space-y-2">
-        <p className="island-kicker">{copy.kicker}</p>
-      </div>
-
+    <main className="page-wrap mx-auto max-w-5xl space-y-6">
       {/* Table View with Search */}
       {viewMode === 'table' ? (
         <div className="space-y-6">

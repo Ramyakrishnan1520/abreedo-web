@@ -49,7 +49,7 @@ export const COVERAGE_CODE_CONTENT = {
       emptyStateTitle: 'Ready when you are',
       editingLabel: 'Editing:',
       loadingDetails: 'Loading coverage code details...',
-      searchPlaceholder: 'Search by coverage code...',
+      searchPlaceholder: 'Search by coverage codes or name',
       searchButton: 'Search',
       clearButton: 'Clear',
       viewTitle: 'Coverage Code Details',

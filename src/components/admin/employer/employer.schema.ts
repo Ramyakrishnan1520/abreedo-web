@@ -98,6 +98,40 @@ export const employerSchema = z.object({
     maxMessage: v.notesTitleMax,
   }),
   notes: optionalNotesSchema(),
+
+  // Plan Step
+  planId: requiredTextSchema(v.planRequired),
+  planName: optionalTextSchema(),
+  cgnGroupNumber: requiredTextSchema(v.cgnGroupNumberRequired, {
+    max: 100,
+  }),
+  billerAccountNumber: requiredTextSchema(v.billerAccountNumberRequired, {
+    max: 100,
+  }),
+  cgnCustomerNumber: optionalTextSchema({
+    max: 100,
+  }),
+  brokerCodeId: optionalTextSchema(),
+  brokerCodeName: optionalTextSchema(),
+  isActive: z.boolean().optional(),
+
+  // Rate Step
+  planRates: z
+    .array(
+      z.object({
+        id: z.string().optional(),
+        planRateId: z.string().optional(),
+        effectiveDate: requiredTextSchema(v.effectiveDateRequired),
+        individual: z.number({ message: v.individualRequired }),
+        parentChild: z.number({ message: v.parentChildRequired }),
+        parentChildren: z.number({ message: v.parentChildrenRequired }),
+        husbandWife: z.number({ message: v.memberSpouseRequired }),
+        family: z.number({ message: v.familyRequired }),
+      }),
+    )
+    .min(1, v.rateRequiresAtLeastOne),
 })
 
 export type EmployerFormValues = z.infer<typeof employerSchema>
+export type PlanRateFormItem = EmployerFormValues['planRates'][number]
+

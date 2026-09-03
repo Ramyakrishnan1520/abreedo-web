@@ -66,8 +66,10 @@ export function EditCarrierPage() {
   const filteredCarriers = useMemo(() => {
     if (!activeSearch.trim()) return allCarriers
     const term = activeSearch.trim().toLowerCase()
-    return allCarriers.filter((carrier) =>
-      carrier.name.toLowerCase().includes(term),
+    return allCarriers.filter(
+      (carrier) =>
+        carrier.name.toLowerCase().includes(term) ||
+        (carrier.groupNumber?.toLowerCase().includes(term) ?? false),
     )
   }, [allCarriers, activeSearch])
 
@@ -111,12 +113,7 @@ export function EditCarrierPage() {
     carrierDetail ? mapCarrierDetailToFormValues(carrierDetail) : undefined
 
   return (
-    <main className="page-wrap mx-auto max-w-5xl space-y-6 py-8">
-      {/* Top Header */}
-      <div className="space-y-2">
-        <p className="island-kicker">{copy.kicker}</p>
-      </div>
-
+    <main className="page-wrap mx-auto max-w-5xl space-y-6">
       {/* Mode 1: Table View with Search */}
       {viewMode === 'table' ? (
         <div className="space-y-6">
