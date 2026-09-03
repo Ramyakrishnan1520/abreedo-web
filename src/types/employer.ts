@@ -10,6 +10,17 @@ export interface EmployerLinkedCarrier {
   name: string
 }
 
+export interface PlanRateItem {
+  id?: string
+  planRateId?: string
+  effectiveDate: string
+  individual?: number | null
+  family?: number | null
+  husbandWife?: number | null
+  parentChild?: number | null
+  parentChildren?: number | null
+}
+
 export interface EmployerApiItem {
   employerId: string
   id?: string
@@ -44,6 +55,16 @@ export interface EmployerApiItem {
   groupPlan?: string | null
   groupTypeId?: string | null
   groupNotes?: string | null
+  carrierGroupNumberId?: string | null
+  planId?: string | null
+  planName?: string | null
+  cgnGroupNumber?: string | null
+  brokerCodeId?: string | null
+  brokerCodeName?: string | null
+  billerAccountNumber?: string | null
+  cgnCustomerNumber?: string | null
+  isActive?: boolean | null
+  planRates?: PlanRateItem[] | null
 }
 
 export interface EmployerUpsertRequest {
@@ -76,6 +97,13 @@ export interface EmployerUpsertRequest {
   groupPlan?: string | null
   groupTypeId?: string | null
   groupNotes?: string | null
+  planId?: string | null
+  cgnGroupNumber?: string | null
+  billerAccountNumber?: string | null
+  cgnCustomerNumber?: string | null
+  brokerCodeId?: string | null
+  isActive?: boolean
+  planRates?: PlanRateItem[] | null
 }
 
 export type EmployerPaginatedListResponse = {

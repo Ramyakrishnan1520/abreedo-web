@@ -74,6 +74,35 @@ function ReviewSectionItems({
           )
         }
 
+        if (item.type === 'subheading') {
+          return (
+            <div
+              key={`subheading-${index}`}
+              className="col-span-full pt-3 first:pt-0 border-b border-slate-200 pb-1.5 mb-1"
+            >
+              <h5 className="text-xs font-bold uppercase tracking-wider text-slate-800">
+                {item.title}
+              </h5>
+            </div>
+          )
+        }
+
+        if (item.type === 'row') {
+          return (
+            <div
+              key={`row-${index}`}
+              className="col-span-full flex items-center py-1 text-sm"
+            >
+              <dt className="w-48 font-medium text-slate-600 shrink-0">
+                {item.label}
+              </dt>
+              <dd className="font-semibold text-slate-900">
+                {item.value && item.value.trim() !== '' ? item.value : emptyValue}
+              </dd>
+            </div>
+          )
+        }
+
         return (
           <div key={`badges-${index}`} className="col-span-full">
             {item.items.length === 0 ? (

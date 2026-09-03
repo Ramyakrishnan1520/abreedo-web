@@ -98,7 +98,7 @@ export function DatePicker({
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <div className={cn('relative inline-flex items-center w-full sm:w-auto', className)}>
+      <div className={cn('relative inline-flex items-center w-full', className)}>
         <PopoverTrigger asChild>
           <button
             id={id}
@@ -106,7 +106,7 @@ export function DatePicker({
             disabled={disabled}
             aria-label={ariaLabel || placeholder}
             className={cn(
-              'flex h-9 w-full sm:w-64 items-center justify-between rounded-md border border-slate-200 bg-slate-50/50 px-3 py-1.5 text-sm text-left font-normal text-slate-900 transition-colors cursor-pointer',
+              'flex h-9 w-full items-center justify-between rounded-md border border-slate-200 bg-slate-50/50 px-3 py-1.5 text-sm text-left font-normal text-slate-900 transition-colors cursor-pointer',
               'hover:bg-slate-100/70 focus:outline-none focus:ring-2 focus:ring-tan-dark focus:border-tan-dark focus:bg-white',
               'disabled:cursor-not-allowed disabled:opacity-50 disabled:bg-slate-100',
               !selectedDate && 'text-slate-400',

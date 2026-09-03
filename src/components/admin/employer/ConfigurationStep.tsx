@@ -21,9 +21,9 @@ import { EMPLOYER_CONTENT } from '#/utils/employer-content.ts'
 
 import type { EmployerFormValues } from '#/components/admin/employer/employer.schema.ts'
 
-const copy = EMPLOYER_CONTENT.companyGroupStep
+const copy = EMPLOYER_CONTENT.configurationStep
 
-export function CompanyGroupStep() {
+export function ConfigurationStep() {
   const form = useFormContext<EmployerFormValues>()
 
   const statusOptions = useMemo(
@@ -126,7 +126,7 @@ export function CompanyGroupStep() {
                   placeholder={copy.monthlyAdminFeePlaceholder}
                   className={FORM_INPUT_CLASS}
                   value={field.value ?? ''}
-                  onChange={(e) => field.onChange(e.target.value === "" ? 0 : Number(e.target.value))}
+                  onChange={(e) => field.onChange(e.target.value === '' ? 0 : Number(e.target.value))}
                 />
               </FormControl>
               <FormMessage />

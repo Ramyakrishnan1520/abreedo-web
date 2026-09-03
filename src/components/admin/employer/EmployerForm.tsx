@@ -7,9 +7,11 @@ import { AlertCircle } from 'lucide-react'
 import { Form } from '#/components/ui/Form'
 import { GeneralStep } from '#/components/admin/employer/GeneralStep.tsx'
 import { ContactStep } from '#/components/admin/employer/ContactStep.tsx'
+import { ConfigurationStep } from '#/components/admin/employer/ConfigurationStep.tsx'
 import { CarriersStep } from '#/components/admin/employer/CarriersStep.tsx'
-import { CompanyGroupStep } from '#/components/admin/employer/CompanyGroupStep.tsx'
 import { NotesStep } from '#/components/admin/employer/NotesStep.tsx'
+import { PlanStep } from '#/components/admin/employer/PlanStep.tsx'
+import { RateStep } from '#/components/admin/employer/RateStep.tsx'
 import { ReviewStep } from '#/components/admin/employer/ReviewStep.tsx'
 import { Stepper } from '#/components/admin/common/Stepper'
 import { FormNavigationActions } from '#/components/admin/common/FormNavigationActions.tsx'
@@ -43,9 +45,11 @@ interface EmployerFormProps {
 const STEP_COMPONENTS = [
   GeneralStep,
   ContactStep,
+  ConfigurationStep,
   CarriersStep,
-  CompanyGroupStep,
   NotesStep,
+  PlanStep,
+  RateStep,
   ReviewStep,
 ] as const
 
@@ -108,9 +112,11 @@ export function EmployerForm({
     const fields = getEmployerStepValidationFields(currentStep)
     const isValid = await form.trigger(fields)
 
-    if (isValid) {
-      setCurrentStep((step) => step + 1)
+    if (!isValid) {
+      return
     }
+
+    setCurrentStep((step) => step + 1)
   }
 
   const onSubmit = (data: EmployerFormValues) => {
@@ -144,8 +150,16 @@ export function EmployerForm({
       initialNotificationStartOn: data.initialNotificationStartOn || null,
 
       notes: data.notes || null,
-    }
 
+      planId: data.planId || null,
+      cgnGroupNumber: data.cgnGroupNumber || null,
+      billerAccountNumber: data.billerAccountNumber || null,
+      cgnCustomerNumber: data.cgnCustomerNumber || null,
+      brokerCodeId: data.brokerCodeId || null,
+      isActive: data.isActive ?? true,
+      planRates: data.planRates && data.planRates.length > 0 ? data.planRates : null,
+    }
+    console.log(JSON.stringify(payload))
     if (mode === 'edit' && employerId) {
       updateEmployer(
         { id: employerId, data: payload },

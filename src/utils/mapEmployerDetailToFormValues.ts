@@ -52,5 +52,26 @@ export function mapEmployerDetailToFormValues(
 
     notesTitle: '',
     notes: detail.notes ?? '',
+
+    planId: detail.planId ?? '',
+    planName: detail.planName ?? '',
+    cgnGroupNumber: detail.cgnGroupNumber ?? '',
+    billerAccountNumber: detail.billerAccountNumber ?? '',
+    cgnCustomerNumber: detail.cgnCustomerNumber ?? '',
+    brokerCodeId: detail.brokerCodeId ?? '',
+    brokerCodeName: detail.brokerCodeName ?? '',
+    isActive: detail.isActive ?? true,
+
+    planRates:
+      detail.planRates?.map((rate) => ({
+        id: rate.id,
+        planRateId: rate.planRateId,
+        effectiveDate: rate.effectiveDate ?? '',
+        individual: rate.individual ?? 0,
+        parentChild: rate.parentChild ?? 0,
+        parentChildren: rate.parentChildren ?? 0,
+        husbandWife: rate.husbandWife ?? 0,
+        family: rate.family ?? 0,
+      })) ?? [],
   }
 }

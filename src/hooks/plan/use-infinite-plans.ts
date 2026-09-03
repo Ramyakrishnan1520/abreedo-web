@@ -4,13 +4,33 @@ import { getPlansApi } from '#/api/plan/plan.api.ts'
 
 export const PLAN_INFINITE_PAGE_SIZE = 20
 
-export function useInfinitePlans() {
+export interface UseInfinitePlansParams {
+  parentCompanyId?: string
+  carrierId?: string
+  search?: string
+}
+
+export function useInfinitePlans(params?: UseInfinitePlansParams) {
+  const parentCompanyId = params?.parentCompanyId
+  const carrierId = params?.carrierId
+  const search = params?.search
+
   return useInfiniteQuery({
-    queryKey: ['plans', 'infinite', PLAN_INFINITE_PAGE_SIZE],
+    queryKey: [
+      'plans',
+      'infinite',
+      PLAN_INFINITE_PAGE_SIZE,
+      parentCompanyId ?? null,
+      carrierId ?? null,
+      search ?? null,
+    ],
     queryFn: ({ pageParam }) =>
       getPlansApi({
         pageIndex: pageParam,
         pageSize: PLAN_INFINITE_PAGE_SIZE,
+        parentCompanyId,
+        carrierId,
+        search,
       }),
     initialPageParam: 0,
     getNextPageParam: (lastPage, allPages) => {
@@ -20,5 +40,6 @@ export function useInfinitePlans() {
 
       return allPages.length
     },
+    staleTime: 5 * 60 * 1000,
   })
 }

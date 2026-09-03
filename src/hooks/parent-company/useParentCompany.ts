@@ -12,6 +12,7 @@ export function useParentCompany(id: string | undefined) {
 
       return getParentCompanyByIdApi(id)
     },
+    refetchOnWindowFocus: false,
     enabled: Boolean(id),
   })
 }

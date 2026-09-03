@@ -23,8 +23,8 @@ export function tenDigitPhoneSchema(
 ) {
   return z
     .string()
-    .min(1, requiredMessage)
     .trim()
+    .min(1, requiredMessage)
     .refine((value) => PHONE_REGEX.test(value), digitsMessage)
 }
 
@@ -56,8 +56,8 @@ export function fiveDigitZipSchema(
 ) {
   return z
     .string()
-    .min(1, requiredMessage)
     .trim()
+    .min(1, requiredMessage)
     .refine((value) => ZIP_REGEX.test(value), digitsMessage)
 }
 
@@ -87,7 +87,7 @@ export function requiredTextSchema(
   requiredMessage: string,
   options?: RequiredTextSchemaOptions,
 ) {
-  let schema = z.string().min(1, requiredMessage)
+  let schema = z.string().trim().min(1, requiredMessage)
 
   if (options?.max !== undefined) {
     schema = options.maxMessage
@@ -133,7 +133,7 @@ export function requiredEmailSchema(
   invalidMessage: string,
   options?: RequiredEmailSchemaOptions,
 ) {
-  let schema = z.string().min(1, requiredMessage).email(invalidMessage)
+  let schema = z.string().trim().min(1, requiredMessage).email(invalidMessage)
 
   if (options?.max !== undefined) {
     schema = options.maxMessage

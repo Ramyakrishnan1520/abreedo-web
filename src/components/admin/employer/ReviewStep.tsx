@@ -98,19 +98,8 @@ export function ReviewStep() {
         ],
       },
       {
-        id: 'carriers',
-        title: sectionTitles.carriers,
-        items: [
-          {
-            type: 'badges',
-            items: selectedCarrierNames,
-            emptyMessage: copy.noCarriersSelected,
-          },
-        ],
-      },
-      {
-        id: 'group',
-        title: sectionTitles.groupDetails,
+        id: 'configuration',
+        title: sectionTitles.configuration,
         items: [
           {
             type: 'text',
@@ -168,6 +157,17 @@ export function ReviewStep() {
         ],
       },
       {
+        id: 'carriers',
+        title: sectionTitles.carriers,
+        items: [
+          {
+            type: 'badges',
+            items: selectedCarrierNames,
+            emptyMessage: copy.noCarriersSelected,
+          },
+        ],
+      },
+      {
         id: 'notes',
         title: sectionTitles.notes,
         items: [
@@ -178,9 +178,110 @@ export function ReviewStep() {
           },
           {
             type: 'multiline',
+            label: fields.notes,
             value: values.notes,
           },
         ],
+      },
+      {
+        id: 'plan',
+        title: sectionTitles.plan,
+        items: [
+          {
+            type: 'text',
+            label: fields.plan,
+            value: values.planName || values.planId,
+          },
+          {
+            type: 'text',
+            label: fields.planGroupNumber,
+            value: values.cgnGroupNumber,
+          },
+          {
+            type: 'text',
+            label: fields.billerAccountNumber,
+            value: values.billerAccountNumber,
+          },
+          {
+            type: 'text',
+            label: fields.customerNumber,
+            value: values.cgnCustomerNumber,
+          },
+          {
+            type: 'text',
+            label: fields.brokerCode,
+            value: values.brokerCodeName || values.brokerCodeId,
+          },
+          {
+            type: 'text',
+            label: fields.isActive,
+            value: values.isActive ? copy.yes : copy.no,
+          },
+        ],
+      },
+      {
+        id: 'rates',
+        title: sectionTitles.rates,
+        items:
+          values.planRates && values.planRates.length > 0
+            ? values.planRates.flatMap((rate, index) => [
+                {
+                  type: 'subheading' as const,
+                  title: `RATE ${index + 1}`,
+                },
+                {
+                  type: 'row' as const,
+                  label: fields.effectiveDate,
+                  value: rate.effectiveDate ? rate.effectiveDate.split('T')[0] : copy.emptyValue,
+                },
+                {
+                  type: 'row' as const,
+                  label: fields.individual,
+                  value:
+                    rate.individual !== undefined && rate.individual !== null
+                      ? String(rate.individual)
+                      : copy.emptyValue,
+                },
+                {
+                  type: 'row' as const,
+                  label: fields.parentChild,
+                  value:
+                    rate.parentChild !== undefined && rate.parentChild !== null
+                      ? String(rate.parentChild)
+                      : copy.emptyValue,
+                },
+                {
+                  type: 'row' as const,
+                  label: fields.parentChildren,
+                  value:
+                    rate.parentChildren !== undefined && rate.parentChildren !== null
+                      ? String(rate.parentChildren)
+                      : copy.emptyValue,
+                },
+                {
+                  type: 'row' as const,
+                  label: fields.memberSpouse,
+                  value:
+                    rate.husbandWife !== undefined && rate.husbandWife !== null
+                      ? String(rate.husbandWife)
+                      : copy.emptyValue,
+                },
+                {
+                  type: 'row' as const,
+                  label: fields.family,
+                  value:
+                    rate.family !== undefined && rate.family !== null
+                      ? String(rate.family)
+                      : copy.emptyValue,
+                },
+              ])
+            : [
+                {
+                  type: 'text' as const,
+                  label: 'Rates',
+                  value: copy.noRatesConfigured,
+                },
+              ],
       },
     ],
     [sectionTitles, fields, values, parentCompanyName, selectedCarrierNames],

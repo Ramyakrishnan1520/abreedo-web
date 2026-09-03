@@ -167,19 +167,8 @@ export function EmployerDetailView({
             ],
           },
           {
-            id: 'carriers',
-            title: reviewCopy.sections.carriers,
-            items: [
-              {
-                type: 'badges',
-                items: selectedCarrierNames,
-                emptyMessage: reviewCopy.noCarriersSelected,
-              },
-            ],
-          },
-          {
-            id: 'group',
-            title: reviewCopy.sections.groupDetails,
+            id: 'configuration',
+            title: reviewCopy.sections.configuration,
             items: [
               {
                 type: 'text',
@@ -238,6 +227,17 @@ export function EmployerDetailView({
             ],
           },
           {
+            id: 'carriers',
+            title: reviewCopy.sections.carriers,
+            items: [
+              {
+                type: 'badges',
+                items: selectedCarrierNames,
+                emptyMessage: reviewCopy.noCarriersSelected,
+              },
+            ],
+          },
+          {
             id: 'notes',
             title: reviewCopy.sections.notes,
             items: [
@@ -251,6 +251,106 @@ export function EmployerDetailView({
                 value: values.notes,
               },
             ],
+          },
+          {
+            id: 'plan',
+            title: reviewCopy.sections.plan,
+            items: [
+              {
+                type: 'text',
+                label: reviewCopy.fields.plan,
+                value: values.planName || values.planId,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.planGroupNumber,
+                value: values.cgnGroupNumber,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.billerAccountNumber,
+                value: values.billerAccountNumber,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.customerNumber,
+                value: values.cgnCustomerNumber,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.brokerCode,
+                value: values.brokerCodeName || values.brokerCodeId,
+              },
+              {
+                type: 'text',
+                label: reviewCopy.fields.isActive,
+                value: values.isActive ? reviewCopy.yes : reviewCopy.no,
+              },
+            ],
+          },
+          {
+            id: 'rates',
+            title: reviewCopy.sections.rates,
+            items:
+              values.planRates && values.planRates.length > 0
+                ? values.planRates.flatMap((rate, index) => [
+                    {
+                      type: 'subheading' as const,
+                      title: `RATE ${index + 1}`,
+                    },
+                    {
+                      type: 'row' as const,
+                      label: reviewCopy.fields.effectiveDate,
+                      value: rate.effectiveDate ? rate.effectiveDate.split('T')[0] : reviewCopy.emptyValue,
+                    },
+                    {
+                      type: 'row' as const,
+                      label: reviewCopy.fields.individual,
+                      value:
+                        rate.individual !== undefined && rate.individual !== null
+                          ? String(rate.individual)
+                          : reviewCopy.emptyValue,
+                    },
+                    {
+                      type: 'row' as const,
+                      label: reviewCopy.fields.parentChild,
+                      value:
+                        rate.parentChild !== undefined && rate.parentChild !== null
+                          ? String(rate.parentChild)
+                          : reviewCopy.emptyValue,
+                    },
+                    {
+                      type: 'row' as const,
+                      label: reviewCopy.fields.parentChildren,
+                      value:
+                        rate.parentChildren !== undefined && rate.parentChildren !== null
+                          ? String(rate.parentChildren)
+                          : reviewCopy.emptyValue,
+                    },
+                    {
+                      type: 'row' as const,
+                      label: reviewCopy.fields.memberSpouse,
+                      value:
+                        rate.husbandWife !== undefined && rate.husbandWife !== null
+                          ? String(rate.husbandWife)
+                          : reviewCopy.emptyValue,
+                    },
+                    {
+                      type: 'row' as const,
+                      label: reviewCopy.fields.family,
+                      value:
+                        rate.family !== undefined && rate.family !== null
+                          ? String(rate.family)
+                          : reviewCopy.emptyValue,
+                    },
+                  ])
+                : [
+                    {
+                      type: 'text' as const,
+                      label: 'Rates',
+                      value: reviewCopy.noRatesConfigured,
+                    },
+                  ],
           },
         ]
         : [],
