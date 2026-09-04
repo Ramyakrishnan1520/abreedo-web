@@ -10,10 +10,15 @@ import { resolveSelectedCarrierOptions } from '#/utils/resolveSelectedCarrierOpt
 import type { EmployerFormValues } from '#/components/admin/employer/employer.schema.ts'
 import type { ReviewSectionConfig } from '#/types/review-steps.ts'
 import type { AvailableCarrierOption } from '#/types/parent-company.ts'
+import type { EmployerFormMode } from '#/utils/getEmployerStepValidationFields.ts'
 
 const copy = EMPLOYER_CONTENT.reviewStep
 
-export function ReviewStep() {
+export interface EmployerReviewStepProps {
+  mode?: EmployerFormMode
+}
+
+export function ReviewStep({ mode = 'create' }: EmployerReviewStepProps = {}) {
   const form = useFormContext<EmployerFormValues>()
   const values = form.getValues()
   const { data: parentCompany } = useParentCompany(
@@ -57,7 +62,7 @@ export function ReviewStep() {
 
   const { sections: sectionTitles, fields } = copy
 
-  const sections: ReviewSectionConfig[] = useMemo(
+  const allSections: ReviewSectionConfig[] = useMemo(
     () => [
       {
         id: 'general',
@@ -293,8 +298,27 @@ export function ReviewStep() {
               ],
       },
     ],
-    [sectionTitles, fields, values, parentCompanyName, selectedCarrierNames],
+    [sectionTitles, fields, values, parentCompanyName, selectedCarrierNames, stateName],
   )
+
+  const sections = useMemo(() => {
+    if (mode === 'edit-general') {
+      return allSections.filter((s) =>
+        [
+          'general',
+          'address',
+          'contact',
+          'configuration',
+          'carriers',
+          'notes',
+        ].includes(s.id),
+      )
+    }
+    if (mode === 'edit-plan') {
+      return allSections.filter((s) => ['plan', 'rates'].includes(s.id))
+    }
+    return allSections
+  }, [allSections, mode])
 
   return (
     <CommonReviewStep

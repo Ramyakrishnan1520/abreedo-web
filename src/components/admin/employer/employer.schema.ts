@@ -132,6 +132,37 @@ export const employerSchema = z.object({
     .min(1, v.rateRequiresAtLeastOne),
 })
 
+export const employerGeneralEditSchema = employerSchema.extend({
+  planId: optionalTextSchema(),
+  cgnGroupNumber: optionalTextSchema(),
+  billerAccountNumber: optionalTextSchema(),
+  planRates: z
+    .array(
+      z.object({
+        id: z.string().optional(),
+        planRateId: z.string().optional(),
+        effectiveDate: optionalTextSchema(),
+        individual: z.number().nullable().optional(),
+        parentChild: z.number().nullable().optional(),
+        parentChildren: z.number().nullable().optional(),
+        husbandWife: z.number().nullable().optional(),
+        family: z.number().nullable().optional(),
+      }),
+    )
+    .optional(),
+})
+
+export const employerPlanEditSchema = employerSchema.extend({
+  name: optionalTextSchema(),
+  parentCompanyId: optionalTextSchema(),
+  address1: optionalTextSchema(),
+  city: optionalTextSchema(),
+  zip: optionalTextSchema(),
+  contactFirst: optionalTextSchema(),
+  contactLast: optionalTextSchema(),
+  groupNumber: optionalTextSchema(),
+})
+
 export type EmployerFormValues = z.infer<typeof employerSchema>
-export type PlanRateFormItem = EmployerFormValues['planRates'][number]
+export type PlanRateFormItem = NonNullable<EmployerFormValues['planRates']>[number]
 

@@ -63,6 +63,8 @@ export const EMPLOYER_CONTENT = {
       deleteButton: 'Delete',
       backButton: 'Back',
       editButton: 'Edit',
+      editGeneralButton: 'Edit General',
+      editPlanButton: 'Edit Plan',
       confirmDeleteTitle: 'Delete Employer',
       confirmDeletePrompt:
         'Are you sure you want to delete this employer? This action cannot be undone.',
@@ -73,6 +75,13 @@ export const EMPLOYER_CONTENT = {
         detailLoad: 'Failed to load employer details. Please try again.',
       },
     },
+  },
+  filters: {
+    allParentCompanies: 'All Parent Companies',
+    parentCompanyLabel: 'Parent Company',
+    clearFilters: 'Clear Filters',
+    loadingMore: 'Loading more...',
+    parentCompanyPlaceholder: 'Filter by parent company...',
   },
   table: {
     emptyValue: '-',
@@ -93,6 +102,8 @@ export const EMPLOYER_CONTENT = {
     titles: {
       create: 'Create Employer',
       edit: 'Edit Employer',
+      editGeneral: 'Edit Employer (General)',
+      editPlan: 'Edit Employer (Plan & Rates)',
     },
     saveLabels: {
       create: 'Save',
@@ -111,6 +122,19 @@ export const EMPLOYER_CONTENT = {
       { id: 'plan', label: 'Plan', index: 5 },
       { id: 'rate', label: 'Rate', index: 6 },
       { id: 'review', label: 'Review', index: 7 },
+    ],
+    generalSteps: [
+      { id: 'general', label: 'General', index: 0 },
+      { id: 'contact', label: 'Contact', index: 1 },
+      { id: 'configuration', label: 'Configuration', index: 2 },
+      { id: 'carriers', label: 'Carriers', index: 3 },
+      { id: 'notes', label: 'Notes', index: 4 },
+      { id: 'review', label: 'Review', index: 5 },
+    ],
+    planSteps: [
+      { id: 'plan', label: 'Plan', index: 0 },
+      { id: 'rate', label: 'Rate', index: 1 },
+      { id: 'review', label: 'Review', index: 2 },
     ],
     validationSummary: 'Please fix the highlighted fields before saving.',
   },

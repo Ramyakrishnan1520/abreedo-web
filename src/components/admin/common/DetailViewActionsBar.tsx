@@ -8,11 +8,13 @@ export interface DetailViewActionsBarProps {
   deleteLabel?: string
   backLabel?: string
   editLabel?: string
+  secondaryEditLabel?: string
   isDeleting?: boolean
   isDeleteDisabled?: boolean
   onDelete: () => void
   onBack: () => void
-  onEdit: () => void
+  onEdit?: () => void
+  onSecondaryEdit?: () => void
   className?: string
 }
 
@@ -21,11 +23,13 @@ export function DetailViewActionsBar({
   deleteLabel = 'Delete',
   backLabel = 'Back',
   editLabel = 'Edit',
+  secondaryEditLabel,
   isDeleting = false,
   isDeleteDisabled = false,
   onDelete,
   onBack,
   onEdit,
+  onSecondaryEdit,
   className,
 }: DetailViewActionsBarProps) {
   return (
@@ -60,16 +64,32 @@ export function DetailViewActionsBar({
           {backLabel}
         </Button>
 
-        <Button
-          id={`${idPrefix}-edit-btn`}
-          type="button"
-          onClick={onEdit}
-          disabled={isDeleting}
-          className="h-9 gap-1.5 rounded-md bg-tan-dark px-5 font-semibold text-white shadow-xs hover:bg-tan-dark/90"
-        >
-          <Pencil className="size-4" />
-          {editLabel}
-        </Button>
+        {onSecondaryEdit && secondaryEditLabel ? (
+          <Button
+            id={`${idPrefix}-secondary-edit-btn`}
+            type="button"
+            variant="outline"
+            onClick={onSecondaryEdit}
+            disabled={isDeleting}
+            className="h-9 gap-1.5 rounded-md border-tan-dark/30 px-5 font-semibold text-tan-dark shadow-xs hover:bg-tan-light/20 hover:text-tan-dark"
+          >
+            <Pencil className="size-4" />
+            {secondaryEditLabel}
+          </Button>
+        ) : null}
+
+        {onEdit && editLabel ? (
+          <Button
+            id={`${idPrefix}-edit-btn`}
+            type="button"
+            onClick={onEdit}
+            disabled={isDeleting}
+            className="h-9 gap-1.5 rounded-md bg-tan-dark px-5 font-semibold text-white shadow-xs hover:bg-tan-dark/90"
+          >
+            <Pencil className="size-4" />
+            {editLabel}
+          </Button>
+        ) : null}
       </div>
     </div>
   )

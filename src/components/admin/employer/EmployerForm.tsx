@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, type Resolver } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { AlertCircle } from 'lucide-react'
 
@@ -17,23 +17,32 @@ import { Stepper } from '#/components/admin/common/Stepper'
 import { FormNavigationActions } from '#/components/admin/common/FormNavigationActions.tsx'
 import {
   EMPLOYER_DEFAULT_VALUES,
+  EMPLOYER_GENERAL_STEPS,
+  EMPLOYER_PLAN_STEPS,
   EMPLOYER_STEPS,
 } from '#/components/admin/employer/employer-steps.ts'
 import {
+  employerGeneralEditSchema,
+  employerPlanEditSchema,
   employerSchema,
   type EmployerFormValues,
 } from '#/components/admin/employer/employer.schema.ts'
 import { useCreateEmployer } from '#/hooks/employer/useCreateEmployer.ts'
 import { useUpdateEmployer } from '#/hooks/employer/useUpdateEmployer.ts'
 import { EMPLOYER_CONTENT } from '#/utils/employer-content.ts'
-import { getEmployerStepValidationFields } from '#/utils/getEmployerStepValidationFields.ts'
+import {
+  getEmployerStepValidationFields,
+  type EmployerFormMode,
+} from '#/utils/getEmployerStepValidationFields.ts'
 
 import type { EmployerUpsertRequest } from '#/types/employer.ts'
 
 const { form: formCopy } = EMPLOYER_CONTENT
 
+export type { EmployerFormMode }
+
 interface EmployerFormProps {
-  mode?: 'create' | 'edit'
+  mode?: EmployerFormMode | 'edit'
   employerId?: string
   defaultValues?: Partial<EmployerFormValues>
   initialValues?: Partial<EmployerFormValues>
@@ -42,12 +51,27 @@ interface EmployerFormProps {
   title?: string
 }
 
-const STEP_COMPONENTS = [
+const CREATE_STEP_COMPONENTS = [
   GeneralStep,
   ContactStep,
   ConfigurationStep,
   CarriersStep,
   NotesStep,
+  PlanStep,
+  RateStep,
+  ReviewStep,
+] as const
+
+const GENERAL_EDIT_STEP_COMPONENTS = [
+  GeneralStep,
+  ContactStep,
+  ConfigurationStep,
+  CarriersStep,
+  NotesStep,
+  ReviewStep,
+] as const
+
+const PLAN_EDIT_STEP_COMPONENTS = [
   PlanStep,
   RateStep,
   ReviewStep,
@@ -67,14 +91,39 @@ export function EmployerForm({
   const { mutate: updateEmployer, isPending: isUpdating } = useUpdateEmployer()
   const isPending = isCreating || isUpdating
 
-  const resolvedTitle =
-    title ??
-    (mode === 'edit'
-      ? EMPLOYER_CONTENT.form.titles.edit
-      : EMPLOYER_CONTENT.form.titles.create)
+  const normalizedMode: EmployerFormMode =
+    mode === 'edit' ? 'edit-general' : mode
+
+  const isEditMode =
+    normalizedMode === 'edit-general' || normalizedMode === 'edit-plan'
+
+  const stepComponents = useMemo(() => {
+    if (normalizedMode === 'edit-general') return GENERAL_EDIT_STEP_COMPONENTS
+    if (normalizedMode === 'edit-plan') return PLAN_EDIT_STEP_COMPONENTS
+    return CREATE_STEP_COMPONENTS
+  }, [normalizedMode])
+
+  const steps = useMemo(() => {
+    if (normalizedMode === 'edit-general') return EMPLOYER_GENERAL_STEPS
+    if (normalizedMode === 'edit-plan') return EMPLOYER_PLAN_STEPS
+    return EMPLOYER_STEPS
+  }, [normalizedMode])
+
+  const schema = useMemo(() => {
+    if (normalizedMode === 'edit-general') return employerGeneralEditSchema
+    if (normalizedMode === 'edit-plan') return employerPlanEditSchema
+    return employerSchema
+  }, [normalizedMode])
+
+  const resolvedTitle = useMemo(() => {
+    if (title) return title
+    if (normalizedMode === 'edit-general') return formCopy.titles.editGeneral
+    if (normalizedMode === 'edit-plan') return formCopy.titles.editPlan
+    return formCopy.titles.create
+  }, [normalizedMode, title])
 
   const form = useForm<EmployerFormValues>({
-    resolver: zodResolver(employerSchema),
+    resolver: zodResolver(schema) as Resolver<EmployerFormValues>,
     defaultValues: {
       ...EMPLOYER_DEFAULT_VALUES,
       ...defaultValues,
@@ -85,18 +134,18 @@ export function EmployerForm({
   })
 
   useEffect(() => {
-    if (mode === 'edit' && initialValues) {
+    if (isEditMode && initialValues) {
       form.reset({
         ...EMPLOYER_DEFAULT_VALUES,
         ...initialValues,
       })
       setCurrentStep(0)
     }
-  }, [form, initialValues, mode])
+  }, [form, initialValues, isEditMode])
 
   const isFirstStep = currentStep === 0
-  const isLastStep = currentStep === EMPLOYER_STEPS.length - 1
-  const StepComponent = STEP_COMPONENTS[currentStep]
+  const isLastStep = currentStep === steps.length - 1
+  const StepComponent = stepComponents[currentStep]
 
   const handleBack = () => {
     if (!isFirstStep) {
@@ -109,7 +158,7 @@ export function EmployerForm({
   }
 
   const handleNext = async () => {
-    const fields = getEmployerStepValidationFields(currentStep)
+    const fields = getEmployerStepValidationFields(currentStep, normalizedMode)
     const isValid = await form.trigger(fields)
 
     if (!isValid) {
@@ -157,10 +206,11 @@ export function EmployerForm({
       cgnCustomerNumber: data.cgnCustomerNumber || null,
       brokerCodeId: data.brokerCodeId || null,
       isActive: data.isActive ?? true,
-      planRates: data.planRates && data.planRates.length > 0 ? data.planRates : null,
+      planRates:
+        data.planRates && data.planRates.length > 0 ? data.planRates : null,
     }
-    console.log(JSON.stringify(payload))
-    if (mode === 'edit' && employerId) {
+
+    if (isEditMode && employerId) {
       updateEmployer(
         { id: employerId, data: payload },
         {
@@ -186,10 +236,9 @@ export function EmployerForm({
     event.preventDefault()
   }
 
-  const saveLabel =
-    mode === 'edit'
-      ? formCopy.saveLabels.edit
-      : formCopy.saveLabels.create
+  const saveLabel = isEditMode
+    ? formCopy.saveLabels.edit
+    : formCopy.saveLabels.create
 
   return (
     <div className="flex min-h-[calc(100vh-8rem)] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xs">
@@ -207,7 +256,7 @@ export function EmployerForm({
         </div>
 
         <Stepper
-          steps={EMPLOYER_STEPS}
+          steps={steps}
           currentStep={currentStep}
           className="rounded-xl bg-white/5 px-2 py-4 sm:px-4"
         />
@@ -221,7 +270,11 @@ export function EmployerForm({
           className="flex min-h-0 flex-1 flex-col"
         >
           <div className="flex-1 overflow-y-auto px-6 py-6 sm:px-8">
-            <StepComponent />
+            {isLastStep ? (
+              <ReviewStep mode={normalizedMode} />
+            ) : (
+              <StepComponent />
+            )}
 
             {Object.keys(form.formState.errors).length > 0 &&
               form.formState.isSubmitted && (

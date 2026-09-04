@@ -1,11 +1,11 @@
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import type { FormEvent } from 'react'
-import { AlertCircle, Building2, Search, X } from 'lucide-react'
+import { AlertCircle, Building2 } from 'lucide-react'
 
 import { EmployerDetailView } from '#/components/admin/employer/EmployerDetailView.tsx'
 import { EmployerForm } from '#/components/admin/employer/EmployerForm.tsx'
 import { getEmployerTableColumns } from '#/components/admin/employer/employer-table-columns.tsx'
-import { FORM_INPUT_CLASS } from '#/components/admin/common/form-styles.ts'
+import { EmployerTableFilters } from '#/components/admin/employer/employer-table-filters.tsx'
 import { ReusableTable } from '#/components/table/index.ts'
 import { Button } from '#/components/ui/button.tsx'
 import {
@@ -14,7 +14,6 @@ import {
   CardHeader,
   CardTitle,
 } from '#/components/ui/card.tsx'
-import { Input } from '#/components/ui/input.tsx'
 import { useEmployers } from '#/hooks/employer/use-employers.ts'
 import { useEmployer } from '#/hooks/employer/useEmployerById.ts'
 import { EMPLOYER_CONTENT } from '#/utils/employer-content.ts'
@@ -25,13 +24,14 @@ import type { Employer } from '#/types/employer.ts'
 
 const copy = EMPLOYER_CONTENT.pages.edit
 
-type ViewMode = 'table' | 'view' | 'edit'
+type ViewMode = 'table' | 'view' | 'edit-general' | 'edit-plan'
 
 export function EditEmployerPage() {
   const [viewMode, setViewMode] = useState<ViewMode>('table')
   const [selectedEmployerId, setSelectedEmployerId] = useState<string | null>(
     null,
   )
+  const [parentCompanyId, setParentCompanyId] = useState<string | undefined>()
   const [searchTerm, setSearchTerm] = useState('')
   const [activeSearch, setActiveSearch] = useState('')
 
@@ -48,7 +48,7 @@ export function EditEmployerPage() {
     isFetching,
     refetch,
   } = useEmployers(
-    undefined,
+    parentCompanyId,
     {
       pageIndex: pagination.pageIndex,
       pageSize: pagination.pageSize,
@@ -86,16 +86,17 @@ export function EditEmployerPage() {
     setPagination((prev) => ({ ...prev, pageIndex: 0 }))
   }
 
+  const handleParentCompanyChange = useCallback((id: string | undefined) => {
+    setParentCompanyId(id)
+    setPagination((prev) => ({ ...prev, pageIndex: 0 }))
+  }, [])
+
   const columns = useMemo(
     () =>
       getEmployerTableColumns({
         onView: (employer: Employer) => {
           setSelectedEmployerId(String(employer.id))
           setViewMode('view')
-        },
-        onEdit: (employer: Employer) => {
-          setSelectedEmployerId(String(employer.id))
-          setViewMode('edit')
         },
       }),
     [],
@@ -106,8 +107,12 @@ export function EditEmployerPage() {
     setSelectedEmployerId(null)
   }
 
-  const handleEditFromView = () => {
-    setViewMode('edit')
+  const handleEditGeneralFromView = () => {
+    setViewMode('edit-general')
+  }
+
+  const handleEditPlanFromView = () => {
+    setViewMode('edit-plan')
   }
 
   const initialValues = employerDetail
@@ -137,39 +142,14 @@ export function EditEmployerPage() {
               </div>
             </CardHeader>
             <CardContent className="pt-5">
-              <form
-                onSubmit={handleSearchSubmit}
-                className="flex w-full max-w-2xl flex-col gap-3 sm:flex-row sm:items-center"
-              >
-                <div className="relative flex-1">
-                  <Input
-                    id="employer-search-input"
-                    type="text"
-                    placeholder={copy.searchPlaceholder}
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className={FORM_INPUT_CLASS}
-                  />
-                  {searchTerm ? (
-                    <button
-                      type="button"
-                      onClick={handleClearSearch}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-                      aria-label={copy.clearButton}
-                    >
-                      <X className="size-4" />
-                    </button>
-                  ) : null}
-                </div>
-                <Button
-                  id="employer-search-btn"
-                  type="submit"
-                  className="h-10 gap-2 bg-tan-dark font-semibold text-white shadow-xs hover:bg-tan-dark/90"
-                >
-                  <Search className="size-4" />
-                  {copy.searchButton}
-                </Button>
-              </form>
+              <EmployerTableFilters
+                parentCompanyId={parentCompanyId}
+                searchTerm={searchTerm}
+                onParentCompanyChange={handleParentCompanyChange}
+                onSearchTermChange={setSearchTerm}
+                onSearchSubmit={handleSearchSubmit}
+                onClearSearch={handleClearSearch}
+              />
             </CardContent>
           </Card>
 
@@ -218,13 +198,15 @@ export function EditEmployerPage() {
         <EmployerDetailView
           employerId={selectedEmployerId}
           onBack={handleBackToTable}
-          onEdit={handleEditFromView}
+          onEditGeneral={handleEditGeneralFromView}
+          onEditPlan={handleEditPlanFromView}
           onDeleteSuccess={handleBackToTable}
         />
       ) : null}
 
       {/* Multi-Step Edit Form */}
-      {viewMode === 'edit' && selectedEmployerId ? (
+      {(viewMode === 'edit-general' || viewMode === 'edit-plan') &&
+      selectedEmployerId ? (
         isLoadingDetail ? (
           <Card className="border-slate-200 shadow-xs">
             <CardContent className="flex items-center justify-center gap-3 py-16 text-sm text-slate-600">
@@ -251,11 +233,11 @@ export function EditEmployerPage() {
           </Card>
         ) : initialValues ? (
           <EmployerForm
-            key={selectedEmployerId}
-            mode="edit"
+            key={`${selectedEmployerId}-${viewMode}`}
+            mode={viewMode}
             employerId={selectedEmployerId}
             initialValues={initialValues}
-            onBack={handleBackToTable}
+            onBack={() => setViewMode('view')}
             onSuccess={handleBackToTable}
           />
         ) : null

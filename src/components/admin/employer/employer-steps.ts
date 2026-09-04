@@ -3,6 +3,8 @@ import { EMPLOYER_CONTENT } from '#/utils/employer-content.ts'
 import type { EmployerFormValues } from '#/components/admin/employer/employer.schema.ts'
 
 export const EMPLOYER_STEPS = EMPLOYER_CONTENT.form.steps
+export const EMPLOYER_GENERAL_STEPS = EMPLOYER_CONTENT.form.generalSteps
+export const EMPLOYER_PLAN_STEPS = EMPLOYER_CONTENT.form.planSteps
 
 export const EMPLOYER_DEFAULT_VALUES: EmployerFormValues = {
   name: '',
