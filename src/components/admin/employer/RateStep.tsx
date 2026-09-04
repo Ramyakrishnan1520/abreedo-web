@@ -343,7 +343,7 @@ export function RateStep() {
                 onClick={handleAddOrUpdateRate}
                 className="bg-[#94723C] hover:bg-[#805e2b] text-white cursor-pointer"
               >
-                <Plus className="mr-1.5 size-4" />
+                <Plus className="size-4" />
                 {isEditing ? copy.updateButton : copy.addButton}
               </Button>
             </div>

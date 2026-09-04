@@ -33,6 +33,7 @@ export function PlanStep() {
     fetchNextPage: fetchNextPlansPage,
   } = useInfinitePlans({
     parentCompanyId: values.parentCompanyId,
+    carrierIds: values.carrierIds,
   })
 
   const [planSelectContent, setPlanSelectContent] =
@@ -395,9 +396,10 @@ export function PlanStep() {
           <Button
             type="button"
             onClick={handleAddOrUpdatePlan}
-            className="bg-[#94723C] hover:bg-[#805e2b] text-white cursor-pointer"
+            disabled={hasConfiguredPlan && !isEditing}
+            className="bg-[#94723C] hover:bg-[#805e2b] text-white disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
-            <Plus className="mr-1.5 size-4" />
+            <Plus className="size-4" />
             {isEditing ? copy.updateButton : copy.addButton}
           </Button>
         </div>
