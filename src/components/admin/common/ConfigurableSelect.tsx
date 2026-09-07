@@ -133,7 +133,7 @@ export function ConfigurableSelect({
                 className={cn(
                   'truncate text-left flex-1',
                   selectedOption
-                    ? 'font-medium text-[#94723C]'
+                    ? 'font-medium text-tan-dark'
                     : 'text-slate-400',
                 )}
               >
@@ -172,7 +172,7 @@ export function ConfigurableSelect({
           >
             {/* Search Input Box */}
             <div className="p-2.5 border-b border-slate-100 bg-white">
-              <div className="flex items-center gap-2 rounded-lg border border-[#BFA780] bg-white px-3 py-1.5 ring-2 ring-[#BFA780]/20">
+              <div className="flex items-center gap-2 rounded-lg border border-tan-accent bg-white px-3 py-1.5 ring-2 ring-tan-accent/20">
                 <Search className="size-4 shrink-0 text-slate-400" />
                 <input
                   type="text"
@@ -209,8 +209,10 @@ export function ConfigurableSelect({
                     handleOpenChange(false)
                   }}
                   className={cn(
-                    'flex w-full items-center px-3 py-2 text-sm rounded-lg transition-colors cursor-pointer text-slate-700 hover:bg-slate-100',
-                    !value && 'font-medium',
+                    'flex w-full items-center px-3 py-2 text-sm rounded-lg transition-colors cursor-pointer',
+                    !value
+                      ? 'bg-tan-subtle font-medium text-tan-dark'
+                      : 'text-slate-800 hover:bg-tan-subtle hover:text-tan-dark',
                   )}
                 >
                   {emptyOptionLabel}
@@ -236,12 +238,12 @@ export function ConfigurableSelect({
                       className={cn(
                         'flex w-full items-center gap-2.5 px-3 py-2 text-sm rounded-lg transition-colors cursor-pointer',
                         isSelected
-                          ? 'bg-[#F7F2EB] font-medium text-slate-900'
-                          : 'text-slate-700 hover:bg-slate-100',
+                          ? 'bg-tan-subtle font-medium text-tan-dark'
+                          : 'text-slate-800 hover:bg-tan-subtle hover:text-tan-dark',
                       )}
                     >
                       {isSelected ? (
-                        <Check className="size-4 shrink-0 text-slate-800" />
+                        <Check className="size-4 shrink-0 text-tan-dark" />
                       ) : (
                         <span className="w-4 shrink-0" />
                       )}

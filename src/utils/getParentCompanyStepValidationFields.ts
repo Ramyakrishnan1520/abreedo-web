@@ -16,11 +16,12 @@ export function getStepValidationFields(
         'contact.alternativePhoneNumber',
         'contact.fax',
         'contact.email',
+        'allowCobra',
       ]
     case 2:
       return ['carrierIds']
     case 3:
-      return ['notes', 'allowCobra']
+      return ['notes']
     default:
       return []
   }

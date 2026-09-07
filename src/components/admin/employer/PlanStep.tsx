@@ -333,6 +333,7 @@ export function PlanStep() {
               placeholder={copy.customerNumberPlaceholder}
               className={FORM_INPUT_CLASS}
               value={draftCustomerNumber}
+              maxLength={10}
               onChange={(e) => setDraftCustomerNumber(e.target.value)}
             />
           </div>

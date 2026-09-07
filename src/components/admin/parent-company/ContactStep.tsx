@@ -1,5 +1,6 @@
 import { useFormContext } from 'react-hook-form'
 
+import { Checkbox } from '#/components/ui/checkbox.tsx'
 import { Input } from '#/components/ui/input.tsx'
 import { PhoneInput } from '#/components/admin/common/PhoneInput.tsx'
 import { Separator } from '#/components/ui/separator.tsx'
@@ -181,6 +182,27 @@ export function ContactStep() {
                   placeholder={copy.websitePlaceholder}
                   className={FORM_INPUT_CLASS}
                   {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </div>
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={form.control}
+        name="allowCobra"
+        render={({ field }) => (
+          <FormItem className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-center sm:gap-4">
+            <FormLabel className={FORM_LABEL_CLASS}>
+              {copy.allowCobraLabel}
+            </FormLabel>
+            <div className="flex items-center">
+              <FormControl>
+                <Checkbox
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
                 />
               </FormControl>
               <FormMessage />

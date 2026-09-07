@@ -91,6 +91,11 @@ export function ReviewStep() {
             label: fields.website,
             value: values.contact.website,
           },
+          {
+            type: 'text',
+            label: fields.allowCobra || 'Allow Cobra',
+            value: values.allowCobra ? 'Yes' : 'No',
+          },
         ],
       },
       {
@@ -108,11 +113,6 @@ export function ReviewStep() {
         id: 'notes',
         title: sectionTitles.notes,
         items: [
-          {
-            type: 'text',
-            label: 'Allow Cobra',
-            value: values.allowCobra ? 'Yes' : 'No',
-          },
           {
             type: 'multiline',
             value: values.notes,

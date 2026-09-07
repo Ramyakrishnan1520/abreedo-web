@@ -7,13 +7,8 @@ import {
   FormLabel,
   FormMessage,
 } from '#/components/ui/Form'
-import { Input } from '#/components/ui/input.tsx'
 import { Textarea } from '#/components/ui/textarea.tsx'
-import {
-  FORM_INPUT_CLASS,
-  FORM_TEXTAREA_CLASS,
-  LABEL_COL,
-} from '#/components/admin/common/form-styles.ts'
+import { FORM_TEXTAREA_CLASS } from '#/components/admin/common/form-styles.ts'
 import { EMPLOYER_CONTENT } from '#/utils/employer-content.ts'
 
 import type { EmployerFormValues } from '#/components/admin/employer/employer.schema.ts'
@@ -25,50 +20,28 @@ export function NotesStep() {
 
   return (
     <div className="space-y-6">
-      {/* Title */}
-      <FormField
-        control={form.control}
-        name="notesTitle"
-        render={({ field }) => (
-          <FormItem className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-start sm:gap-4">
-            <FormLabel className={LABEL_COL}>
-              {copy.titleLabel}
-            </FormLabel>
-            <div className="space-y-1">
-              <FormControl>
-                <Input
-                  id="employer-notes-title"
-                  placeholder={copy.titlePlaceholder}
-                  className={FORM_INPUT_CLASS}
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </div>
-          </FormItem>
-        )}
-      />
+      <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 sm:text-sm">
+        {copy.heading}
+      </h3>
 
-      {/* Notes Textarea */}
       <FormField
         control={form.control}
         name="notes"
         render={({ field }) => (
-          <FormItem className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-start sm:gap-4">
-            <FormLabel className={LABEL_COL}>
+          <FormItem className="space-y-2">
+            <FormLabel className="text-sm font-bold text-slate-900 sm:text-base">
               {copy.notesLabel}
             </FormLabel>
-            <div className="space-y-1">
-              <FormControl>
-                <Textarea
-                  id="employer-notes-body"
-                  placeholder={copy.notesPlaceholder}
-                  className={FORM_TEXTAREA_CLASS}
-                  {...field}
-                />
-              </FormControl>
-              <FormMessage />
-            </div>
+            <FormControl>
+              <Textarea
+                id="employer-notes-body"
+                placeholder={copy.notesPlaceholder}
+                className={FORM_TEXTAREA_CLASS}
+                maxLength={2000}
+                {...field}
+              />
+            </FormControl>
+            <FormMessage />
           </FormItem>
         )}
       />

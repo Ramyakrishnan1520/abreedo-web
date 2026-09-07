@@ -220,12 +220,11 @@ export const EMPLOYER_CONTENT = {
     hintRight: 'Remove carriers from the right panel to deselect them.',
   },
   notesStep: {
-    heading: 'Administrative Notes',
-    description: 'Add any optional title or administrative notes for this employer.',
+    heading: 'EMPLOYER NOTES',
     titleLabel: 'Title',
     titlePlaceholder: 'Enter title for notes',
-    notesLabel: 'Notes',
-    notesPlaceholder: 'Paragraph describing any additional information needed...',
+    notesLabel: 'Administrative Notes (optional)',
+    notesPlaceholder: 'Additional details about this Employer.',
   },
   planStep: {
     heading: 'Plan',
@@ -384,10 +383,13 @@ export const EMPLOYER_CONTENT = {
     emailMax: 'Email must be 254 characters or fewer',
 
     groupNumberRequired: 'Group Number is required',
-    groupNumberMax: 'Group Number must be 100 characters or fewer',
-    policyNumberMax: 'Policy Number must be 100 characters or fewer',
-    tpacNumberMax: 'TPAC Number must be 100 characters or fewer',
+    groupNumberMax: 'Group Number must be 10 characters or fewer',
+    policyNumberMax: 'Policy Number must be 50 characters or fewer',
+    tpacNumberMax: 'TPAC Number must be 3 characters or fewer',
+    monthlyAdminFeeMax: 'Monthly Admin Fee must be 16 digits or fewer',
     notesTitleMax: 'Notes Title must be 200 characters or fewer',
+    notesMax: 'Notes must be 2000 characters or fewer',
+    cgnCustomerNumberMax: 'Customer Number must be 10 characters or fewer',
 
     planRequired: 'Plan is required',
     cgnGroupNumberRequired: 'Group Number is required',

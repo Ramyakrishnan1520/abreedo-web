@@ -18,18 +18,17 @@ export function NotesStep() {
 
   return (
     <div className="space-y-6">
-      <div className="space-y-1">
-        <h3 className="text-base font-bold text-slate-900">{copy.heading}</h3>
-        <p className="text-sm text-slate-500">{copy.description}</p>
-      </div>
+      <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 sm:text-sm">
+        {copy.heading}
+      </h3>
 
       <FormField
         control={form.control}
         name="notes"
         render={({ field }) => (
           <FormItem className="space-y-2">
-            <FormLabel className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-              {copy.heading}
+            <FormLabel className="text-sm font-bold text-slate-900 sm:text-base">
+              {copy.notesLabel}
             </FormLabel>
             <FormControl>
               <Textarea
