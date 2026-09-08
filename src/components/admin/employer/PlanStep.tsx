@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { useFormContext } from 'react-hook-form'
 import { AlertCircle, Plus } from 'lucide-react'
 
@@ -122,6 +122,13 @@ export function PlanStep() {
   const [isEditing, setIsEditing] = useState<boolean>(false)
 
   const hasConfiguredPlan = Boolean(values.planId && values.cgnGroupNumber)
+
+  // If a plan is already configured set editing mode to true so the Update button is shown instead of Add.
+  useEffect(() => {
+    if (hasConfiguredPlan) {
+      setIsEditing(true);
+    }
+  }, [hasConfiguredPlan]);
 
   // Resolve labels for display in the table
   const selectedPlanLabel = useMemo(() => {

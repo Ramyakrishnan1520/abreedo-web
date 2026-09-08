@@ -29,13 +29,17 @@ import {
 } from '#/components/admin/employer/employer.schema.ts'
 import { useCreateEmployer } from '#/hooks/employer/useCreateEmployer.ts'
 import { useUpdateEmployer } from '#/hooks/employer/useUpdateEmployer.ts'
+import { useUpdateEmployerPlan } from '#/hooks/employer/useUpdateEmployerPlan.ts'
 import { EMPLOYER_CONTENT } from '#/utils/employer-content.ts'
 import {
   getEmployerStepValidationFields,
   type EmployerFormMode,
 } from '#/utils/getEmployerStepValidationFields.ts'
 
-import type { EmployerUpsertRequest } from '#/types/employer.ts'
+import type {
+  EmployerPlanUpdateRequest,
+  EmployerUpsertRequest,
+} from '#/types/employer.ts'
 
 const { form: formCopy } = EMPLOYER_CONTENT
 
@@ -88,8 +92,11 @@ export function EmployerForm({
 }: EmployerFormProps) {
   const [currentStep, setCurrentStep] = useState(0)
   const { mutate: createEmployer, isPending: isCreating } = useCreateEmployer()
-  const { mutate: updateEmployer, isPending: isUpdating } = useUpdateEmployer()
-  const isPending = isCreating || isUpdating
+  const { mutate: updateEmployer, isPending: isUpdatingGeneral } =
+    useUpdateEmployer()
+  const { mutate: updateEmployerPlan, isPending: isUpdatingPlan } =
+    useUpdateEmployerPlan()
+  const isPending = isCreating || isUpdatingGeneral || isUpdatingPlan
 
   const normalizedMode: EmployerFormMode =
     mode === 'edit' ? 'edit-general' : mode
@@ -169,7 +176,82 @@ export function EmployerForm({
   }
 
   const onSubmit = (data: EmployerFormValues) => {
-    const payload: EmployerUpsertRequest = {
+    if (normalizedMode === 'edit-plan' && employerId) {
+      const planPayload: EmployerPlanUpdateRequest = {
+        planId: data.planId,
+        cgnGroupNumber: data.cgnGroupNumber || null,
+        brokerCodeId: data.brokerCodeId || null,
+        billerAccountNumber: data.billerAccountNumber || null,
+        cgnCustomerNumber: data.cgnCustomerNumber || null,
+        isActive: data.isActive ?? true,
+        planRates: (data.planRates ?? []).map((rate) => ({
+          effectiveDate: rate.effectiveDate
+            ? new Date(rate.effectiveDate).toISOString()
+            : '',
+          individual: rate.individual ?? 0,
+          family: rate.family ?? 0,
+          husbandWife: rate.husbandWife ?? 0,
+          parentChild: rate.parentChild ?? 0,
+          parentChildren: rate.parentChildren ?? 0,
+        })),
+      }
+
+      updateEmployerPlan(
+        { id: employerId, data: planPayload },
+        {
+          onSuccess: () => {
+            onSuccess?.()
+          },
+        },
+      )
+      return
+    }
+
+    if (normalizedMode === 'edit-general' && employerId) {
+      const generalPayload: EmployerUpsertRequest = {
+        name: data.name,
+        parentCompanyId: data.parentCompanyId || null,
+        address1: data.address1,
+        address2: data.address2 || null,
+        city: data.city,
+        state: data.state || null,
+        zip: data.zip,
+
+        contactFirst: data.contactFirst,
+        contactLast: data.contactLast,
+        title: data.contactTitle || null,
+        phone: data.phone || null,
+        fax: data.fax || null,
+        email: data.email || null,
+
+        carrierIds: data.carrierIds,
+
+        groupNumber: data.groupNumber,
+        policyNumber: data.policyNumber || null,
+        tpacNumber: data.tpacNumber || null,
+        monthlyAdminFee: data.monthlyAdminFee ?? null,
+        status: data.status,
+        isPaper: data.isPaper,
+        allowCobra: data.allowCobra,
+        isPano: data.isPano,
+        renewalDate: data.renewalDate || null,
+        initialNotificationStartOn: data.initialNotificationStartOn || null,
+
+        notes: data.notes || null,
+      }
+
+      updateEmployer(
+        { id: employerId, data: generalPayload },
+        {
+          onSuccess: () => {
+            onSuccess?.()
+          },
+        },
+      )
+      return
+    }
+
+    const createPayload: EmployerUpsertRequest = {
       name: data.name,
       parentCompanyId: data.parentCompanyId || null,
       address1: data.address1,
@@ -207,25 +289,25 @@ export function EmployerForm({
       brokerCodeId: data.brokerCodeId || null,
       isActive: data.isActive ?? true,
       planRates:
-        data.planRates && data.planRates.length > 0 ? data.planRates : null,
+        data.planRates && data.planRates.length > 0
+          ? data.planRates.map((rate) => ({
+              effectiveDate: rate.effectiveDate
+                ? new Date(rate.effectiveDate).toISOString()
+                : '',
+              individual: rate.individual ?? 0,
+              family: rate.family ?? 0,
+              husbandWife: rate.husbandWife ?? 0,
+              parentChild: rate.parentChild ?? 0,
+              parentChildren: rate.parentChildren ?? 0,
+            }))
+          : null,
     }
 
-    if (isEditMode && employerId) {
-      updateEmployer(
-        { id: employerId, data: payload },
-        {
-          onSuccess: () => {
-            onSuccess?.()
-          },
-        },
-      )
-    } else {
-      createEmployer(payload, {
-        onSuccess: () => {
-          onSuccess?.()
-        },
-      })
-    }
+    createEmployer(createPayload, {
+      onSuccess: () => {
+        onSuccess?.()
+      },
+    })
   }
 
   const handleSave = () => {

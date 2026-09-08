@@ -356,6 +356,8 @@ export const EMPLOYER_CONTENT = {
     createError: 'Failed to create employer. Please try again.',
     updateSuccess: 'Employer updated successfully!',
     updateError: 'Failed to update employer. Please try again.',
+    updatePlanSuccess: 'Employer plan updated successfully!',
+    updatePlanError: 'Failed to update employer plan. Please try again.',
     deleteSuccess: 'Employer deleted successfully!',
     deleteError: 'Failed to delete employer. Please try again.',
   },

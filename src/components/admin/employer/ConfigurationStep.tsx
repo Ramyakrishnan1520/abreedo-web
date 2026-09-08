@@ -127,8 +127,9 @@ export function ConfigurationStep() {
                   type="number"
                   step="1"
                   placeholder={copy.monthlyAdminFeePlaceholder}
-                  className={FORM_INPUT_CLASS}
+                  className={`${FORM_INPUT_CLASS} [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none`}
                   value={field.value ?? ''}
+                  onWheel={(e) => e.currentTarget.blur()}
                   onChange={(e) => {
                     const rawVal = e.target.value
                     if (rawVal.length <= 16) {

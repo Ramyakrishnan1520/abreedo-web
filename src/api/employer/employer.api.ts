@@ -5,6 +5,7 @@ import type {
   EmployerApiItem,
   EmployerListResponse,
   EmployerPaginatedListResponse,
+  EmployerPlanUpdateRequest,
   EmployerUpsertRequest,
 } from '#/types/employer.ts'
 import type {
@@ -98,6 +99,13 @@ export async function updateEmployerApi(
   data: EmployerUpsertRequest,
 ): Promise<void> {
   await apiClient.put(`/api/v1/employers/${id}`, data)
+}
+
+export async function updateEmployerPlanApi(
+  id: string,
+  data: EmployerPlanUpdateRequest,
+): Promise<void> {
+  await apiClient.put(`/api/v1/employers/${id}/plan`, data)
 }
 
 export async function deleteEmployerApi(id: string): Promise<void> {
