@@ -1,8 +1,6 @@
 import { useFormContext } from 'react-hook-form'
 
-import { Checkbox } from '#/components/ui/checkbox.tsx'
 import { Textarea } from '#/components/ui/textarea.tsx'
-import { Separator } from '#/components/ui/separator.tsx'
 import {
   FormControl,
   FormField,
@@ -21,39 +19,21 @@ export function NotesStep() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h3 className="text-base font-bold text-slate-900">{copy.heading}</h3>
-        <p className="mt-1 text-sm text-slate-600">{copy.description}</p>
-      </div>
-
-      <Separator />
-
-      <FormField
-        control={form.control}
-        name="allowCobra"
-        render={({ field }) => (
-          <FormItem className="flex items-center gap-3 space-y-0 pt-2">
-            <FormLabel className="text-base font-bold text-slate-900 cursor-pointer">
-              {copy.allowCobraLabel}
-            </FormLabel>
-            <FormControl>
-              <Checkbox
-                checked={field.value}
-                onCheckedChange={field.onChange}
-              />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
+      <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 sm:text-sm">
+        {copy.heading}
+      </h3>
 
       <FormField
         control={form.control}
         name="notes"
         render={({ field }) => (
-          <FormItem>
+          <FormItem className="space-y-2">
+            <FormLabel className="text-sm font-bold text-slate-900 sm:text-base">
+              {copy.notesLabel}
+            </FormLabel>
             <FormControl>
               <Textarea
+                id="parent-company-notes"
                 placeholder={copy.placeholder}
                 className={FORM_TEXTAREA_CLASS}
                 {...field}

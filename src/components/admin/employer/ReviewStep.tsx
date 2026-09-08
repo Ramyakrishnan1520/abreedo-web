@@ -2,25 +2,44 @@ import { useMemo } from 'react'
 import { useFormContext } from 'react-hook-form'
 
 import { ReviewStep as CommonReviewStep } from '#/components/admin/common/ReviewSection'
-import { useAvailableCarriers } from '#/hooks/parent-company/useAvailableCarriers.ts'
-import { useParentCompanies } from '#/hooks/parent-company/useParentCompanies.ts'
+import { useParentCompany } from '#/hooks/parent-company/useParentCompany.ts'
 import { useGetStates } from '#/hooks/carrier/useGetStates.ts'
 import { EMPLOYER_CONTENT } from '#/utils/employer-content.ts'
 import { resolveSelectedCarrierOptions } from '#/utils/resolveSelectedCarrierOptions.ts'
 
-import { resolveOptionLabel } from '#/utils/resolveOptionLabel.ts'
-
 import type { EmployerFormValues } from '#/components/admin/employer/employer.schema.ts'
 import type { ReviewSectionConfig } from '#/types/review-steps.ts'
+import type { AvailableCarrierOption } from '#/types/parent-company.ts'
+import type { EmployerFormMode } from '#/utils/getEmployerStepValidationFields.ts'
 
 const copy = EMPLOYER_CONTENT.reviewStep
 
-export function ReviewStep() {
+export interface EmployerReviewStepProps {
+  mode?: EmployerFormMode
+}
+
+export function ReviewStep({ mode = 'create' }: EmployerReviewStepProps = {}) {
   const form = useFormContext<EmployerFormValues>()
   const values = form.getValues()
-  const { carriers } = useAvailableCarriers()
-  const { data: parentCompanies = [] } = useParentCompanies()
+  const { data: parentCompany } = useParentCompany(
+    values.parentCompanyId || undefined,
+  )
   const { data: states = [] } = useGetStates()
+
+  const parentCompanyCarriers = useMemo<AvailableCarrierOption[]>(() => {
+    const rawCarriers = parentCompany?.carriers ?? []
+    const map = new Map<string, AvailableCarrierOption>()
+
+    for (const item of rawCarriers) {
+      const id = item.carrierId ?? (item as unknown as { id: string }).id
+      const name = item.name
+      if (id && name && !map.has(String(id))) {
+        map.set(String(id), { id: String(id), name })
+      }
+    }
+
+    return Array.from(map.values())
+  }, [parentCompany?.carriers])
 
   const stateName = useMemo(() => {
     if (!values.state) return undefined
@@ -28,27 +47,22 @@ export function ReviewStep() {
   }, [states, values.state])
 
   const parentCompanyName = useMemo(() => {
-    return resolveOptionLabel(
-      values.parentCompanyId,
-      parentCompanies,
-      values.parentCompanyName,
-    )
-  }, [parentCompanies, values.parentCompanyId, values.parentCompanyName])
-
+    return parentCompany?.name || values.parentCompanyName || values.parentCompanyId
+  }, [parentCompany?.name, values.parentCompanyId, values.parentCompanyName])
 
   const selectedCarrierNames = useMemo(
     () =>
       resolveSelectedCarrierOptions(
         values.carrierIds ?? [],
-        carriers,
+        parentCompanyCarriers,
         values.linkedCarriers ?? [],
       ),
-    [carriers, values.carrierIds, values.linkedCarriers],
+    [parentCompanyCarriers, values.carrierIds, values.linkedCarriers],
   )
 
   const { sections: sectionTitles, fields } = copy
 
-  const sections: ReviewSectionConfig[] = useMemo(
+  const allSections: ReviewSectionConfig[] = useMemo(
     () => [
       {
         id: 'general',
@@ -284,8 +298,27 @@ export function ReviewStep() {
               ],
       },
     ],
-    [sectionTitles, fields, values, parentCompanyName, selectedCarrierNames],
+    [sectionTitles, fields, values, parentCompanyName, selectedCarrierNames, stateName],
   )
+
+  const sections = useMemo(() => {
+    if (mode === 'edit-general') {
+      return allSections.filter((s) =>
+        [
+          'general',
+          'address',
+          'contact',
+          'configuration',
+          'carriers',
+          'notes',
+        ].includes(s.id),
+      )
+    }
+    if (mode === 'edit-plan') {
+      return allSections.filter((s) => ['plan', 'rates'].includes(s.id))
+    }
+    return allSections
+  }, [allSections, mode])
 
   return (
     <CommonReviewStep

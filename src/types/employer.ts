@@ -21,6 +21,25 @@ export interface PlanRateItem {
   parentChildren?: number | null
 }
 
+export interface EmployerPlanRatePayload {
+  effectiveDate: string
+  individual?: number | null
+  family?: number | null
+  husbandWife?: number | null
+  parentChild?: number | null
+  parentChildren?: number | null
+}
+
+export interface EmployerPlanUpdateRequest {
+  planId: string
+  cgnGroupNumber?: string | null
+  brokerCodeId?: string | null
+  billerAccountNumber?: string | null
+  cgnCustomerNumber?: string | null
+  isActive?: boolean
+  planRates: EmployerPlanRatePayload[]
+}
+
 export interface EmployerApiItem {
   employerId: string
   id?: string

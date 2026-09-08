@@ -63,6 +63,8 @@ export const EMPLOYER_CONTENT = {
       deleteButton: 'Delete',
       backButton: 'Back',
       editButton: 'Edit',
+      editGeneralButton: 'Edit General',
+      editPlanButton: 'Edit Plan',
       confirmDeleteTitle: 'Delete Employer',
       confirmDeletePrompt:
         'Are you sure you want to delete this employer? This action cannot be undone.',
@@ -73,6 +75,13 @@ export const EMPLOYER_CONTENT = {
         detailLoad: 'Failed to load employer details. Please try again.',
       },
     },
+  },
+  filters: {
+    allParentCompanies: 'All Parent Companies',
+    parentCompanyLabel: 'Parent Company',
+    clearFilters: 'Clear Filters',
+    loadingMore: 'Loading more...',
+    parentCompanyPlaceholder: 'Filter by parent company...',
   },
   table: {
     emptyValue: '-',
@@ -93,6 +102,8 @@ export const EMPLOYER_CONTENT = {
     titles: {
       create: 'Create Employer',
       edit: 'Edit Employer',
+      editGeneral: 'Edit Employer (General)',
+      editPlan: 'Edit Employer (Plan & Rates)',
     },
     saveLabels: {
       create: 'Save',
@@ -111,6 +122,19 @@ export const EMPLOYER_CONTENT = {
       { id: 'plan', label: 'Plan', index: 5 },
       { id: 'rate', label: 'Rate', index: 6 },
       { id: 'review', label: 'Review', index: 7 },
+    ],
+    generalSteps: [
+      { id: 'general', label: 'General', index: 0 },
+      { id: 'contact', label: 'Contact', index: 1 },
+      { id: 'configuration', label: 'Configuration', index: 2 },
+      { id: 'carriers', label: 'Carriers', index: 3 },
+      { id: 'notes', label: 'Notes', index: 4 },
+      { id: 'review', label: 'Review', index: 5 },
+    ],
+    planSteps: [
+      { id: 'plan', label: 'Plan', index: 0 },
+      { id: 'rate', label: 'Rate', index: 1 },
+      { id: 'review', label: 'Review', index: 2 },
     ],
     validationSummary: 'Please fix the highlighted fields before saving.',
   },
@@ -196,12 +220,11 @@ export const EMPLOYER_CONTENT = {
     hintRight: 'Remove carriers from the right panel to deselect them.',
   },
   notesStep: {
-    heading: 'Administrative Notes',
-    description: 'Add any optional title or administrative notes for this employer.',
+    heading: 'EMPLOYER NOTES',
     titleLabel: 'Title',
     titlePlaceholder: 'Enter title for notes',
-    notesLabel: 'Notes',
-    notesPlaceholder: 'Paragraph describing any additional information needed...',
+    notesLabel: 'Administrative Notes (optional)',
+    notesPlaceholder: 'Additional details about this Employer.',
   },
   planStep: {
     heading: 'Plan',
@@ -333,6 +356,8 @@ export const EMPLOYER_CONTENT = {
     createError: 'Failed to create employer. Please try again.',
     updateSuccess: 'Employer updated successfully!',
     updateError: 'Failed to update employer. Please try again.',
+    updatePlanSuccess: 'Employer plan updated successfully!',
+    updatePlanError: 'Failed to update employer plan. Please try again.',
     deleteSuccess: 'Employer deleted successfully!',
     deleteError: 'Failed to delete employer. Please try again.',
   },
@@ -360,10 +385,13 @@ export const EMPLOYER_CONTENT = {
     emailMax: 'Email must be 254 characters or fewer',
 
     groupNumberRequired: 'Group Number is required',
-    groupNumberMax: 'Group Number must be 100 characters or fewer',
-    policyNumberMax: 'Policy Number must be 100 characters or fewer',
-    tpacNumberMax: 'TPAC Number must be 100 characters or fewer',
+    groupNumberMax: 'Group Number must be 10 characters or fewer',
+    policyNumberMax: 'Policy Number must be 50 characters or fewer',
+    tpacNumberMax: 'TPAC Number must be 3 characters or fewer',
+    monthlyAdminFeeMax: 'Monthly Admin Fee must be 16 digits or fewer',
     notesTitleMax: 'Notes Title must be 200 characters or fewer',
+    notesMax: 'Notes must be 2000 characters or fewer',
+    cgnCustomerNumberMax: 'Customer Number must be 10 characters or fewer',
 
     planRequired: 'Plan is required',
     cgnGroupNumberRequired: 'Group Number is required',

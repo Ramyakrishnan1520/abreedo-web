@@ -1,24 +1,60 @@
 import type { EmployerFormValues } from '#/components/admin/employer/employer.schema.ts'
 
+export type EmployerFormMode = 'create' | 'edit-general' | 'edit-plan'
+
 export function getEmployerStepValidationFields(
   step: number,
+  mode: EmployerFormMode = 'create',
 ): Array<keyof EmployerFormValues> {
+  if (mode === 'edit-general') {
+    switch (step) {
+      case 0: 
+        return ['name', 'parentCompanyId', 'address1', 'city', 'zip']
+      case 1: 
+        return ['contactFirst', 'contactLast', 'phone', 'fax', 'email']
+      case 2: 
+        return ['groupNumber']
+      case 3: 
+        return ['carrierIds']
+      case 4: // Notes
+        return []
+      case 5: // Review
+        return []
+      default:
+        return []
+    }
+  }
+
+  if (mode === 'edit-plan') {
+    switch (step) {
+      case 0: 
+        return ['planId', 'cgnGroupNumber', 'billerAccountNumber']
+      case 1: 
+        return ['planRates']
+      case 2: // Review
+        return []
+      default:
+        return []
+    }
+  }
+
+  // mode === 'create'
   switch (step) {
     case 0:
       return ['name', 'parentCompanyId', 'address1', 'city', 'zip']
-    case 1:
+    case 1: 
       return ['contactFirst', 'contactLast', 'phone', 'fax', 'email']
     case 2:
       return ['groupNumber']
     case 3:
       return ['carrierIds']
-    case 4:
+    case 4: // Notes
       return []
-    case 5:
+    case 5: 
       return ['planId', 'cgnGroupNumber', 'billerAccountNumber']
-    case 6:
+    case 6: 
       return ['planRates']
-    case 7:
+    case 7: // Review
       return []
     default:
       return []

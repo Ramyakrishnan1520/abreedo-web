@@ -18,6 +18,7 @@
   --tan-accent: #C9A876;
   --tan-accent-dark: #916E39;
   --tan-light: #F1E7D6;
+  --tan-subtle: #F7F2EB;
 
   /* Shadcn UI CSS Variables (WCAG AA Audited) */
   --background: #F8F8F6;
@@ -134,6 +135,7 @@
   --color-tan-accent: #C9A876;
   --color-tan-dark: #916E39;
   --color-tan-light: #F1E7D6;
+  --color-tan-subtle: #F7F2EB;
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);

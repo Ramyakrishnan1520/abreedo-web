@@ -49,6 +49,7 @@ export type PlanListResponse = PlanApiItem[] | PlanDtoPagedResult
 export interface GetPlansQueryParams {
   parentCompanyId?: string
   carrierId?: string
+  carrierIds?: string[]
   search?: string
   pageIndex: number
   pageSize: number

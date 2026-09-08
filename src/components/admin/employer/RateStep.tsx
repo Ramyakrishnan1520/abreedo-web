@@ -203,8 +203,9 @@ export function RateStep() {
                   step="0.01"
                   min="0"
                   placeholder={copy.individualPlaceholder}
-                  className={FORM_INPUT_CLASS}
+                  className={`${FORM_INPUT_CLASS} [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none`}
                   value={individual}
+                  onWheel={(e) => e.currentTarget.blur()}
                   onChange={(e) => {
                     setIndividual(e.target.value)
                     if (errors.individual) {
@@ -230,8 +231,9 @@ export function RateStep() {
                   step="0.01"
                   min="0"
                   placeholder={copy.parentChildPlaceholder}
-                  className={FORM_INPUT_CLASS}
+                  className={`${FORM_INPUT_CLASS} [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none`}
                   value={parentChild}
+                  onWheel={(e) => e.currentTarget.blur()}
                   onChange={(e) => {
                     setParentChild(e.target.value)
                     if (errors.parentChild) {
@@ -257,8 +259,9 @@ export function RateStep() {
                   step="0.01"
                   min="0"
                   placeholder={copy.parentChildrenPlaceholder}
-                  className={FORM_INPUT_CLASS}
+                  className={`${FORM_INPUT_CLASS} [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none`}
                   value={parentChildren}
+                  onWheel={(e) => e.currentTarget.blur()}
                   onChange={(e) => {
                     setParentChildren(e.target.value)
                     if (errors.parentChildren) {
@@ -284,8 +287,9 @@ export function RateStep() {
                   step="0.01"
                   min="0"
                   placeholder={copy.memberSpousePlaceholder}
-                  className={FORM_INPUT_CLASS}
+                  className={`${FORM_INPUT_CLASS} [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none`}
                   value={husbandWife}
+                  onWheel={(e) => e.currentTarget.blur()}
                   onChange={(e) => {
                     setHusbandWife(e.target.value)
                     if (errors.husbandWife) {
@@ -311,8 +315,9 @@ export function RateStep() {
                   step="0.01"
                   min="0"
                   placeholder={copy.familyPlaceholder}
-                  className={FORM_INPUT_CLASS}
+                  className={`${FORM_INPUT_CLASS} [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none`}
                   value={family}
+                  onWheel={(e) => e.currentTarget.blur()}
                   onChange={(e) => {
                     setFamily(e.target.value)
                     if (errors.family) {
@@ -343,7 +348,7 @@ export function RateStep() {
                 onClick={handleAddOrUpdateRate}
                 className="bg-[#94723C] hover:bg-[#805e2b] text-white cursor-pointer"
               >
-                <Plus className="mr-1.5 size-4" />
+                <Plus className="size-4" />
                 {isEditing ? copy.updateButton : copy.addButton}
               </Button>
             </div>

@@ -129,6 +129,7 @@ export const PARENT_COMPANY_CONTENT = {
     emailPlaceholder: 'ex. john.doe@example.com',
     websiteLabel: 'Website',
     websitePlaceholder: 'ex. https://yourcompany.com',
+    allowCobraLabel: 'Allow Cobra',
   },
   carriersStep: {
     heading: 'Carrier Selection',
@@ -152,10 +153,9 @@ export const PARENT_COMPANY_CONTENT = {
     hintRight: 'Remove carriers from the right panel to deselect them.',
   },
   notesStep: {
-    heading: 'Important Notes',
-    description:
-      'Add any additional information that should be recorded for this parent company.',
-    placeholder: 'Paragraph describing any additional information needed',
+    heading: 'PARENT COMPANY NOTES',
+    notesLabel: 'Administrative Notes (optional)',
+    placeholder: 'Additional details about this Parent Company.',
     allowCobraLabel: 'Allow Cobra',
   },
   reviewStep: {
@@ -184,6 +184,7 @@ export const PARENT_COMPANY_CONTENT = {
       fax: 'Fax',
       email: 'Email',
       website: 'Website',
+      allowCobra: 'Allow Cobra',
     },
     noCarriersSelected: 'No carriers selected.',
   },

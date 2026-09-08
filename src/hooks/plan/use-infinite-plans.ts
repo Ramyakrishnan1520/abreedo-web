@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { useInfiniteQuery } from '@tanstack/react-query'
 
 import { getPlansApi } from '#/api/plan/plan.api.ts'
@@ -7,13 +8,20 @@ export const PLAN_INFINITE_PAGE_SIZE = 20
 export interface UseInfinitePlansParams {
   parentCompanyId?: string
   carrierId?: string
+  carrierIds?: string[]
   search?: string
 }
 
 export function useInfinitePlans(params?: UseInfinitePlansParams) {
   const parentCompanyId = params?.parentCompanyId
   const carrierId = params?.carrierId
+  const carrierIds = params?.carrierIds
   const search = params?.search
+
+  const sortedCarrierIds = useMemo(
+    () => (carrierIds ? [...carrierIds].sort() : undefined),
+    [carrierIds],
+  )
 
   return useInfiniteQuery({
     queryKey: [
@@ -22,6 +30,7 @@ export function useInfinitePlans(params?: UseInfinitePlansParams) {
       PLAN_INFINITE_PAGE_SIZE,
       parentCompanyId ?? null,
       carrierId ?? null,
+      sortedCarrierIds ?? null,
       search ?? null,
     ],
     queryFn: ({ pageParam }) =>
@@ -30,6 +39,7 @@ export function useInfinitePlans(params?: UseInfinitePlansParams) {
         pageSize: PLAN_INFINITE_PAGE_SIZE,
         parentCompanyId,
         carrierId,
+        carrierIds: sortedCarrierIds,
         search,
       }),
     initialPageParam: 0,

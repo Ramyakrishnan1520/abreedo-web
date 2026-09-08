@@ -111,18 +111,6 @@ export function EditPlanPage() {
     })
   }
 
-  const handleClearAll = () => {
-    setSearchTerm('')
-    setActiveSearch('')
-    setParentCompanyId(undefined)
-    setCarrierId(undefined)
-    setPagination((prev) => ({ ...prev, pageIndex: 0 }))
-  }
-
-  const hasActiveFiltersOrSearch = Boolean(
-    parentCompanyId || carrierId || activeSearch || searchTerm,
-  )
-
   const columns = useMemo(
     () =>
       getPlanTableColumns({
@@ -185,8 +173,6 @@ export function EditPlanPage() {
                 onSearchTermChange={setSearchTerm}
                 onSearchSubmit={handleSearchSubmit}
                 onClearSearch={handleClearSearch}
-                onClearAll={handleClearAll}
-                hasActiveFiltersOrSearch={hasActiveFiltersOrSearch}
               />
             </CardContent>
           </Card>

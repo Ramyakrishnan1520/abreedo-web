@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { useFormContext } from 'react-hook-form'
 import { AlertCircle, Plus } from 'lucide-react'
 
@@ -33,6 +33,7 @@ export function PlanStep() {
     fetchNextPage: fetchNextPlansPage,
   } = useInfinitePlans({
     parentCompanyId: values.parentCompanyId,
+    carrierIds: values.carrierIds,
   })
 
   const [planSelectContent, setPlanSelectContent] =
@@ -121,6 +122,13 @@ export function PlanStep() {
   const [isEditing, setIsEditing] = useState<boolean>(false)
 
   const hasConfiguredPlan = Boolean(values.planId && values.cgnGroupNumber)
+
+  // If a plan is already configured set editing mode to true so the Update button is shown instead of Add.
+  useEffect(() => {
+    if (hasConfiguredPlan) {
+      setIsEditing(true);
+    }
+  }, [hasConfiguredPlan]);
 
   // Resolve labels for display in the table
   const selectedPlanLabel = useMemo(() => {
@@ -332,6 +340,7 @@ export function PlanStep() {
               placeholder={copy.customerNumberPlaceholder}
               className={FORM_INPUT_CLASS}
               value={draftCustomerNumber}
+              maxLength={10}
               onChange={(e) => setDraftCustomerNumber(e.target.value)}
             />
           </div>
@@ -395,9 +404,10 @@ export function PlanStep() {
           <Button
             type="button"
             onClick={handleAddOrUpdatePlan}
-            className="bg-[#94723C] hover:bg-[#805e2b] text-white cursor-pointer"
+            disabled={hasConfiguredPlan && !isEditing}
+            className="bg-[#94723C] hover:bg-[#805e2b] text-white disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
           >
-            <Plus className="mr-1.5 size-4" />
+            <Plus className="size-4" />
             {isEditing ? copy.updateButton : copy.addButton}
           </Button>
         </div>

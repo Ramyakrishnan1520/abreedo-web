@@ -51,6 +51,7 @@ export function ConfigurationStep() {
                   id="employer-group-number"
                   placeholder={copy.groupNumberPlaceholder}
                   className={FORM_INPUT_CLASS}
+                  maxLength={10}
                   {...field}
                 />
               </FormControl>
@@ -75,6 +76,7 @@ export function ConfigurationStep() {
                   id="employer-policy-number"
                   placeholder={copy.policyNumberPlaceholder}
                   className={FORM_INPUT_CLASS}
+                  maxLength={50}
                   {...field}
                 />
               </FormControl>
@@ -99,6 +101,7 @@ export function ConfigurationStep() {
                   id="employer-tpac-number"
                   placeholder={copy.tpacNumberPlaceholder}
                   className={FORM_INPUT_CLASS}
+                  maxLength={3}
                   {...field}
                 />
               </FormControl>
@@ -124,9 +127,15 @@ export function ConfigurationStep() {
                   type="number"
                   step="1"
                   placeholder={copy.monthlyAdminFeePlaceholder}
-                  className={FORM_INPUT_CLASS}
+                  className={`${FORM_INPUT_CLASS} [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none`}
                   value={field.value ?? ''}
-                  onChange={(e) => field.onChange(e.target.value === '' ? 0 : Number(e.target.value))}
+                  onWheel={(e) => e.currentTarget.blur()}
+                  onChange={(e) => {
+                    const rawVal = e.target.value
+                    if (rawVal.length <= 16) {
+                      field.onChange(rawVal === '' ? 0 : Number(rawVal))
+                    }
+                  }}
                 />
               </FormControl>
               <FormMessage />

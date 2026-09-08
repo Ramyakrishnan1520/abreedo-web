@@ -143,9 +143,9 @@ export const COVERAGE_CODE_CONTENT = {
     invoiceGroupPlaceholder: 'Enter invoice group',
   },
   notesStep: {
-    heading: 'Important Notes',
-    description: 'Add any optional administrative notes for this coverage code.',
-    placeholder: 'Paragraph describing any additional information needed',
+    heading: 'COVERAGE CODE NOTES',
+    notesLabel: 'Administrative Notes (optional)',
+    placeholder: 'Additional details about this Coverage Code.',
   },
   reviewStep: {
     heading: 'Review & Save',

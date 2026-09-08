@@ -28,7 +28,8 @@ import type { ReviewSectionConfig } from '#/types/review-steps.ts'
 interface EmployerDetailViewProps {
   employerId: string
   onBack: () => void
-  onEdit: () => void
+  onEditGeneral: () => void
+  onEditPlan: () => void
   onDeleteSuccess: () => void
 }
 
@@ -38,7 +39,8 @@ const reviewCopy = EMPLOYER_CONTENT.reviewStep
 export function EmployerDetailView({
   employerId,
   onBack,
-  onEdit,
+  onEditGeneral,
+  onEditPlan,
   onDeleteSuccess,
 }: EmployerDetailViewProps) {
   const [showConfirmDelete, setShowConfirmDelete] = useState(false)
@@ -459,12 +461,14 @@ export function EmployerDetailView({
             idPrefix="employer-view"
             deleteLabel={copy.deleteButton}
             backLabel={copy.backButton}
-            editLabel={copy.editButton}
+            editLabel={copy.editGeneralButton}
+            secondaryEditLabel={copy.editPlanButton}
             isDeleting={isDeleting}
             isDeleteDisabled={showConfirmDelete}
             onDelete={() => setShowConfirmDelete(true)}
             onBack={onBack}
-            onEdit={onEdit}
+            onEdit={onEditGeneral}
+            onSecondaryEdit={onEditPlan}
           />
         </CardContent>
       </Card>

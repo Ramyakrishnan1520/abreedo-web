@@ -97,6 +97,7 @@ export interface ParentCompanyContent {
       fax: string
       email: string
       website: string
+      allowCobra: string
     }
   }
   validation: Record<string, string>

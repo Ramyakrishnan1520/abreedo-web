@@ -67,25 +67,30 @@ export async function createPlanApi(
 export async function getPlansApi(
   params: GetPlansQueryParams,
 ): Promise<PaginatedResult<Plan>> {
-  const queryParams: Record<string, string | number> = {
-    Page: params.pageIndex + 1,
-    PageSize: params.pageSize,
-  }
+  const searchParams = new URLSearchParams()
+  searchParams.append('Page', String(params.pageIndex + 1))
+  searchParams.append('PageSize', String(params.pageSize))
 
   if (params.parentCompanyId && params.parentCompanyId.trim() !== '') {
-    queryParams.parentCompanyId = params.parentCompanyId
+    searchParams.append('parentCompanyId', params.parentCompanyId.trim())
   }
 
-  if (params.carrierId && params.carrierId.trim() !== '') {
-    queryParams.carrierId = params.carrierId
+  if (params.carrierIds && params.carrierIds.length > 0) {
+    for (const carrierId of params.carrierIds) {
+      if (carrierId && carrierId.trim() !== '') {
+        searchParams.append('carrierIds', carrierId.trim())
+      }
+    }
+  } else if (params.carrierId && params.carrierId.trim() !== '') {
+    searchParams.append('carrierId', params.carrierId.trim())
   }
 
   if (params.search && params.search.trim() !== '') {
-    queryParams.search = params.search.trim()
+    searchParams.append('search', params.search.trim())
   }
 
   const { data } = await apiClient.get<PlanListResponse>('/api/v1/Plans', {
-    params: queryParams,
+    params: searchParams,
   })
 
   const request: PaginationRequest = {

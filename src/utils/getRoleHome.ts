@@ -4,5 +4,5 @@ import { ROUTES } from '#/static/routes.ts'
 import type { AppRoute } from '#/static/routes.ts'
 
 export function getRoleHome(role: UserRole): AppRoute {
-  return role === UserRole.Admin ? ROUTES.ADMIN_USERS : ROUTES.EMPLOYEE_ROOT
+  return role === UserRole.Admin ? ROUTES.ADMIN_PARENT_SETUP : ROUTES.EMPLOYEE_ROOT
 }

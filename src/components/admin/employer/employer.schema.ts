@@ -73,18 +73,23 @@ export const employerSchema = z.object({
 
   // Company Group Number Step
   groupNumber: requiredTextSchema(v.groupNumberRequired, {
-    max: 100,
+    max: 10,
     maxMessage: v.groupNumberMax,
   }),
   policyNumber: optionalTextSchema({
-    max: 100,
+    max: 50,
     maxMessage: v.policyNumberMax,
   }),
   tpacNumber: optionalTextSchema({
-    max: 100,
+    max: 3,
     maxMessage: v.tpacNumberMax,
   }),
-  monthlyAdminFee: z.number().int().nonnegative().optional(),
+  monthlyAdminFee: z
+    .number()
+    .int()
+    .nonnegative()
+    .max(9999999999999999, v.monthlyAdminFeeMax)
+    .optional(),
   status: z.number().optional(),
   isPaper: z.boolean().optional(),
   allowCobra: z.boolean().optional(),
@@ -97,7 +102,7 @@ export const employerSchema = z.object({
     max: 200,
     maxMessage: v.notesTitleMax,
   }),
-  notes: optionalNotesSchema(),
+  notes: optionalNotesSchema({ max: 2000, maxMessage: v.notesMax }),
 
   // Plan Step
   planId: requiredTextSchema(v.planRequired),
@@ -109,7 +114,8 @@ export const employerSchema = z.object({
     max: 100,
   }),
   cgnCustomerNumber: optionalTextSchema({
-    max: 100,
+    max: 10,
+    maxMessage: v.cgnCustomerNumberMax,
   }),
   brokerCodeId: optionalTextSchema(),
   brokerCodeName: optionalTextSchema(),
@@ -132,6 +138,37 @@ export const employerSchema = z.object({
     .min(1, v.rateRequiresAtLeastOne),
 })
 
+export const employerGeneralEditSchema = employerSchema.extend({
+  planId: optionalTextSchema(),
+  cgnGroupNumber: optionalTextSchema(),
+  billerAccountNumber: optionalTextSchema(),
+  planRates: z
+    .array(
+      z.object({
+        id: z.string().optional(),
+        planRateId: z.string().optional(),
+        effectiveDate: optionalTextSchema(),
+        individual: z.number().nullable().optional(),
+        parentChild: z.number().nullable().optional(),
+        parentChildren: z.number().nullable().optional(),
+        husbandWife: z.number().nullable().optional(),
+        family: z.number().nullable().optional(),
+      }),
+    )
+    .optional(),
+})
+
+export const employerPlanEditSchema = employerSchema.extend({
+  name: optionalTextSchema(),
+  parentCompanyId: optionalTextSchema(),
+  address1: optionalTextSchema(),
+  city: optionalTextSchema(),
+  zip: optionalTextSchema(),
+  contactFirst: optionalTextSchema(),
+  contactLast: optionalTextSchema(),
+  groupNumber: optionalTextSchema(),
+})
+
 export type EmployerFormValues = z.infer<typeof employerSchema>
-export type PlanRateFormItem = EmployerFormValues['planRates'][number]
+export type PlanRateFormItem = NonNullable<EmployerFormValues['planRates']>[number]
 
