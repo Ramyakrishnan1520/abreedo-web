@@ -113,6 +113,7 @@ export const PLAN_CONTENT = {
     linkedHeading: 'Linked Plans',
     linkedDescription: 'Optionally link this plan to other existing plans.',
     labels: {
+      parentCompany: 'Parent Company',
       coverageCode: 'Coverage Code',
       commissionCode: 'Commission Code',
       option: 'Option',
@@ -123,7 +124,11 @@ export const PLAN_CONTENT = {
       linkedPlan2: 'Linked Plan 2',
     },
     placeholders: {
+      parentCompanySelect: 'Select parent company...',
+      parentCompanyLoading: 'Loading parent companies...',
       coverageCodeSelect: 'Select coverage code...',
+      coverageCodeSelectParentCompanyFirst:
+        'Select a parent company first...',
       coverageCodeLoading: 'Loading coverage codes...',
       commissionCodeSelect: 'Select commission code...',
       commissionCodeLoading: 'Loading commission codes...',
@@ -132,6 +137,8 @@ export const PLAN_CONTENT = {
       effectiveDate: 'Select effective date...',
       groupTypeSelect: 'Select group type...',
       linkedPlanSelect: 'Select a plan (optional)...',
+      linkedPlanSelectParentCompanyFirst:
+        'Select a parent company first...',
       linkedPlanLoading: 'Loading plans...',
     },
     loadingMore: 'Loading more...',
@@ -145,6 +152,7 @@ export const PLAN_CONTENT = {
       linked: 'Linked Plans',
     },
     fields: {
+      parentCompany: 'Parent Company',
       coverageCode: 'Coverage Code',
       commissionCode: 'Commission Code',
       option: 'Option',
@@ -156,6 +164,7 @@ export const PLAN_CONTENT = {
     },
   },
   validation: {
+    parentCompanyRequired: 'Parent Company is required',
     coverageCodeRequired: 'Coverage Code is required',
     commissionCodeRequired: 'Commission Code is required',
     optionRequired: 'Option is required',

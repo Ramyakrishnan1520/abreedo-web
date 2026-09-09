@@ -76,16 +76,24 @@ export async function getCoverageTypesApi(): Promise<GetCoverageTypesResponse> {
 export async function getCoverageCodesApi(
   request: PaginationRequest,
   search?: string,
+  parentCompanyId?: string,
 ): Promise<PaginatedResult<CoverageCode>> {
+  const params: Record<string, unknown> = {
+    page: request.pageIndex + 1,
+    pageSize: request.pageSize,
+  }
+
+  if (search?.trim()) {
+    params.search = search.trim()
+  }
+
+  if (parentCompanyId?.trim()) {
+    params.parentCompanyId = parentCompanyId.trim()
+  }
+
   const { data } = await apiClient.get<CoverageCodeListResponse>(
     '/api/v1/coverageCodes',
-    {
-      params: {
-        page: request.pageIndex + 1,
-        pageSize: request.pageSize,
-        search: search?.trim() || undefined,
-      },
-    },
+    { params },
   )
 
   if (Array.isArray(data)) {

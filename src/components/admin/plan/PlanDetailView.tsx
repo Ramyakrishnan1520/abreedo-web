@@ -13,6 +13,7 @@ import {
   CardTitle,
 } from '#/components/ui/card.tsx'
 import { useInfiniteCoverageCodeOptions } from '#/hooks/coverage-code/use-infinite-coverage-code-options.ts'
+import { useAvailableParentCompanies } from '#/hooks/parent-company/useAvailableParentCompanies.ts'
 import { useCommissionCodeOptions } from '#/hooks/commisssion-code/useCommissionCodeOptions'
 import { useInfinitePlanOptions } from '#/hooks/plan/use-infinite-plan-options.ts'
 import { useGroupTypeOptions } from '#/hooks/plan/useGroupTypeOptions.ts'
@@ -44,10 +45,23 @@ export function PlanDetailView({
   const { data: planDetail, isLoading, isError } = usePlan(planId)
   const { mutate: deletePlan, isPending: isDeleting } = useDeletePlan()
 
-  const { coverageCodes } = useInfiniteCoverageCodeOptions()
+  const { parentCompanies } = useAvailableParentCompanies()
+  const { coverageCodes } = useInfiniteCoverageCodeOptions(
+    planDetail?.parentCompanyId ?? undefined,
+  )
   const { options: commissionCodeOptions } = useCommissionCodeOptions()
   const { options: groupTypeOptions } = useGroupTypeOptions()
-  const { plans } = useInfinitePlanOptions()
+  const { plans } = useInfinitePlanOptions(
+    planDetail?.parentCompanyId ?? undefined,
+  )
+
+  const parentCompanyName = useMemo(() => {
+    return resolveOptionLabel(
+      planDetail?.parentCompanyId,
+      parentCompanies,
+      planDetail?.parentCompanyName,
+    )
+  }, [parentCompanies, planDetail?.parentCompanyId, planDetail?.parentCompanyName])
 
   const coverageCodeName = useMemo(() => {
     return resolveOptionLabel(
@@ -110,6 +124,11 @@ export function PlanDetailView({
             items: [
               {
                 type: 'text',
+                label: reviewCopy.fields.parentCompany,
+                value: parentCompanyName,
+              },
+              {
+                type: 'text',
                 label: reviewCopy.fields.coverageCode,
                 value: coverageCodeName ?? planDetail.coverageCodeTitle ?? undefined,
               },
@@ -160,6 +179,7 @@ export function PlanDetailView({
         : [],
     [
       planDetail,
+      parentCompanyName,
       coverageCodeName,
       commissionCodeName,
       formattedEffectiveDate,

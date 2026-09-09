@@ -18,6 +18,7 @@ import {
 import { Input } from '#/components/ui/input.tsx'
 import { Separator } from '#/components/ui/separator.tsx'
 import { useInfiniteCoverageCodeOptions } from '#/hooks/coverage-code/use-infinite-coverage-code-options.ts'
+import { useAvailableParentCompanies } from '#/hooks/parent-company/useAvailableParentCompanies.ts'
 import { useCommissionCodeOptions } from '#/hooks/commisssion-code/useCommissionCodeOptions'
 import { useInfinitePlanOptions } from '#/hooks/plan/use-infinite-plan-options.ts'
 import { useGroupTypeOptions } from '#/hooks/plan/useGroupTypeOptions.ts'
@@ -32,7 +33,29 @@ const copy = PLAN_CONTENT.generalStep
 export function GeneralStep() {
   const form = useFormContext<PlanFormSchemaValues>()
 
-  // Coverage Code infinite scroll setup
+  const selectedParentCompanyId = form.watch('parentCompanyId')
+
+  // Parent Company infinite scroll setup
+  const {
+    parentCompanies = [],
+    isLoading: isLoadingParentCompanies,
+    isFetchingNextPage: isFetchingNextParentCompaniesPage,
+    hasNextPage: hasNextParentCompaniesPage,
+    fetchNextPage: fetchNextParentCompaniesPage,
+  } = useAvailableParentCompanies()
+
+  const [parentCompanySelectContent, setParentCompanySelectContent] =
+    useState<HTMLDivElement | null>(null)
+  const [parentCompanySelectOpen, setParentCompanySelectOpen] = useState(false)
+  const parentCompanyLoadMoreRef = useLoadMoreIntersection({
+    hasNextPage: hasNextParentCompaniesPage,
+    isFetchingNextPage: isFetchingNextParentCompaniesPage,
+    fetchNextPage: fetchNextParentCompaniesPage,
+    enabled: parentCompanySelectOpen,
+    root: parentCompanySelectContent,
+  })
+
+  // Coverage Code infinite scroll setup (dependent on parentCompanyId)
   const {
     coverageCodes,
     isLoading: coverageCodesLoading,
@@ -40,7 +63,7 @@ export function GeneralStep() {
     isFetchingNextPage: coverageCodesFetchingNextPage,
     hasNextPage: coverageCodesHasNextPage,
     fetchNextPage: fetchNextCoverageCodesPage,
-  } = useInfiniteCoverageCodeOptions()
+  } = useInfiniteCoverageCodeOptions(selectedParentCompanyId)
 
   const [coverageCodeSelectContent, setCoverageCodeSelectContent] =
     useState<HTMLDivElement | null>(null)
@@ -64,7 +87,7 @@ export function GeneralStep() {
   const { options: groupTypeOptions, isLoading: groupTypeLoading } =
     useGroupTypeOptions()
 
-  // Linked Plans infinite scroll setup
+  // Linked Plans infinite scroll setup (dependent on parentCompanyId)
   const {
     plans,
     isLoading: plansLoading,
@@ -72,7 +95,7 @@ export function GeneralStep() {
     isFetchingNextPage: plansFetchingNextPage,
     hasNextPage: plansHasNextPage,
     fetchNextPage: fetchNextPlansPage,
-  } = useInfinitePlanOptions()
+  } = useInfinitePlanOptions(selectedParentCompanyId)
 
   const [linkedPlanSelectContent, setLinkedPlanSelectContent] =
     useState<HTMLDivElement | null>(null)
@@ -98,6 +121,17 @@ export function GeneralStep() {
 
   const selectedLinkedPlanId = form.watch('linkedPlanId')
   const selectedLinkedPlan2Id = form.watch('linkedPlan2Id')
+
+  const parentCompanyOptions = useMemo(
+    () =>
+      parentCompanies
+        .filter((pc) => Boolean(pc.id && String(pc.id).trim() !== ''))
+        .map((pc) => ({
+          value: String(pc.id),
+          label: pc.name,
+        })),
+    [parentCompanies],
+  )
 
   const coverageCodeOptions = useMemo(
     () =>
@@ -142,6 +176,61 @@ export function GeneralStep() {
         </div>
 
         <div className="space-y-4 rounded-xl border border-slate-200 bg-slate-50/40 p-4 sm:p-5">
+          {/* Parent Company Dropdown */}
+          <FormField
+            control={form.control}
+            name="parentCompanyId"
+            render={({ field }) => (
+              <FormItem className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-start sm:gap-4">
+                <FormLabel className={cn(LABEL_COL, REQUIRED_LABEL_CLASS)}>
+                  {copy.labels.parentCompany}
+                </FormLabel>
+                <div className="space-y-1">
+                  <FormControl>
+                    <ConfigurableSelect
+                      id="plan-parent-company"
+                      value={field.value}
+                      onValueChange={(newVal) => {
+                        const previousVal = field.value
+                        field.onChange(newVal)
+                        const picked = parentCompanyOptions.find(
+                          (p) => p.value === newVal,
+                        )
+                        if (picked) {
+                          form.setValue('parentCompanyName', picked.label)
+                        }
+                        if (previousVal !== newVal) {
+                          form.setValue('coverageCodeId', '')
+                          form.setValue('coverageCodeTitle', '')
+                          form.setValue('linkedPlanId', '')
+                          form.setValue('linkedPlanName', '')
+                          form.setValue('linkedPlan2Id', '')
+                          form.setValue('linkedPlan2Name', '')
+                        }
+                      }}
+                      options={parentCompanyOptions}
+                      selectedLabel={form.watch('parentCompanyName')}
+                      loading={isLoadingParentCompanies}
+                      placeholder={copy.placeholders.parentCompanySelect}
+                      loadingPlaceholder={
+                        copy.placeholders.parentCompanyLoading
+                      }
+                      open={parentCompanySelectOpen}
+                      onOpenChange={setParentCompanySelectOpen}
+                      onContentRef={setParentCompanySelectContent}
+                      loadMoreRef={parentCompanyLoadMoreRef}
+                      isFetchingNextPage={isFetchingNextParentCompaniesPage}
+                      loadingMoreLabel={copy.loadingMore}
+                      triggerClassName={FORM_INPUT_CLASS}
+                      contentClassName="max-h-60"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </div>
+              </FormItem>
+            )}
+          />
+
           {/* Coverage Code Dropdown */}
           <FormField
             control={form.control}
@@ -156,6 +245,7 @@ export function GeneralStep() {
                     <ConfigurableSelect
                       id="plan-coverage-code"
                       value={field.value}
+                      disabled={!selectedParentCompanyId}
                       onValueChange={(newVal) => {
                         field.onChange(newVal)
                         const picked = coverageCodeOptions.find(
@@ -168,7 +258,12 @@ export function GeneralStep() {
                       options={coverageCodeOptions}
                       selectedLabel={form.watch('coverageCodeTitle')}
                       loading={coverageCodesLoading}
-                      placeholder={copy.placeholders.coverageCodeSelect}
+                      placeholder={
+                        !selectedParentCompanyId
+                          ? copy.placeholders
+                              .coverageCodeSelectParentCompanyFirst
+                          : copy.placeholders.coverageCodeSelect
+                      }
                       loadingPlaceholder={
                         copy.placeholders.coverageCodeLoading
                       }
@@ -181,9 +276,8 @@ export function GeneralStep() {
                       triggerClassName={FORM_INPUT_CLASS}
                       contentClassName="max-h-60"
                     />
-
                   </FormControl>
-                  {coverageCodesError && (
+                  {coverageCodesError && selectedParentCompanyId && (
                     <p className="text-xs font-medium text-destructive">
                       {copy.placeholders.coverageCodeLoading}
                     </p>
@@ -358,6 +452,7 @@ export function GeneralStep() {
                     <ConfigurableSelect
                       id="plan-linked-plan"
                       value={field.value || ''}
+                      disabled={!selectedParentCompanyId}
                       onValueChange={(newVal) => {
                         field.onChange(newVal)
                         const picked = linkedPlan1Options.find(
@@ -370,7 +465,12 @@ export function GeneralStep() {
                       options={linkedPlan1Options}
                       selectedLabel={form.watch('linkedPlanName')}
                       loading={plansLoading}
-                      placeholder={copy.placeholders.linkedPlanSelect}
+                      placeholder={
+                        !selectedParentCompanyId
+                          ? copy.placeholders
+                              .linkedPlanSelectParentCompanyFirst
+                          : copy.placeholders.linkedPlanSelect
+                      }
                       loadingPlaceholder={
                         copy.placeholders.linkedPlanLoading
                       }
@@ -384,7 +484,7 @@ export function GeneralStep() {
                       contentClassName="max-h-60"
                     />
                   </FormControl>
-                  {plansError && (
+                  {plansError && selectedParentCompanyId && (
                     <p className="text-xs font-medium text-destructive">
                       {copy.placeholders.linkedPlanLoading}
                     </p>
@@ -409,6 +509,7 @@ export function GeneralStep() {
                     <ConfigurableSelect
                       id="plan-linked-plan-2"
                       value={field.value || ''}
+                      disabled={!selectedParentCompanyId}
                       onValueChange={(newVal) => {
                         field.onChange(newVal)
                         const picked = linkedPlan2Options.find(
@@ -421,7 +522,12 @@ export function GeneralStep() {
                       options={linkedPlan2Options}
                       selectedLabel={form.watch('linkedPlan2Name')}
                       loading={plansLoading}
-                      placeholder={copy.placeholders.linkedPlanSelect}
+                      placeholder={
+                        !selectedParentCompanyId
+                          ? copy.placeholders
+                              .linkedPlanSelectParentCompanyFirst
+                          : copy.placeholders.linkedPlanSelect
+                      }
                       loadingPlaceholder={
                         copy.placeholders.linkedPlanLoading
                       }
@@ -435,7 +541,11 @@ export function GeneralStep() {
                       contentClassName="max-h-60"
                     />
                   </FormControl>
-
+                  {plansError && selectedParentCompanyId && (
+                    <p className="text-xs font-medium text-destructive">
+                      {copy.placeholders.linkedPlanLoading}
+                    </p>
+                  )}
                   <FormMessage />
                 </div>
               </FormItem>

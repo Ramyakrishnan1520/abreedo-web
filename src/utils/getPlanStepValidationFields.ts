@@ -8,6 +8,7 @@ export function getPlanStepValidationFields(
   switch (stepIndex) {
     case 0:
       return [
+        'parentCompanyId',
         'coverageCodeId',
         'commissionCodeId',
         'option',
