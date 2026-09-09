@@ -23,6 +23,11 @@ export function useInfinitePlans(params?: UseInfinitePlansParams) {
     [carrierIds],
   )
 
+  const isParentCompanyParamProvided = parentCompanyId !== undefined
+  const isParentCompanyValid = Boolean(
+    parentCompanyId && parentCompanyId.trim() !== '',
+  )
+
   return useInfiniteQuery({
     queryKey: [
       'plans',
@@ -33,6 +38,7 @@ export function useInfinitePlans(params?: UseInfinitePlansParams) {
       sortedCarrierIds ?? null,
       search ?? null,
     ],
+    enabled: isParentCompanyParamProvided ? isParentCompanyValid : true,
     queryFn: ({ pageParam }) =>
       getPlansApi({
         pageIndex: pageParam,

@@ -10,7 +10,8 @@ const val = PLAN_CONTENT.validation
 
 export const planSchema = z
   .object({
-    parentCompanyId: z.string(),
+    parentCompanyId: requiredTextSchema(val.parentCompanyRequired),
+    parentCompanyName: optionalTextSchema(),
     coverageCodeId: requiredTextSchema(val.coverageCodeRequired),
     coverageCodeTitle: optionalTextSchema(),
     commissionCodeId: optionalTextSchema(),

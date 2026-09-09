@@ -1,11 +1,12 @@
-import { DEFAULT_PARENT_COMPANY_ID, type PlanApiItem } from '#/types/plan.ts'
+import type { PlanApiItem } from '#/types/plan.ts'
 import type { PlanFormSchemaValues } from '#/components/admin/plan/plan.schema.ts'
 
 export function mapPlanDetailToFormValues(
   detail: PlanApiItem,
 ): PlanFormSchemaValues {
   return {
-    parentCompanyId: detail.parentCompanyId || DEFAULT_PARENT_COMPANY_ID,
+    parentCompanyId: detail.parentCompanyId ?? '',
+    parentCompanyName: detail.parentCompanyName ?? '',
     coverageCodeId: detail.coverageCodeId ?? '',
     coverageCodeTitle: detail.coverageCodeTitle ?? '',
     commissionCodeId: detail.commissionCodeId ?? '',

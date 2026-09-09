@@ -4,8 +4,10 @@ import { useInfinitePlans } from './use-infinite-plans.ts'
 
 import type { Plan } from '#/types/plan.ts'
 
-export function useInfinitePlanOptions() {
-  const query = useInfinitePlans()
+export function useInfinitePlanOptions(parentCompanyId?: string) {
+  const query = useInfinitePlans(
+    parentCompanyId !== undefined ? { parentCompanyId } : undefined,
+  )
 
   const plans = useMemo<Plan[]>(() => {
     const pages = query.data?.pages ?? []

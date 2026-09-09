@@ -1,5 +1,3 @@
-export const DEFAULT_PARENT_COMPANY_ID =
-  '8B374850-56B4-409C-B25D-32230F70BF81'
 
 export interface Plan {
   id: string

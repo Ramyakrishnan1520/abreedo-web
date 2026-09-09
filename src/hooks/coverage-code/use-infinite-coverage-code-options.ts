@@ -4,8 +4,8 @@ import { useInfiniteCoverageCodes } from './use-infinite-coverage-codes.ts'
 
 import type { CoverageCode } from '#/types/coverage-code.ts'
 
-export function useInfiniteCoverageCodeOptions() {
-  const query = useInfiniteCoverageCodes()
+export function useInfiniteCoverageCodeOptions(parentCompanyId?: string) {
+  const query = useInfiniteCoverageCodes(parentCompanyId)
 
   const coverageCodes = useMemo<CoverageCode[]>(() => {
     const pages = query.data?.pages ?? []

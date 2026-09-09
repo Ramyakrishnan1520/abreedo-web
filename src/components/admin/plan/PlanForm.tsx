@@ -22,10 +22,7 @@ import { useUpdatePlan } from '#/hooks/plan/useUpdatePlan.ts'
 import { PLAN_CONTENT } from '#/utils/plan-content.ts'
 import { getPlanStepValidationFields } from '#/utils/getPlanStepValidationFields.ts'
 
-import {
-  DEFAULT_PARENT_COMPANY_ID,
-  type CreatePlanRequest,
-} from '#/types/plan.ts'
+import type { CreatePlanRequest } from '#/types/plan.ts'
 
 const { form: formCopy } = PLAN_CONTENT
 
@@ -98,7 +95,7 @@ export function PlanForm({
   const onSubmit = (data: PlanFormSchemaValues) => {
     const payload: CreatePlanRequest = {
       code: null,
-      parentCompanyId: data.parentCompanyId || DEFAULT_PARENT_COMPANY_ID,
+      parentCompanyId: data.parentCompanyId || null,
       commissionCodeId: data.commissionCodeId || null,
       name: data.name,
       option: data.option,

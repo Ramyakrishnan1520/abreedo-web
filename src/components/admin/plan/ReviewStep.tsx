@@ -3,6 +3,7 @@ import { useFormContext } from 'react-hook-form'
 
 import { ReviewStep as CommonReviewStep } from '#/components/admin/common/ReviewSection'
 import { useInfiniteCoverageCodeOptions } from '#/hooks/coverage-code/use-infinite-coverage-code-options.ts'
+import { useAvailableParentCompanies } from '#/hooks/parent-company/useAvailableParentCompanies.ts'
 import { useCommissionCodeOptions } from '#/hooks/commisssion-code/useCommissionCodeOptions'
 import { useInfinitePlanOptions } from '#/hooks/plan/use-infinite-plan-options.ts'
 import { useGroupTypeOptions } from '#/hooks/plan/useGroupTypeOptions.ts'
@@ -18,10 +19,19 @@ export function ReviewStep() {
   const values = form.getValues()
   const copy = PLAN_CONTENT.reviewStep
 
-  const { coverageCodes } = useInfiniteCoverageCodeOptions()
+  const { parentCompanies } = useAvailableParentCompanies()
+  const { coverageCodes } = useInfiniteCoverageCodeOptions(values.parentCompanyId)
   const { options: commissionCodeOptions } = useCommissionCodeOptions()
   const { options: groupTypeOptions } = useGroupTypeOptions()
-  const { plans } = useInfinitePlanOptions()
+  const { plans } = useInfinitePlanOptions(values.parentCompanyId)
+
+  const parentCompanyName = useMemo(() => {
+    return resolveOptionLabel(
+      values.parentCompanyId,
+      parentCompanies,
+      values.parentCompanyName,
+    )
+  }, [parentCompanies, values.parentCompanyId, values.parentCompanyName])
 
   const coverageCodeName = useMemo(() => {
     return resolveOptionLabel(
@@ -65,12 +75,16 @@ export function ReviewStep() {
   }, [plans, values.linkedPlan2Id, values.linkedPlan2Name])
 
   const sections: ReviewSectionConfig[] = useMemo(
-
     () => [
       {
         id: 'general',
         title: copy.sections.general,
         items: [
+          {
+            type: 'text',
+            label: copy.fields.parentCompany,
+            value: parentCompanyName,
+          },
           {
             type: 'text',
             label: copy.fields.coverageCode,
@@ -122,6 +136,7 @@ export function ReviewStep() {
     ],
     [
       values,
+      parentCompanyName,
       coverageCodeName,
       commissionCodeName,
       groupTypeName,
