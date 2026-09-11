@@ -42,6 +42,13 @@ export function GeneralStep() {
 
   return (
     <div className="space-y-6">
+      <div className="space-y-1">
+        <h3 className="text-sm font-bold uppercase tracking-wide text-slate-700">
+          {copy.heading}
+        </h3>
+        <p className="text-sm text-slate-500">{copy.description}</p>
+      </div>
+
       {/* Carrier Name */}
       <FormField
         control={form.control}
@@ -64,7 +71,7 @@ export function GeneralStep() {
         )}
       />
 
-      {/* Group Number */}
+      {/* Short Description */}
       <FormField
         control={form.control}
         name="groupNumber"

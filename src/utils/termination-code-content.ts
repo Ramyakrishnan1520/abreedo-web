@@ -1,6 +1,6 @@
 export const TERMINATION_CODE_CONTENT = {
   list: {
-    kicker: 'Site Manager',
+    kicker: '',
     title: 'Termination Codes',
     description:
       'Manage termination code records, COBRA notice requirements, and coverage rules.',
@@ -11,10 +11,10 @@ export const TERMINATION_CODE_CONTENT = {
   pages: {
     index: {
       kicker: 'Administration',
-      title: 'Update Termination Codes',
+      title: 'Termination Code Setup',
       description:
-        'Select an action below to set up a new termination code or manage existing termination codes.',
-      chooseHeading: 'Please Choose',
+        '',
+      chooseHeading: 'Select a task:',
       cards: {
         new: {
           title: 'New Termination Code',
@@ -31,7 +31,7 @@ export const TERMINATION_CODE_CONTENT = {
     },
     edit: {
       kicker: 'Administration',
-      title: 'Termination Code Edit',
+      title: 'Update Current Termination Code',
       description:
         'Search and select a termination code to load its details, then update using guided steps.',
       selectLabel: 'Select Termination Code',
@@ -45,7 +45,7 @@ export const TERMINATION_CODE_CONTENT = {
       emptyStateTitle: 'Ready when you are',
       editingLabel: 'Editing:',
       loadingDetails: 'Loading termination code details...',
-      searchPlaceholder: 'Search by termination code or name...',
+      searchPlaceholder: 'Search by termination code or name',
       searchButton: 'Search',
       clearButton: 'Clear',
       viewTitle: 'Termination Code Details',
@@ -70,7 +70,7 @@ export const TERMINATION_CODE_CONTENT = {
     emptyValue: '-',
     columns: {
       code: 'Code',
-      name: 'Name',
+      name: 'Termination Name',
       cobraTerm: 'COBRA Term',
       coverageMonths: 'COBRA Term',
       cobraNotice: 'COBRA Notice',
@@ -83,10 +83,10 @@ export const TERMINATION_CODE_CONTENT = {
     deleteAria: (code: string) => `Delete ${code}`,
   },
   form: {
-    kicker: 'Site Manager',
+    kicker: '',
     defaultTitle: 'New Termination Code',
     titles: {
-      create: 'Create Termination Code',
+      create: 'New Termination Code',
       edit: 'Edit Termination Code',
     },
     saveLabels: {
@@ -108,13 +108,13 @@ export const TERMINATION_CODE_CONTENT = {
     },
   },
   generalStep: {
-    heading: 'General Information',
-    description: 'Enter the main details for this termination code.',
+    heading: 'GENERAL INFORMATION',
+    description: '',
     codeLabel: 'Termination Code',
-    codePlaceholder: 'Enter termination code',
-    additionalDetailsHeading: 'Additional Details',
-    nameLabel: 'Name',
-    namePlaceholder: 'Enter name',
+    codePlaceholder: 'ex. 00',
+    additionalDetailsHeading: 'DETAILS',
+    nameLabel: 'Termination Name',
+    namePlaceholder: 'Enter termination name',
     bcCodeLabel: 'BC Code',
     bcCodePlaceholder: 'Enter BC code',
     nepaCodeLabel: 'NEPA Code',
@@ -142,7 +142,7 @@ export const TERMINATION_CODE_CONTENT = {
     },
     fields: {
       code: 'Termination Code',
-      name: 'Name',
+      name: 'Termination Name',
       bcCode: 'BC Code',
       nepaCode: 'NEPA Code',
       cobraNotice: 'COBRA Notice',
@@ -153,8 +153,8 @@ export const TERMINATION_CODE_CONTENT = {
   validation: {
     codeRequired: 'Termination code is required',
     codeMax: 'Termination code must below 2 characters',
-    nameRequired: 'Name is required',
-    nameMax: 'Name must be 100 characters or fewer',
+    nameRequired: 'Termination name is required',
+    nameMax: 'Termination name must be 100 characters or fewer',
     bcCodeMax: 'BC Code must be 50 characters or fewer',
     nepaCodeMax: 'NEPA Code must be 50 characters or fewer',
     cobraMonthsMin: 'COBRA Month must be 0 or greater',

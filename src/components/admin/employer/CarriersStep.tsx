@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { ChevronLeft, ChevronRight, Info, Loader2, Search } from 'lucide-react'
+import { ChevronRight, Info, Loader2, Search } from 'lucide-react'
 import { useFormContext } from 'react-hook-form'
 
 import { Badge } from '#/components/ui/badge.tsx'
@@ -43,16 +43,18 @@ function CarrierListItem({
       >
         {name}
       </span>
-      <Button
-        type="button"
-        variant="outline"
-        size="sm"
-        onClick={onAction}
-        disabled={disabled}
-        className="h-8 shrink-0 border-slate-200 text-xs font-semibold"
-      >
-        {actionLabel}
-      </Button>
+      {actionLabel && onAction ? (
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={onAction}
+          disabled={disabled}
+          className="h-8 shrink-0 border-slate-200 text-xs font-semibold"
+        >
+          {actionLabel}
+        </Button>
+      ) : null}
     </div>
   )
 }
@@ -134,16 +136,6 @@ export function CarriersStep() {
       shouldDirty: true,
       shouldValidate: true,
     })
-  }
-
-  const removeCarrier = (carrierId: string) => {
-    form.setValue(
-      'carrierIds',
-      [...new Set(form.getValues('carrierIds') ?? [])].filter(
-        (item) => item !== carrierId,
-      ),
-      { shouldDirty: true, shouldValidate: true },
-    )
   }
 
   const totalCount = carriers.length
@@ -269,8 +261,6 @@ export function CarriersStep() {
                       <CarrierListItem
                         key={carrier.id}
                         name={carrier.name}
-                        actionLabel={copy.actionRemove}
-                        onAction={() => removeCarrier(carrier.id)}
                       />
                     ))
                   )}
@@ -284,8 +274,6 @@ export function CarriersStep() {
       <div className="flex flex-wrap items-center gap-2 rounded-lg border border-dashed border-slate-200 bg-slate-50/50 px-4 py-3 text-xs text-slate-600">
         <ChevronRight className="size-4 text-tan-dark" aria-hidden />
         {copy.hintLeft}
-        <ChevronLeft className="size-4 text-tan-dark" aria-hidden />
-        {copy.hintRight}
       </div>
     </div>
   )

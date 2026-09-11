@@ -1,6 +1,5 @@
-import { useCallback, useMemo, useState } from 'react'
-import type { FormEvent } from 'react'
-import { AlertCircle, Building2 } from 'lucide-react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { AlertCircle } from 'lucide-react'
 
 import { EmployerDetailView } from '#/components/admin/employer/EmployerDetailView.tsx'
 import { EmployerForm } from '#/components/admin/employer/EmployerForm.tsx'
@@ -8,12 +7,8 @@ import { getEmployerTableColumns } from '#/components/admin/employer/employer-ta
 import { EmployerTableFilters } from '#/components/admin/employer/employer-table-filters.tsx'
 import { ReusableTable } from '#/components/table/index.ts'
 import { Button } from '#/components/ui/button.tsx'
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '#/components/ui/card.tsx'
+import { Card, CardContent } from '#/components/ui/card.tsx'
+import { useDebouncedValue } from '#/hooks/common/use-debounced-value.ts'
 import { useEmployers } from '#/hooks/employer/use-employers.ts'
 import { useEmployer } from '#/hooks/employer/useEmployerById.ts'
 import { EMPLOYER_CONTENT } from '#/utils/employer-content.ts'
@@ -33,12 +28,18 @@ export function EditEmployerPage() {
   )
   const [parentCompanyId, setParentCompanyId] = useState<string | undefined>()
   const [searchTerm, setSearchTerm] = useState('')
-  const [activeSearch, setActiveSearch] = useState('')
+  const activeSearch = useDebouncedValue(searchTerm)
 
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
   })
+
+  useEffect(() => {
+    setPagination((prev) =>
+      prev.pageIndex === 0 ? prev : { ...prev, pageIndex: 0 },
+    )
+  }, [activeSearch])
 
   const {
     data: employersResult,
@@ -74,16 +75,8 @@ export function EditEmployerPage() {
     )
   }, [allEmployers, activeSearch])
 
-  const handleSearchSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setActiveSearch(searchTerm)
-    setPagination((prev) => ({ ...prev, pageIndex: 0 }))
-  }
-
   const handleClearSearch = () => {
     setSearchTerm('')
-    setActiveSearch('')
-    setPagination((prev) => ({ ...prev, pageIndex: 0 }))
   }
 
   const handleParentCompanyChange = useCallback((id: string | undefined) => {
@@ -120,38 +113,21 @@ export function EditEmployerPage() {
     : undefined
 
   return (
-    <main className="page-wrap mx-auto max-w-5xl space-y-6">
+    <main className="page-wrap space-y-6">
       {/* Table View with Search */}
       {viewMode === 'table' ? (
         <div className="space-y-6">
-          {/* Search Card */}
-          <Card className="overflow-hidden border-slate-200 shadow-xs">
-            <CardHeader className="border-b border-slate-100 bg-linear-to-br from-tan-light/30 via-white to-white pb-4">
-              <div className="flex gap-4">
-                <div className="flex size-11 shrink-0 items-center justify-center rounded-xl border border-tan-dark/15 bg-white text-tan-dark shadow-xs">
-                  <Building2 className="size-5" aria-hidden />
-                </div>
-                <div className="min-w-0 space-y-1">
-                  <CardTitle className="text-lg font-bold text-slate-900">
-                    {copy.selectLabel}
-                  </CardTitle>
-                  <p className="text-xs text-slate-500">
-                    {copy.selectCardDescription}
-                  </p>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="pt-5">
-              <EmployerTableFilters
-                parentCompanyId={parentCompanyId}
-                searchTerm={searchTerm}
-                onParentCompanyChange={handleParentCompanyChange}
-                onSearchTermChange={setSearchTerm}
-                onSearchSubmit={handleSearchSubmit}
-                onClearSearch={handleClearSearch}
-              />
-            </CardContent>
-          </Card>
+          <h1 className="display-title text-3xl font-bold text-slate-900">
+            {copy.title}
+          </h1>
+
+          <EmployerTableFilters
+            parentCompanyId={parentCompanyId}
+            searchTerm={searchTerm}
+            onParentCompanyChange={handleParentCompanyChange}
+            onSearchTermChange={setSearchTerm}
+            onClearSearch={handleClearSearch}
+          />
 
           {/* List Load Error Banner */}
           {isListError ? (

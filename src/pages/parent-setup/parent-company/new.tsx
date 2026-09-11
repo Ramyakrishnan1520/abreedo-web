@@ -11,8 +11,12 @@ export function NewParentCompanyPage() {
   }
 
   return (
-    <main className="page-wrap mx-auto max-w-5xl">
-      <ParentCompanyForm mode="create" onSuccess={handleNavigateBack} onBack={handleNavigateBack} />
+    <main className="page-wrap mx-auto max-w-5xl mt-8">
+      <ParentCompanyForm
+        mode="create"
+        onSuccess={handleNavigateBack}
+        onBack={handleNavigateBack}
+      />
     </main>
   )
 }

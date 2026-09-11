@@ -1,7 +1,14 @@
+import { useEffect, useState } from 'react'
 import { ChevronRight, LogOut } from 'lucide-react'
 import { useLocation, useNavigate } from '@tanstack/react-router'
 
 import { Button } from '#/components/ui/button.tsx'
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '#/components/ui/accordion.tsx'
 import { adminSidebar } from '#/static/admin-sidebar.ts'
 import { employeeSidebar } from '#/static/employee-sidebar.ts'
 import { cn } from '#/lib/utils.ts'
@@ -37,6 +44,17 @@ function isItemActive(item: SidebarItem, pathname: string): boolean {
   )
 }
 
+function getActiveSectionIds(
+  sections: SidebarSection[],
+  pathname: string,
+): string[] {
+  return sections
+    .filter((section) =>
+      section.items.some((item) => isItemActive(item, pathname)),
+    )
+    .map((section) => section.id)
+}
+
 function SidebarNavItem({
   item,
   pathname,
@@ -50,28 +68,45 @@ function SidebarNavItem({
   const active = isItemActive(item, pathname)
   const hasChildren = Boolean(item.children?.length)
   const Icon = item.icon
+  const [expanded, setExpanded] = useState(active)
+
+  useEffect(() => {
+    if (active) {
+      setExpanded(true)
+    }
+  }, [active])
 
   return (
     <li>
       <button
         type="button"
-        onClick={() => void navigate({ to: item.route })}
+        onClick={() => {
+          if (hasChildren) {
+            setExpanded((open) => !open)
+            return
+          }
+
+          void navigate({ to: item.route })
+        }}
         className={cn(
           'group flex w-full items-center justify-between rounded-xl px-3 py-2 text-sm font-semibold transition-colors',
-          'text-white/90 hover:bg-sidebar-accent/60 hover:text-white',
+          'text-white/70 hover:bg-sidebar-accent/60 hover:text-white',
+          depth > 0 && 'py-1.5 text-xs font-medium',
           active &&
-            'bg-sidebar-accent text-white shadow-xs font-bold ring-1 ring-slate-600',
-          depth > 0 && 'py-1.5 text-xs font-medium text-slate-300 hover:text-white',
+            'bg-sidebar-accent font-bold text-tan-accent hover:text-tan-accent',
         )}
         style={{ paddingLeft: `${0.75 + depth * 0.85}rem` }}
         aria-current={pathname === item.route ? 'page' : undefined}
+        aria-expanded={hasChildren ? expanded : undefined}
       >
         <span className="flex min-w-0 items-center gap-2">
           {Icon ? (
             <Icon
               className={cn(
                 'size-4 shrink-0 transition-colors',
-                active ? 'text-tan-accent' : 'text-slate-400 group-hover:text-tan-accent',
+                active
+                  ? 'text-tan-accent'
+                  : 'text-slate-400 group-hover:text-tan-accent',
               )}
               aria-hidden="true"
             />
@@ -82,23 +117,30 @@ function SidebarNavItem({
           <ChevronRight
             className={cn(
               'size-4 transition-transform text-slate-400',
-              active && 'rotate-90 text-tan-accent',
+              expanded && 'rotate-90 text-tan-accent',
             )}
           />
         ) : null}
       </button>
 
       {hasChildren ? (
-        <ul className="mt-1 space-y-1">
-          {item.children?.map((child) => (
-            <SidebarNavItem
-              key={child.id}
-              item={child}
-              pathname={pathname}
-              depth={depth + 1}
-            />
-          ))}
-        </ul>
+        <div
+          className={cn(
+            'grid transition-[grid-template-rows] duration-200 ease-out',
+            expanded ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]',
+          )}
+        >
+          <ul className="mt-1 space-y-1 overflow-hidden">
+            {item.children?.map((child) => (
+              <SidebarNavItem
+                key={child.id}
+                item={child}
+                pathname={pathname}
+                depth={depth + 1}
+              />
+            ))}
+          </ul>
+        </div>
       ) : null}
     </li>
   )
@@ -115,11 +157,36 @@ export function Sidebar({ role, onLogout, className }: SidebarProps) {
   const normalizedRole = normalizeRole(role)
   const sections = sidebarByRole[normalizedRole]
   const navigate = useNavigate()
+  const [openSections, setOpenSections] = useState<string[]>(() =>
+    getActiveSectionIds(sections, pathname),
+  )
+
+  useEffect(() => {
+    const activeIds = getActiveSectionIds(sections, pathname)
+
+    if (activeIds.length === 0) {
+      return
+    }
+
+    setOpenSections((current) => {
+      const next = new Set(current)
+      let changed = false
+
+      for (const id of activeIds) {
+        if (!next.has(id)) {
+          next.add(id)
+          changed = true
+        }
+      }
+
+      return changed ? Array.from(next) : current
+    })
+  }, [pathname, sections])
 
   return (
     <aside
       className={cn(
-        'flex h-full flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground',
+        'flex h-full min-h-0 flex-col overflow-hidden border-r border-sidebar-border bg-sidebar text-sidebar-foreground',
         className,
       )}
     >
@@ -127,13 +194,24 @@ export function Sidebar({ role, onLogout, className }: SidebarProps) {
         aria-label={`${normalizedRole.toLowerCase()} navigation`}
         className="flex-1 overflow-y-auto px-4 py-5"
       >
-        <div className="space-y-6">
+        <Accordion
+          type="multiple"
+          value={openSections}
+          onValueChange={setOpenSections}
+          className="space-y-2"
+        >
           {sections.map((section) => {
             const SectionIcon = section.icon
-            const isClickableSection = Boolean(section.route && !section.items.length)
+            const isClickableSection = Boolean(
+              section.route && !section.items.length,
+            )
             const active = section.route
-              ? pathname === section.route || pathname.startsWith(`${section.route}/`)
+              ? pathname === section.route ||
+                pathname.startsWith(`${section.route}/`)
               : false
+            const sectionHasActiveItem = section.items.some((item) =>
+              isItemActive(item, pathname),
+            )
 
             if (isClickableSection && section.route) {
               return (
@@ -142,14 +220,20 @@ export function Sidebar({ role, onLogout, className }: SidebarProps) {
                     type="button"
                     onClick={() => void navigate({ to: section.route! })}
                     className={cn(
-                      'group flex w-full items-center gap-2 rounded-xl px-2 py-1 text-xs font-bold uppercase tracking-[0.14em] text-tan-accent transition-colors',
-                      'hover:bg-sidebar-accent/60 hover:text-white cursor-pointer',
-                      active && 'text-white font-bold ring-1 ring-slate-600 bg-sidebar-accent shadow-xs',
+                      'group flex w-full cursor-pointer items-center gap-2 rounded-xl px-2 py-2 text-xs font-bold uppercase tracking-[0.14em] text-white/70 transition-colors',
+                      'hover:bg-sidebar-accent/60 hover:text-white',
+                      active && 'bg-sidebar-accent font-bold text-tan-accent',
                     )}
                     aria-current={active ? 'page' : undefined}
                   >
                     {SectionIcon ? (
-                      <SectionIcon className="size-3.5 shrink-0 text-tan-accent" aria-hidden="true" />
+                      <SectionIcon
+                        className={cn(
+                          'size-3.5 shrink-0',
+                          active ? 'text-tan-accent' : 'text-white/70',
+                        )}
+                        aria-hidden="true"
+                      />
                     ) : null}
                     <span>{section.title}</span>
                   </button>
@@ -158,34 +242,50 @@ export function Sidebar({ role, onLogout, className }: SidebarProps) {
             }
 
             return (
-              <section key={section.id} aria-labelledby={`${section.id}-heading`}>
-                <h2
-                  id={`${section.id}-heading`}
-                  className="mb-2 flex items-center gap-2 px-2 text-xs font-bold uppercase tracking-[0.14em] text-tan-accent"
+              <AccordionItem
+                key={section.id}
+                value={section.id}
+                className="border-none"
+              >
+                <AccordionTrigger
+                  className={cn(
+                    'items-center rounded-xl px-2 py-2 text-xs font-bold uppercase tracking-[0.14em] text-white/70 hover:bg-sidebar-accent/60 hover:text-white hover:no-underline',
+                    '[&>svg]:size-4 [&>svg]:translate-y-0 [&>svg]:text-white/70',
+                    'data-[state=open]:bg-sidebar-accent data-[state=open]:text-white data-[state=open]:[&>svg]:text-white',
+                    sectionHasActiveItem &&
+                      'bg-sidebar-accent text-white [&>svg]:text-white',
+                  )}
                 >
-                  {SectionIcon ? (
-                    <SectionIcon className="size-3.5 shrink-0 text-tan-accent" aria-hidden="true" />
-                  ) : null}
-                  <span>{section.title}</span>
-                </h2>
-                {section.items.length ? (
-                  <ul className="space-y-1">
-                    {section.items.map((item) => (
-                      <SidebarNavItem
-                        key={item.id}
-                        item={item}
-                        pathname={pathname}
+                  <span className="flex min-w-0 items-center gap-2">
+                    {SectionIcon ? (
+                      <SectionIcon
+                        className="size-3.5 shrink-0 text-current"
+                        aria-hidden="true"
                       />
-                    ))}
-                  </ul>
+                    ) : null}
+                    <span>{section.title}</span>
+                  </span>
+                </AccordionTrigger>
+                {section.items.length ? (
+                  <AccordionContent className="pb-0 pt-1">
+                    <ul className="space-y-1">
+                      {section.items.map((item) => (
+                        <SidebarNavItem
+                          key={item.id}
+                          item={item}
+                          pathname={pathname}
+                        />
+                      ))}
+                    </ul>
+                  </AccordionContent>
                 ) : null}
-              </section>
+              </AccordionItem>
             )
           })}
-        </div>
+        </Accordion>
       </nav>
 
-      <div className="border-t border-sidebar-border p-4">
+      <div className="shrink-0 border-t border-sidebar-border p-4">
         <Button
           type="button"
           variant="ghost"

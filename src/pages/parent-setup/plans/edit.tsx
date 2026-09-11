@@ -1,6 +1,5 @@
-import { useCallback, useMemo, useState } from 'react'
-import type { FormEvent } from 'react'
-import { AlertCircle, Layers } from 'lucide-react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { AlertCircle } from 'lucide-react'
 
 import { PlanDetailView } from '#/components/admin/plan/PlanDetailView.tsx'
 import { PlanForm } from '#/components/admin/plan/PlanForm.tsx'
@@ -8,16 +7,10 @@ import { getPlanTableColumns } from '#/components/admin/plan/plan-table-columns.
 import { PlanTableFilters } from '#/components/admin/plan/plan-table-filters.tsx'
 import { ReusableTable } from '#/components/table/index.ts'
 import { Button } from '#/components/ui/button.tsx'
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '#/components/ui/card.tsx'
+import { Card, CardContent } from '#/components/ui/card.tsx'
+import { useDebouncedValue } from '#/hooks/common/use-debounced-value.ts'
 import { usePlans } from '#/hooks/plan/use-plans.ts'
 import { usePlan } from '#/hooks/plan/usePlanById.ts'
-import { useDeletePlan } from '#/hooks/plan/useDeletePlan.ts'
-import { DeleteConfirmBanner } from '#/components/admin/common/DeleteConfirmBanner.tsx'
 import { PLAN_CONTENT } from '#/utils/plan-content.ts'
 import { mapPlanDetailToFormValues } from '#/utils/mapPlanDetailToFormValues.ts'
 
@@ -31,9 +24,8 @@ type ViewMode = 'table' | 'view' | 'edit'
 export function EditPlanPage() {
   const [viewMode, setViewMode] = useState<ViewMode>('table')
   const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null)
-  const [deletingPlanId, setDeletingPlanId] = useState<string | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
-  const [activeSearch, setActiveSearch] = useState('')
+  const activeSearch = useDebouncedValue(searchTerm)
   const [parentCompanyId, setParentCompanyId] = useState<string | undefined>()
   const [carrierId, setCarrierId] = useState<string | undefined>()
 
@@ -41,6 +33,12 @@ export function EditPlanPage() {
     pageIndex: 0,
     pageSize: 10,
   })
+
+  useEffect(() => {
+    setPagination((prev) =>
+      prev.pageIndex === 0 ? prev : { ...prev, pageIndex: 0 },
+    )
+  }, [activeSearch])
 
   const {
     data: plansResult,
@@ -62,8 +60,6 @@ export function EditPlanPage() {
     isError: isDetailError,
   } = usePlan(selectedPlanId ?? undefined)
 
-  const { mutate: deletePlan, isPending: isDeleting } = useDeletePlan()
-
   const allPlans = plansResult?.items ?? []
 
   const filteredPlans = useMemo(() => {
@@ -78,16 +74,8 @@ export function EditPlanPage() {
     )
   }, [allPlans, activeSearch])
 
-  const handleSearchSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setActiveSearch(searchTerm)
-    setPagination((prev) => ({ ...prev, pageIndex: 0 }))
-  }
-
   const handleClearSearch = () => {
     setSearchTerm('')
-    setActiveSearch('')
-    setPagination((prev) => ({ ...prev, pageIndex: 0 }))
   }
 
   const handleParentCompanyChange = useCallback((id: string | undefined) => {
@@ -100,17 +88,6 @@ export function EditPlanPage() {
     setPagination((prev) => ({ ...prev, pageIndex: 0 }))
   }, [])
 
-  const handleDeletePlan = (id: string) => {
-    deletePlan(id, {
-      onSuccess: () => {
-        setDeletingPlanId(null)
-      },
-      onError: () => {
-        setDeletingPlanId(null)
-      },
-    })
-  }
-
   const columns = useMemo(
     () =>
       getPlanTableColumns({
@@ -121,9 +98,6 @@ export function EditPlanPage() {
         onEdit: (plan: Plan) => {
           setSelectedPlanId(String(plan.id))
           setViewMode('edit')
-        },
-        onDelete: (plan: Plan) => {
-          setDeletingPlanId(String(plan.id))
         },
       }),
     [],
@@ -142,53 +116,23 @@ export function EditPlanPage() {
     planDetail ? mapPlanDetailToFormValues(planDetail) : undefined
 
   return (
-    <main className="page-wrap mx-auto max-w-5xl space-y-6">
+    <main className="page-wrap space-y-6">
       {/* Mode 1: Table View with Search & Filters */}
       {viewMode === 'table' ? (
         <div className="space-y-6">
-          {/* Search & Filter Card */}
-          <Card className="overflow-hidden border-slate-200 shadow-xs">
-            <CardHeader className="border-b border-slate-100 bg-linear-to-br from-tan-light/30 via-white to-white pb-4">
-              <div className="flex gap-4">
-                <div className="flex size-11 shrink-0 items-center justify-center rounded-xl border border-tan-dark/15 bg-white text-tan-dark shadow-xs">
-                  <Layers className="size-5" aria-hidden />
-                </div>
-                <div className="min-w-0 space-y-1">
-                  <CardTitle className="text-lg font-bold text-slate-900">
-                    {copy.selectLabel}
-                  </CardTitle>
-                  <p className="text-xs text-slate-500">
-                    {copy.selectCardDescription}
-                  </p>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="pt-5">
-              <PlanTableFilters
-                parentCompanyId={parentCompanyId}
-                carrierId={carrierId}
-                searchTerm={searchTerm}
-                onParentCompanyChange={handleParentCompanyChange}
-                onCarrierChange={handleCarrierChange}
-                onSearchTermChange={setSearchTerm}
-                onSearchSubmit={handleSearchSubmit}
-                onClearSearch={handleClearSearch}
-              />
-            </CardContent>
-          </Card>
+          <h1 className="display-title text-3xl font-bold text-slate-900">
+            {copy.title}
+          </h1>
 
-          {/* Delete Dialog Banner */}
-          {deletingPlanId ? (
-            <DeleteConfirmBanner
-              title={copy.confirmDeleteTitle}
-              prompt={copy.confirmDeletePrompt}
-              cancelLabel={copy.cancel}
-              confirmLabel={copy.confirmDelete}
-              isDeleting={isDeleting}
-              onCancel={() => setDeletingPlanId(null)}
-              onConfirm={() => handleDeletePlan(deletingPlanId)}
-            />
-          ) : null}
+          <PlanTableFilters
+            parentCompanyId={parentCompanyId}
+            carrierId={carrierId}
+            searchTerm={searchTerm}
+            onParentCompanyChange={handleParentCompanyChange}
+            onCarrierChange={handleCarrierChange}
+            onSearchTermChange={setSearchTerm}
+            onClearSearch={handleClearSearch}
+          />
 
           {/* List Load Error Banner */}
           {isListError ? (

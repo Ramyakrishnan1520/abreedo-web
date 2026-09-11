@@ -98,8 +98,8 @@ export interface ParentCompanyStep {
 
 export interface CarrierListItemProps {
   name: string
-  actionLabel: string
-  onAction: () => void
+  actionLabel?: string
+  onAction?: () => void
   disabled?: boolean
 }
 

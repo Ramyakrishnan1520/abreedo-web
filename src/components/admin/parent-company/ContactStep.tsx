@@ -27,8 +27,12 @@ export function ContactStep() {
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="text-base font-bold text-slate-900">{copy.heading}</h3>
-        <p className="mt-1 text-sm text-slate-600">{copy.description}</p>
+        <h3 className="text-sm font-bold uppercase tracking-wide text-slate-700">
+          {copy.heading}
+        </h3>
+        {copy.description ? (
+          <p className="mt-1 text-sm text-slate-600">{copy.description}</p>
+        ) : null}
       </div>
 
       <Separator />

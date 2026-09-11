@@ -35,7 +35,7 @@ export function AdminBreadcrumb({
   }
 
   return (
-    <Breadcrumb className={cn('mb-6', className)}>
+    <Breadcrumb className={cn('', className)}>
       <BreadcrumbList className="text-sm font-medium text-tan-dark/90">
         {items.map((item, index) => {
           const isLast = index === items.length - 1
@@ -44,14 +44,14 @@ export function AdminBreadcrumb({
             <React.Fragment key={`${item.label}-${index}`}>
               <BreadcrumbItem>
                 {isLast || !item.href ? (
-                  <BreadcrumbPage className="font-normal text-slate-600">
+                  <BreadcrumbPage className="text-sm font-medium text-[#475569]">
                     {item.label}
                   </BreadcrumbPage>
                 ) : (
                   <BreadcrumbLink asChild>
                     <Link
                       to={item.href}
-                      className="text-tan-dark/90 transition-colors hover:text-tan-dark hover:underline"
+                      className="text-tan-dark/90 transition-colors hover:text-tan-dark hover:no-underline"
                     >
                       {item.label}
                     </Link>

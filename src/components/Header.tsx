@@ -23,11 +23,11 @@ export function Header({
   return (
     <header
       className={cn(
-        'sticky top-0 z-20 border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80',
+        'sticky top-0 z-20 h-20 border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80',
         className,
       )}
     >
-      <div className="mx-auto flex h-20 items-center justify-between px-6">
+      <div className="mx-auto flex h-full items-center justify-between px-6">
         {/* Left */}
         <div className="flex items-center gap-4">
           <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-blue-600 to-sky-500 text-lg font-bold text-white shadow-md">

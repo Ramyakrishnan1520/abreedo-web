@@ -26,7 +26,6 @@ const loginSchema = z.object({
   password: requiredTextSchema(LOGIN_CONTENT.validation.passwordRequired),
 })
 
-
 type LoginFormValues = z.infer<typeof loginSchema>
 
 const copy = LOGIN_CONTENT
@@ -57,7 +56,7 @@ export function LoginPage() {
       <div className="absolute bottom-1/4 right-1/4 translate-x-1/2 translate-y-1/2 w-72 h-72 md:w-96 md:h-96 rounded-full bg-tan-accent/15 blur-3xl pointer-events-none" />
 
       <div className="relative w-full max-w-[450px] rounded-2xl p-6 sm:p-8 md:p-10 border border-slate-200 bg-white shadow-md rise-in">
-        <div className="text-center mb-8">
+        <div className="text-center mb-5">
           <div className="inline-flex items-center justify-center p-3 rounded-xl bg-tan-light border border-slate-200 shadow-xs mb-3">
             <Building2 className="size-8 text-tan-dark" />
           </div>
@@ -76,9 +75,16 @@ export function LoginPage() {
           </div>
         )}
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4" noValidate>
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="space-y-4"
+          noValidate
+        >
           <div className="space-y-1.5">
-            <Label htmlFor="username" className="text-xs font-semibold text-slate-900">
+            <Label
+              htmlFor="username"
+              className="text-xs font-semibold text-slate-900"
+            >
               {copy.fields.usernameLabel}
             </Label>
             <div className="relative">
@@ -91,7 +97,8 @@ export function LoginPage() {
                 {...register('username')}
                 className={cn(
                   'pl-9 bg-slate-50 border-slate-200 text-slate-900',
-                  errors.username && 'border-destructive/60 focus-visible:ring-destructive/30',
+                  errors.username &&
+                    'border-destructive/60 focus-visible:ring-destructive/30',
                 )}
                 disabled={isPending}
               />
@@ -105,7 +112,10 @@ export function LoginPage() {
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="password" className="text-xs font-semibold text-slate-900">
+            <Label
+              htmlFor="password"
+              className="text-xs font-semibold text-slate-900"
+            >
               {copy.fields.passwordLabel}
             </Label>
             <div className="relative">
@@ -118,7 +128,8 @@ export function LoginPage() {
                 {...register('password')}
                 className={cn(
                   'pl-9 pr-10 bg-slate-50 border-slate-200 text-slate-900',
-                  errors.password && 'border-destructive/60 focus-visible:ring-destructive/30',
+                  errors.password &&
+                    'border-destructive/60 focus-visible:ring-destructive/30',
                 )}
                 disabled={isPending}
               />
@@ -127,11 +138,17 @@ export function LoginPage() {
                 onClick={() => setShowPassword(!showPassword)}
                 className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 cursor-pointer focus:outline-hidden"
                 title={
-                  showPassword ? copy.actions.hidePassword : copy.actions.showPassword
+                  showPassword
+                    ? copy.actions.hidePassword
+                    : copy.actions.showPassword
                 }
                 tabIndex={-1}
               >
-                {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
+                {showPassword ? (
+                  <EyeOff className="size-4" />
+                ) : (
+                  <Eye className="size-4" />
+                )}
               </button>
             </div>
             {errors.password && (

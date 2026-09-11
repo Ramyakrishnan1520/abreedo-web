@@ -27,7 +27,7 @@ export function ContactStep() {
 
   return (
     <div className="space-y-6">
-      {/* Contact First Name */}
+      {/* First Name */}
       <FormField
         control={form.control}
         name="contactFirst"
@@ -51,7 +51,7 @@ export function ContactStep() {
         )}
       />
 
-      {/* Contact Last Name */}
+      {/* Last Name */}
       <FormField
         control={form.control}
         name="contactLast"

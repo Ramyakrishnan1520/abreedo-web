@@ -5,12 +5,10 @@ import type { User } from '#/types/user.ts'
 
 interface UserTableColumnActions {
   onEdit: (user: User) => void
-  onDelete: (user: User) => void
 }
 
 export function getUserTableColumns({
   onEdit,
-  onDelete,
 }: UserTableColumnActions): ColumnDef<User>[] {
   return [
     {
@@ -36,20 +34,6 @@ export function getUserTableColumns({
           onClick={() => onEdit(row.original)}
         >
           Edit
-        </Button>
-      ),
-    },
-    {
-      id: 'delete',
-      header: 'Delete',
-      cell: ({ row }) => (
-        <Button
-          type="button"
-          variant="destructive"
-          size="sm"
-          onClick={() => onDelete(row.original)}
-        >
-          Delete
         </Button>
       ),
     },

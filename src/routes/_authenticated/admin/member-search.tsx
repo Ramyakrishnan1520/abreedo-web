@@ -7,5 +7,5 @@ export const Route = createFileRoute('/_authenticated/admin/member-search')({
 })
 
 function MemberSearchPage() {
-  return <RoutePlaceholderPage title="Member Search" section="Site Manager" />
+  return <RoutePlaceholderPage title="Member Search" section="" />
 }

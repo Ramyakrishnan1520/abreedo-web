@@ -32,7 +32,9 @@ export function GeneralStep() {
   return (
     <div className="space-y-6">
       <div className="space-y-1">
-        <h3 className="text-base font-bold text-slate-900">{copy.heading}</h3>
+        <h3 className="text-sm font-bold uppercase tracking-wide text-slate-700">
+          {copy.heading}
+        </h3>
         <p className="text-sm text-slate-500">{copy.description}</p>
       </div>
 
@@ -67,7 +69,7 @@ export function GeneralStep() {
 
         {/* Additional Details Heading */}
         <div className="pt-2">
-          <h4 className="text-xs font-bold uppercase tracking-wider text-tan-dark">
+          <h4 className="text-sm font-bold uppercase tracking-wide text-slate-700">
             {copy.additionalDetailsHeading}
           </h4>
         </div>

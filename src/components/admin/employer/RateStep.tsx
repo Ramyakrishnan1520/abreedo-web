@@ -130,25 +130,6 @@ export function RateStep() {
     setErrors({})
   }
 
-  const handleDeleteRate = (index: number, e: React.MouseEvent) => {
-    e.stopPropagation()
-    const updatedRates = planRates.filter((_, i) => i !== index)
-    form.setValue('planRates', updatedRates, { shouldValidate: false })
-    form.clearErrors('planRates')
-
-    if (editingIndex === index) {
-      setEffectiveDate('')
-      setIndividual('')
-      setParentChild('')
-      setParentChildren('')
-      setHusbandWife('')
-      setFamily('')
-      setEditingIndex(null)
-    } else if (editingIndex !== null && editingIndex > index) {
-      setEditingIndex(editingIndex - 1)
-    }
-  }
-
   const handleCancelEdit = () => {
     setEffectiveDate('')
     setIndividual('')
@@ -380,7 +361,6 @@ export function RateStep() {
           rates={planRates}
           selectedIndex={editingIndex}
           onRowClick={handleRowClickToEdit}
-          onDelete={handleDeleteRate}
         />
       </div>
     </div>

@@ -7,5 +7,5 @@ export const Route = createFileRoute('/_authenticated/admin/life-insurance')({
 })
 
 function LifeInsurancePage() {
-  return <RoutePlaceholderPage title="Life Insurance" section="Site Manager" />
+  return <RoutePlaceholderPage title="Life Insurance" section="" />
 }

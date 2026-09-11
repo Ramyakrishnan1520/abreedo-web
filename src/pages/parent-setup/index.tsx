@@ -7,19 +7,17 @@ const { title, description, chooseHeading, tasks } = PARENT_SETUP_CONTENT
 export function ParentSetupTasksPage() {
   return (
     <main className="page-wrap">
-      <div className="mb-8">
-        <h1 className="display-title text-4xl font-bold text-slate-900">
+      <div className="mb-5">
+        <h1 className="display-title text-3xl font-bold text-slate-900">
           {title}
         </h1>
         {description ? (
-          <p className="mt-3 max-w-2xl text-slate-600">
-            {description}
-          </p>
+          <p className="mt-3 max-w-2xl text-slate-600">{description}</p>
         ) : null}
       </div>
 
       <div className="max-w-2xl">
-        <h2 className="mb-4 text-base font-semibold uppercase tracking-wider text-slate-500">
+        <h2 className="mb-5 text-base font-semibold uppercase tracking-wider text-slate-500">
           {chooseHeading}
         </h2>
 

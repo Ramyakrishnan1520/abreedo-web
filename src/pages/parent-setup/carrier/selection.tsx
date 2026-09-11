@@ -7,8 +7,8 @@ const { pages } = CARRIER_CONTENT
 export function CarrierSelectionPage() {
   return (
     <main className="page-wrap">
-      <div className="mb-8">
-        <h1 className="display-title text-4xl font-bold text-slate-900">
+      <div className="my-4">
+        <h1 className="display-title text-3xl font-bold text-slate-900">
           {pages.index.title}
         </h1>
         <p className="mt-3 max-w-2xl text-slate-600">
@@ -17,7 +17,7 @@ export function CarrierSelectionPage() {
       </div>
 
       <div className="max-w-2xl">
-        <h2 className="mb-4 text-base font-semibold uppercase tracking-wider text-slate-500">
+        <h2 className="mb-5 text-base font-semibold uppercase tracking-wider text-slate-500">
           {pages.index.chooseHeading}
         </h2>
 
@@ -29,15 +29,15 @@ export function CarrierSelectionPage() {
           />
 
           <SelectionCard
-            title={pages.index.cards.updateCarrier.title}
-            description={pages.index.cards.updateCarrier.description}
-            to={ROUTES.ADMIN_CARRIERS_EDIT}
-          />
-
-          <SelectionCard
             title={pages.index.cards.newCoverageCode.title}
             description={pages.index.cards.newCoverageCode.description}
             to={ROUTES.ADMIN_COVERAGE_CODES_NEW}
+          />
+
+          <SelectionCard
+            title={pages.index.cards.updateCarrier.title}
+            description={pages.index.cards.updateCarrier.description}
+            to={ROUTES.ADMIN_CARRIERS_EDIT}
           />
 
           <SelectionCard
