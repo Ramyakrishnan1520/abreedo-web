@@ -22,12 +22,16 @@ export function ContactStep() {
   return (
     <div className="space-y-6">
       <div className="space-y-1">
-        <h3 className="text-base font-bold text-slate-900">{copy.heading}</h3>
-        <p className="text-sm text-slate-500">{copy.description}</p>
+        <h3 className="text-sm font-bold uppercase tracking-wide text-slate-700">
+          {copy.heading}
+        </h3>
+        {copy.description ? (
+          <p className="text-sm text-slate-500">{copy.description}</p>
+        ) : null}
       </div>
 
       <div className="space-y-4">
-        {/* Contact First Name */}
+        {/* First Name */}
         <FormField
           control={form.control}
           name="contactFirstName"
@@ -49,7 +53,7 @@ export function ContactStep() {
           )}
         />
 
-        {/* Contact Last Name */}
+        {/* Last Name */}
         <FormField
           control={form.control}
           name="contactLastName"

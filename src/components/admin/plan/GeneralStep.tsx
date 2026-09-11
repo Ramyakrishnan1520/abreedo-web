@@ -169,7 +169,7 @@ export function GeneralStep() {
       {/* Section 1: Main Plan Information */}
       <div className="space-y-4">
         <div>
-          <h3 className="text-base font-semibold text-slate-900">
+          <h3 className="text-sm font-bold uppercase tracking-wide text-slate-700">
             {copy.heading}
           </h3>
           <p className="text-xs text-slate-500">{copy.description}</p>
@@ -431,7 +431,7 @@ export function GeneralStep() {
       {/* Section 2: Linked Plans */}
       <div className="space-y-4">
         <div>
-          <h3 className="text-base font-semibold text-slate-900">
+          <h3 className="text-sm font-bold uppercase tracking-wide text-slate-700">
             {copy.linkedHeading}
           </h3>
           <p className="text-xs text-slate-500">{copy.linkedDescription}</p>

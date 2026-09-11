@@ -213,28 +213,6 @@ export function PlanStep() {
     setErrors({})
   }
 
-  const handleDeletePlan = (e: React.MouseEvent) => {
-    e.stopPropagation()
-    form.setValue('planId', '', { shouldValidate: false })
-    form.setValue('planName', '')
-    form.setValue('cgnGroupNumber', '', { shouldValidate: false })
-    form.setValue('billerAccountNumber', '', { shouldValidate: false })
-    form.setValue('cgnCustomerNumber', '')
-    form.setValue('brokerCodeId', '')
-    form.setValue('brokerCodeName', '')
-    form.setValue('isActive', true)
-    form.clearErrors(['planId', 'cgnGroupNumber', 'billerAccountNumber'])
-
-    setDraftPlanId('')
-    setDraftGroupNumber('')
-    setDraftBillerAccount('')
-    setDraftCustomerNumber('')
-    setDraftBrokerCodeId('')
-    setDraftIsActive(true)
-    setIsEditing(false)
-    setErrors({})
-  }
-
   const handleCancelEdit = () => {
     setDraftPlanId('')
     setDraftGroupNumber('')
@@ -446,7 +424,6 @@ export function PlanStep() {
             isActive={values.isActive}
             isSelected={isEditing}
             onRowClick={handleRowClickToEdit}
-            onDelete={handleDeletePlan}
           />
         ) : (
           <div className="rounded-xl border border-dashed border-slate-200 p-6 text-center text-sm text-slate-400">

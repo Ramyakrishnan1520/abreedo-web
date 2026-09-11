@@ -44,6 +44,10 @@ export function GeneralStep() {
 
   return (
     <div className="space-y-6">
+      <h3 className="text-sm font-bold uppercase tracking-wide text-slate-700">
+        {copy.heading}
+      </h3>
+
       <FormField
         control={form.control}
         name="name"
@@ -96,10 +100,6 @@ export function GeneralStep() {
         </h3>
 
         <div className="space-y-4 rounded-xl border border-slate-200 bg-slate-50/40 p-4">
-          <p className="text-sm font-semibold text-slate-700">
-            {copy.primaryAddressHeading}
-          </p>
-
           <FormField
             control={form.control}
             name="address1"

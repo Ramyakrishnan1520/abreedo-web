@@ -95,6 +95,10 @@ export function GeneralStep() {
 
   return (
     <div className="space-y-6">
+      <h3 className="text-sm font-bold uppercase tracking-wide text-slate-700">
+        {copy.heading}
+      </h3>
+
       {/* Code (required) */}
       <FormField
         control={form.control}

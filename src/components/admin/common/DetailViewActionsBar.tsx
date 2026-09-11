@@ -1,4 +1,4 @@
-import { ArrowLeft, Pencil, Trash2 } from 'lucide-react'
+import { ArrowLeft, Pencil } from 'lucide-react'
 
 import { Button } from '#/components/ui/button.tsx'
 import { cn } from '#/lib/utils.ts'
@@ -11,7 +11,7 @@ export interface DetailViewActionsBarProps {
   secondaryEditLabel?: string
   isDeleting?: boolean
   isDeleteDisabled?: boolean
-  onDelete: () => void
+  onDelete?: () => void
   onBack: () => void
   onEdit?: () => void
   onSecondaryEdit?: () => void
@@ -20,13 +20,10 @@ export interface DetailViewActionsBarProps {
 
 export function DetailViewActionsBar({
   idPrefix = 'view',
-  deleteLabel = 'Delete',
   backLabel = 'Back',
   editLabel = 'Edit',
   secondaryEditLabel,
   isDeleting = false,
-  isDeleteDisabled = false,
-  onDelete,
   onBack,
   onEdit,
   onSecondaryEdit,
@@ -35,62 +32,48 @@ export function DetailViewActionsBar({
   return (
     <div
       className={cn(
-        'mt-6 flex items-center justify-between gap-3 border-t border-slate-200 pt-5',
+        'mt-6 flex items-center justify-end gap-3 border-t border-slate-200 pt-5',
         className,
       )}
     >
       <Button
-        id={`${idPrefix}-delete-btn`}
+        id={`${idPrefix}-back-btn`}
         type="button"
-        variant="destructive"
-        onClick={onDelete}
-        disabled={isDeleting || isDeleteDisabled}
-        className="h-9 gap-1.5 rounded-md px-5 font-semibold shadow-xs"
+        variant="outline"
+        onClick={onBack}
+        disabled={isDeleting}
+        className="h-9 gap-1.5 rounded-md border-slate-200 px-5 font-semibold text-slate-700 shadow-xs hover:bg-slate-100"
       >
-        <Trash2 className="size-4" />
-        {deleteLabel}
+        <ArrowLeft className="size-4" />
+        {backLabel}
       </Button>
 
-      <div className="flex items-center gap-3">
+      {onSecondaryEdit && secondaryEditLabel ? (
         <Button
-          id={`${idPrefix}-back-btn`}
+          id={`${idPrefix}-secondary-edit-btn`}
           type="button"
           variant="outline"
-          onClick={onBack}
+          onClick={onSecondaryEdit}
           disabled={isDeleting}
-          className="h-9 gap-1.5 rounded-md border-slate-200 px-5 font-semibold text-slate-700 shadow-xs hover:bg-slate-100"
+          className="h-9 gap-1.5 rounded-md border-tan-dark/30 px-5 font-semibold text-tan-dark shadow-xs hover:bg-tan-light/20 hover:text-tan-dark"
         >
-          <ArrowLeft className="size-4" />
-          {backLabel}
+          <Pencil className="size-4" />
+          {secondaryEditLabel}
         </Button>
+      ) : null}
 
-        {onSecondaryEdit && secondaryEditLabel ? (
-          <Button
-            id={`${idPrefix}-secondary-edit-btn`}
-            type="button"
-            variant="outline"
-            onClick={onSecondaryEdit}
-            disabled={isDeleting}
-            className="h-9 gap-1.5 rounded-md border-tan-dark/30 px-5 font-semibold text-tan-dark shadow-xs hover:bg-tan-light/20 hover:text-tan-dark"
-          >
-            <Pencil className="size-4" />
-            {secondaryEditLabel}
-          </Button>
-        ) : null}
-
-        {onEdit && editLabel ? (
-          <Button
-            id={`${idPrefix}-edit-btn`}
-            type="button"
-            onClick={onEdit}
-            disabled={isDeleting}
-            className="h-9 gap-1.5 rounded-md bg-tan-dark px-5 font-semibold text-white shadow-xs hover:bg-tan-dark/90"
-          >
-            <Pencil className="size-4" />
-            {editLabel}
-          </Button>
-        ) : null}
-      </div>
+      {onEdit && editLabel ? (
+        <Button
+          id={`${idPrefix}-edit-btn`}
+          type="button"
+          onClick={onEdit}
+          disabled={isDeleting}
+          className="h-9 gap-1.5 rounded-md bg-tan-dark px-5 font-semibold text-white shadow-xs hover:bg-tan-dark/90"
+        >
+          <Pencil className="size-4" />
+          {editLabel}
+        </Button>
+      ) : null}
     </div>
   )
 }

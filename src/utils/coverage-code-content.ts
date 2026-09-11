@@ -1,6 +1,6 @@
 export const COVERAGE_CODE_CONTENT = {
   list: {
-    kicker: 'Site Manager',
+    kicker: '',
     title: 'Coverage Codes',
     description:
       'Manage coverage code records and pricing rules with reusable TanStack Table columns, server-side pagination, and action controls.',
@@ -14,7 +14,7 @@ export const COVERAGE_CODE_CONTENT = {
       title: 'Update Coverage Codes',
       description:
         'Select an action below to set up a new coverage code or manage existing coverage codes.',
-      chooseHeading: 'Please Choose',
+      chooseHeading: 'Select a task:',
       cards: {
         list: {
           title: 'List Coverage Code',
@@ -35,7 +35,7 @@ export const COVERAGE_CODE_CONTENT = {
     },
     edit: {
       kicker: 'Administration',
-      title: 'Coverage Code Edit',
+      title: 'Update Current Coverage Code',
       description:
         'Select a coverage code to load its details, then update using the same guided steps as new setup.',
       selectLabel: 'Select Coverage Code',
@@ -84,7 +84,7 @@ export const COVERAGE_CODE_CONTENT = {
     deleteAria: (code: string) => `Delete ${code}`,
   },
   form: {
-    kicker: 'Site Manager',
+    kicker: '',
     defaultTitle: 'New Coverage Code',
     titles: {
       create: 'Create Coverage Code',
@@ -115,37 +115,39 @@ export const COVERAGE_CODE_CONTENT = {
     },
   },
   generalStep: {
+    heading: 'GENERAL INFORMATION',
     codeLabel: 'Coverage Code',
-    codePlaceholder: 'Enter coverage code',
-    nameLabel: 'Name',
-    namePlaceholder: 'Enter coverage name',
-    carrierLabel: 'Carrier',
+    codePlaceholder: 'Ex.000',
+    nameLabel: 'Code Name',
+    namePlaceholder: 'Enter full name for code',
+    carrierLabel: 'Carrier Name',
     carrierLoadingPlaceholder: 'Loading carriers...',
-    carrierSelectPlaceholder: 'Select a carrier...',
+    carrierSelectPlaceholder: 'Please select',
     coverageClassLabel: 'Coverage Class',
     coverageClassLoadingPlaceholder: 'Loading classes...',
-    coverageClassSelectPlaceholder: 'Select a coverage class...',
+    coverageClassSelectPlaceholder: 'Please select',
     remittanceTypeLabel: 'Remittance Type',
     remittanceTypeLoadingPlaceholder: 'Loading remittance types...',
-    remittanceTypeSelectPlaceholder: 'Select a remittance type...',
+    remittanceTypeSelectPlaceholder: 'Please select',
   },
   processingStep: {
+    heading: 'PROCESSING DETAILS',
     combinationForBillLabel: 'Billing Combination',
-    combinationForBillPlaceholder: 'Enter combination for bill',
+    combinationForBillPlaceholder: 'Please enter code',
     combinationForReportsLabel: 'Reporting Combination',
-    combinationForReportsPlaceholder: 'Enter combination for reports',
+    combinationForReportsPlaceholder: 'Please enter code',
     useForBillLabel: 'Use for Billing',
     descriptionLabel: 'Long Description',
-    descriptionPlaceholder: 'Enter full description',
+    descriptionPlaceholder: 'Detailed description for coverage code',
     shortDescriptionLabel: 'Short Description',
-    shortDescriptionPlaceholder: 'Enter short description',
+    shortDescriptionPlaceholder: 'Simplified description for coverage code',
     invoiceGroupLabel: 'Invoice Group',
     invoiceGroupPlaceholder: 'Enter invoice group',
   },
   notesStep: {
     heading: 'COVERAGE CODE NOTES',
-    notesLabel: 'Administrative Notes (optional)',
-    placeholder: 'Additional details about this Coverage Code.',
+    notesLabel: 'Administrative Notes',
+    placeholder: '(Optional) Add information for other administrators.',
   },
   reviewStep: {
     heading: 'Review & Save',
@@ -154,14 +156,14 @@ export const COVERAGE_CODE_CONTENT = {
     yes: 'Yes',
     no: 'No',
     sections: {
-      general: 'General Information',
+      general: 'GENERAL INFORMATION',
       processing: 'Processing Details',
       notes: 'Administrative Notes',
     },
     fields: {
-      code: 'Code',
-      name: 'Name',
-      carrier: 'Carrier',
+      code: 'Coverage Code',
+      name: 'Code Name',
+      carrier: 'Carrier Name',
       coverageClass: 'Coverage Class',
       remittanceType: 'Remittance Type',
       combinationForBill: 'Combination for Bill',

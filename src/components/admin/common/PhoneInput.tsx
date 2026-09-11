@@ -25,7 +25,7 @@ export const PhoneInput = React.forwardRef<HTMLInputElement, PhoneInputProps>(
       onChange,
       onBlur,
       className,
-      placeholder = '(___) ___-____',
+      placeholder = '(000) 000-0000',
       disabled = false,
       id,
       name,

@@ -24,6 +24,10 @@ export function ProcessingStep() {
 
   return (
     <div className="space-y-6">
+      <h3 className="text-sm font-bold uppercase tracking-wide text-slate-700">
+        {copy.heading}
+      </h3>
+
       {/* Combination for Bill */}
       <FormField
         control={form.control}
@@ -43,6 +47,27 @@ export function ProcessingStep() {
                   placeholder={copy.combinationForBillPlaceholder}
                   className={FORM_INPUT_CLASS}
                   {...field}
+                />
+              </FormControl>
+              <FormMessage />
+            </div>
+          </FormItem>
+        )}
+      />
+
+      {/* Use for Bill Checkbox */}
+      <FormField
+        control={form.control}
+        name="invoiceInclude"
+        render={({ field }) => (
+          <FormItem className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-center sm:gap-4">
+            <FormLabel className={LABEL_COL}>{copy.useForBillLabel}</FormLabel>
+            <div className="flex h-9 items-center">
+              <FormControl>
+                <Checkbox
+                  id="coverage-use-for-bill"
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
                 />
               </FormControl>
               <FormMessage />
@@ -73,27 +98,6 @@ export function ProcessingStep() {
                 />
               </FormControl>
 
-              <FormMessage />
-            </div>
-          </FormItem>
-        )}
-      />
-
-      {/* Use for Bill Checkbox */}
-      <FormField
-        control={form.control}
-        name="invoiceInclude"
-        render={({ field }) => (
-          <FormItem className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-center sm:gap-4">
-            <FormLabel className={LABEL_COL}>{copy.useForBillLabel}</FormLabel>
-            <div className="flex h-9 items-center">
-              <FormControl>
-                <Checkbox
-                  id="coverage-use-for-bill"
-                  checked={field.value}
-                  onCheckedChange={field.onChange}
-                />
-              </FormControl>
               <FormMessage />
             </div>
           </FormItem>

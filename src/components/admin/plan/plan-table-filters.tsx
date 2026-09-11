@@ -1,11 +1,10 @@
 import { useMemo, useState } from 'react'
-import type { FormEvent } from 'react'
-import { Search, X } from 'lucide-react'
 
 import { ConfigurableSelect } from '#/components/admin/common/ConfigurableSelect.tsx'
+import { TableSearchInput } from '#/components/admin/common/TableSearchInput.tsx'
 import { FORM_INPUT_CLASS } from '#/components/admin/common/form-styles.ts'
-import { Button } from '#/components/ui/button.tsx'
-import { Input } from '#/components/ui/input.tsx'
+import { Card, CardContent } from '#/components/ui/card.tsx'
+import { Label } from '#/components/ui/label.tsx'
 import { useAvailableCarriers } from '#/hooks/parent-company/useAvailableCarriers.ts'
 import { useAvailableParentCompanies } from '#/hooks/parent-company/useAvailableParentCompanies.ts'
 import { useLoadMoreIntersection } from '#/hooks/use-load-more-intersection.ts'
@@ -18,7 +17,6 @@ interface PlanTableFiltersProps {
   onParentCompanyChange: (id: string | undefined) => void
   onCarrierChange: (id: string | undefined) => void
   onSearchTermChange: (term: string) => void
-  onSearchSubmit: (e: FormEvent<HTMLFormElement>) => void
   onClearSearch: () => void
 }
 
@@ -32,7 +30,6 @@ export function PlanTableFilters({
   onParentCompanyChange,
   onCarrierChange,
   onSearchTermChange,
-  onSearchSubmit,
   onClearSearch,
 }: PlanTableFiltersProps) {
   const {
@@ -98,94 +95,83 @@ export function PlanTableFilters({
   )
 
   return (
-    <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
-      {/* 1. Parent Company Filter */}
-      <div className="w-full lg:w-60 shrink-0">
-        <ConfigurableSelect
-          id="parent-company-filter-select"
-          value={parentCompanyId || ''}
-          onValueChange={(val) => onParentCompanyChange(val ? val : undefined)}
-          options={parentCompanyOptions}
-          loading={isLoadingParentCompanies}
-          placeholder={copy.parentCompanyPlaceholder}
-          loadingPlaceholder={copy.loadingMore}
-          searchable
-          clearable
-          searchPlaceholder="Search parent companies..."
-          emptyOptionLabel="Please Select"
-          onClear={() => onParentCompanyChange(undefined)}
-          open={parentCompanySelectOpen}
-          onOpenChange={setParentCompanySelectOpen}
-          onContentRef={setParentCompanySelectContent}
-          loadMoreRef={parentCompanyLoadMoreRef}
-          isFetchingNextPage={isFetchingNextParentCompaniesPage}
-          loadingMoreLabel={copy.loadingMore}
-          triggerClassName={FORM_INPUT_CLASS}
-          contentClassName="max-h-80"
-        />
-      </div>
+    <div className="space-y-4">
+      <TableSearchInput
+        id="plan-search-input"
+        value={searchTerm}
+        onChange={onSearchTermChange}
+        onClear={onClearSearch}
+        placeholder={editCopy.searchPlaceholder}
+        clearLabel={editCopy.clearButton}
+      />
 
-      {/* 2. Carrier Filter */}
-      <div className="w-full lg:w-60 shrink-0">
-        <ConfigurableSelect
-          id="carrier-filter-select"
-          value={carrierId || ''}
-          onValueChange={(val) => onCarrierChange(val ? val : undefined)}
-          options={carrierOptions}
-          loading={isLoadingCarriers}
-          placeholder={copy.carrierPlaceholder}
-          loadingPlaceholder={copy.loadingMore}
-          searchable
-          clearable
-          searchPlaceholder="Search carriers..."
-          emptyOptionLabel="Please Select"
-          onClear={() => onCarrierChange(undefined)}
-          open={carrierSelectOpen}
-          onOpenChange={setCarrierSelectOpen}
-          onContentRef={setCarrierSelectContent}
-          loadMoreRef={carrierLoadMoreRef}
-          isFetchingNextPage={isFetchingNextCarriersPage}
-          loadingMoreLabel={copy.loadingMore}
-          triggerClassName={FORM_INPUT_CLASS}
-          contentClassName="max-h-80"
-        />
-      </div>
-
-      {/* 3. Search Input & Search Button */}
-      <form
-        onSubmit={onSearchSubmit}
-        className="flex flex-1 items-center gap-2 min-w-0"
-      >
-        <div className="relative flex-1 min-w-0">
-          <Input
-            id="plan-search-input"
-            type="text"
-            placeholder={editCopy.searchPlaceholder}
-            value={searchTerm}
-            onChange={(e) => onSearchTermChange(e.target.value)}
-            className={FORM_INPUT_CLASS}
-          />
-          {searchTerm ? (
-            <button
-              type="button"
-              onClick={onClearSearch}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
-              aria-label={editCopy.clearButton}
+      <Card className="border-slate-200 shadow-xs">
+        <CardContent className="grid gap-4 p-4 sm:grid-cols-2 sm:p-5">
+          <div className="space-y-2">
+            <Label
+              htmlFor="parent-company-filter-select"
+              className="text-sm font-semibold text-slate-700"
             >
-              <X className="size-4" />
-            </button>
-          ) : null}
-        </div>
-        <Button
-          id="plan-search-btn"
-          type="submit"
-          className="h-10 gap-2 bg-tan-dark font-semibold text-white shadow-xs hover:bg-tan-dark/90 cursor-pointer shrink-0"
-        >
-          <Search className="size-4" />
-          {editCopy.searchButton}
-        </Button>
-      </form>
+              {copy.parentCompanyLabel}
+            </Label>
+            <ConfigurableSelect
+              id="parent-company-filter-select"
+              value={parentCompanyId || ''}
+              onValueChange={(val) =>
+                onParentCompanyChange(val ? val : undefined)
+              }
+              options={parentCompanyOptions}
+              loading={isLoadingParentCompanies}
+              placeholder={copy.parentCompanyPlaceholder}
+              loadingPlaceholder={copy.loadingMore}
+              searchable
+              clearable
+              searchPlaceholder="Search parent companies..."
+              emptyOptionLabel={copy.allParentCompanies}
+              onClear={() => onParentCompanyChange(undefined)}
+              open={parentCompanySelectOpen}
+              onOpenChange={setParentCompanySelectOpen}
+              onContentRef={setParentCompanySelectContent}
+              loadMoreRef={parentCompanyLoadMoreRef}
+              isFetchingNextPage={isFetchingNextParentCompaniesPage}
+              loadingMoreLabel={copy.loadingMore}
+              triggerClassName={FORM_INPUT_CLASS}
+              contentClassName="max-h-80"
+            />
+          </div>
 
+          <div className="space-y-2">
+            <Label
+              htmlFor="carrier-filter-select"
+              className="text-sm font-semibold text-slate-700"
+            >
+              {copy.carrierLabel}
+            </Label>
+            <ConfigurableSelect
+              id="carrier-filter-select"
+              value={carrierId || ''}
+              onValueChange={(val) => onCarrierChange(val ? val : undefined)}
+              options={carrierOptions}
+              loading={isLoadingCarriers}
+              placeholder={copy.carrierPlaceholder}
+              loadingPlaceholder={copy.loadingMore}
+              searchable
+              clearable
+              searchPlaceholder="Search carriers..."
+              emptyOptionLabel={copy.allCarriers}
+              onClear={() => onCarrierChange(undefined)}
+              open={carrierSelectOpen}
+              onOpenChange={setCarrierSelectOpen}
+              onContentRef={setCarrierSelectContent}
+              loadMoreRef={carrierLoadMoreRef}
+              isFetchingNextPage={isFetchingNextCarriersPage}
+              loadingMoreLabel={copy.loadingMore}
+              triggerClassName={FORM_INPUT_CLASS}
+              contentClassName="max-h-80"
+            />
+          </div>
+        </CardContent>
+      </Card>
     </div>
   )
 }

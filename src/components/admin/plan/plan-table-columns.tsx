@@ -1,4 +1,4 @@
-import { Eye, Pencil, Trash2 } from 'lucide-react'
+import { Eye, Pencil } from 'lucide-react'
 
 import { Button } from '#/components/ui/button.tsx'
 import { PLAN_CONTENT } from '#/utils/plan-content.ts'
@@ -9,7 +9,6 @@ import type { Plan } from '#/types/plan.ts'
 interface PlanTableColumnActions {
   onView?: (plan: Plan) => void
   onEdit?: (plan: Plan) => void
-  onDelete?: (plan: Plan) => void
 }
 
 const { table: tableCopy } = PLAN_CONTENT
@@ -21,7 +20,6 @@ function displayValue(value?: string | null) {
 export function getPlanTableColumns({
   onView,
   onEdit,
-  onDelete,
 }: PlanTableColumnActions): ColumnDef<Plan>[] {
   const columns: ColumnDef<Plan>[] = [
     {
@@ -34,14 +32,14 @@ export function getPlanTableColumns({
       ),
     },
     {
-      accessorKey: 'coverageCodeTitle',
-      header: tableCopy.columns.coverageCode,
-      cell: ({ row }) => displayValue(row.original.coverageCodeTitle),
-    },
-    {
       accessorKey: 'option',
       header: tableCopy.columns.option,
       cell: ({ row }) => displayValue(row.original.option),
+    },
+    {
+      accessorKey: 'coverageCodeTitle',
+      header: tableCopy.columns.coverageCode,
+      cell: ({ row }) => displayValue(row.original.coverageCodeTitle),
     },
     {
       accessorKey: 'effectiveDate',
@@ -81,24 +79,6 @@ export function getPlanTableColumns({
           onClick={() => onEdit(row.original)}
         >
           <Pencil className="size-4" />
-        </Button>
-      ),
-    })
-  }
-
-  if (onDelete) {
-    columns.push({
-      id: 'delete',
-      header: tableCopy.columns.delete,
-      cell: ({ row }) => (
-        <Button
-          type="button"
-          variant="destructive"
-          size="icon-sm"
-          aria-label={tableCopy.deleteAria(row.original.name)}
-          onClick={() => onDelete(row.original)}
-        >
-          <Trash2 className="size-4" />
         </Button>
       ),
     })

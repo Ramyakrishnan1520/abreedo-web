@@ -2,8 +2,8 @@ export const PARENT_SETUP_CONTENT = {
   kicker: 'Administration',
   title: 'Parent Company Setup',
   description:
-    'Select a task below to configure parent companies, carriers, coverage codes, termination codes, or plans.',
-  chooseHeading: 'Select a Task',
+    '',
+  chooseHeading: 'Select a Task:',
   tasks: {
     parentCompany: {
       title: 'Parent Company Setup',

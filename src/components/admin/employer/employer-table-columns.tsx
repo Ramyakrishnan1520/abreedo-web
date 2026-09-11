@@ -1,4 +1,4 @@
-import { Eye, Pencil, Trash2 } from 'lucide-react'
+import { Eye, Pencil } from 'lucide-react'
 
 import { Button } from '#/components/ui/button.tsx'
 import { EMPLOYER_CONTENT } from '#/utils/employer-content.ts'
@@ -9,7 +9,6 @@ import type { Employer } from '#/types/employer.ts'
 interface EmployerTableColumnActions {
   onView?: (employer: Employer) => void
   onEdit?: (employer: Employer) => void
-  onDelete?: (employer: Employer) => void
 }
 
 const { table: tableCopy } = EMPLOYER_CONTENT
@@ -21,7 +20,6 @@ function displayValue(value: string) {
 export function getEmployerTableColumns({
   onView,
   onEdit,
-  onDelete,
 }: EmployerTableColumnActions): ColumnDef<Employer>[] {
   const columns: ColumnDef<Employer>[] = [
     {
@@ -67,24 +65,6 @@ export function getEmployerTableColumns({
           onClick={() => onEdit(row.original)}
         >
           <Pencil className="size-4" />
-        </Button>
-      ),
-    })
-  }
-
-  if (onDelete) {
-    columns.push({
-      id: 'delete',
-      header: tableCopy.columns.delete,
-      cell: ({ row }) => (
-        <Button
-          type="button"
-          variant="destructive"
-          size="icon-sm"
-          aria-label={tableCopy.deleteAria(row.original.name)}
-          onClick={() => onDelete(row.original)}
-        >
-          <Trash2 className="size-4" />
         </Button>
       ),
     })

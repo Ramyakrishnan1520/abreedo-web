@@ -1,20 +1,14 @@
-import { useMemo, useState } from 'react'
-import type { FormEvent } from 'react'
-import { AlertCircle, Building2, Search, X } from 'lucide-react'
+import { useEffect, useMemo, useState } from 'react'
+import { AlertCircle } from 'lucide-react'
 
 import { ParentCompanyDetailView } from '#/components/admin/parent-company/ParentCompanyDetailView.tsx'
 import { ParentCompanyForm } from '#/components/admin/parent-company/ParentCompanyForm.tsx'
 import { getParentCompanyTableColumns } from '#/components/admin/parent-company/parent-company-table-columns.tsx'
-import { FORM_INPUT_CLASS } from '#/components/admin/common/form-styles.ts'
+import { TableSearchInput } from '#/components/admin/common/TableSearchInput.tsx'
 import { ReusableTable } from '#/components/table/index.ts'
 import { Button } from '#/components/ui/button.tsx'
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from '#/components/ui/card.tsx'
-import { Input } from '#/components/ui/input.tsx'
+import { Card, CardContent } from '#/components/ui/card.tsx'
+import { useDebouncedValue } from '#/hooks/common/use-debounced-value.ts'
 import { useParentCompanies } from '#/hooks/parent-company/use-parent-companies.ts'
 import { useParentCompany } from '#/hooks/parent-company/useParentCompany.ts'
 import { PARENT_COMPANY_CONTENT } from '#/utils/parent-company-content.ts'
@@ -33,12 +27,18 @@ export function EditParentCompanyPage() {
     string | null
   >(null)
   const [searchTerm, setSearchTerm] = useState('')
-  const [activeSearch, setActiveSearch] = useState('')
+  const activeSearch = useDebouncedValue(searchTerm)
 
   const [pagination, setPagination] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 10,
   })
+
+  useEffect(() => {
+    setPagination((prev) =>
+      prev.pageIndex === 0 ? prev : { ...prev, pageIndex: 0 },
+    )
+  }, [activeSearch])
 
   const {
     data: parentCompaniesResult,
@@ -71,16 +71,8 @@ export function EditParentCompanyPage() {
     )
   }, [allParentCompanies, activeSearch])
 
-  const handleSearchSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    setActiveSearch(searchTerm)
-    setPagination((prev) => ({ ...prev, pageIndex: 0 }))
-  }
-
   const handleClearSearch = () => {
     setSearchTerm('')
-    setActiveSearch('')
-    setPagination((prev) => ({ ...prev, pageIndex: 0 }))
   }
 
   const columns = useMemo(
@@ -112,63 +104,22 @@ export function EditParentCompanyPage() {
     : undefined
 
   return (
-    <main className="page-wrap mx-auto max-w-5xl space-y-6">
+    <main className="page-wrap space-y-6">
       {/* Mode 1: Table View with Search */}
       {viewMode === 'table' ? (
         <div className="space-y-6">
-          {/* Search Card */}
-          <Card className="overflow-hidden border-slate-200 shadow-xs">
-            <CardHeader className="border-b border-slate-100 bg-linear-to-br from-tan-light/30 via-white to-white pb-4">
-              <div className="flex gap-4">
-                <div className="flex size-11 shrink-0 items-center justify-center rounded-xl border border-tan-dark/15 bg-white text-tan-dark shadow-xs">
-                  <Building2 className="size-5" aria-hidden />
-                </div>
-                <div className="min-w-0 space-y-1">
-                  <CardTitle className="text-lg font-bold text-slate-900">
-                    {copy.selectLabel}
-                  </CardTitle>
-                  <p className="text-xs text-slate-500">
-                    {copy.selectCardDescription}
-                  </p>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="pt-5">
-              <form
-                onSubmit={handleSearchSubmit}
-                className="flex w-full max-w-2xl flex-col gap-3 sm:flex-row sm:items-center"
-              >
-                <div className="relative flex-1">
-                  <Input
-                    id="parent-company-search-input"
-                    type="text"
-                    placeholder={copy.searchPlaceholder}
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    className={FORM_INPUT_CLASS}
-                  />
-                  {searchTerm ? (
-                    <button
-                      type="button"
-                      onClick={handleClearSearch}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
-                      aria-label={copy.clearButton}
-                    >
-                      <X className="size-4" />
-                    </button>
-                  ) : null}
-                </div>
-                <Button
-                  id="parent-company-search-btn"
-                  type="submit"
-                  className="h-10 gap-2 bg-tan-dark font-semibold text-white shadow-xs hover:bg-tan-dark/90"
-                >
-                  <Search className="size-4" />
-                  {copy.searchButton}
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
+          <h1 className="display-title text-3xl font-bold text-slate-900">
+            {copy.title}
+          </h1>
+
+          <TableSearchInput
+            id="parent-company-search-input"
+            value={searchTerm}
+            onChange={setSearchTerm}
+            onClear={handleClearSearch}
+            placeholder={copy.searchPlaceholder}
+            clearLabel={copy.clearButton}
+          />
 
           {/* List Load Error Banner */}
           {isListError ? (

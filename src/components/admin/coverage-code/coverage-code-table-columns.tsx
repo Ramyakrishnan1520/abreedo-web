@@ -1,4 +1,4 @@
-import { Eye, Pencil, Trash2 } from 'lucide-react'
+import { Eye, Pencil } from 'lucide-react'
 
 import { Button } from '#/components/ui/button.tsx'
 import { COVERAGE_CODE_CONTENT } from '#/utils/coverage-code-content.ts'
@@ -9,7 +9,6 @@ import type { CoverageCode } from '#/types/coverage-code.ts'
 interface CoverageCodeTableColumnActions {
   onView?: (coverageCode: CoverageCode) => void
   onEdit?: (coverageCode: CoverageCode) => void
-  onDelete?: (coverageCode: CoverageCode) => void
 }
 
 const { table: tableCopy } = COVERAGE_CODE_CONTENT
@@ -21,7 +20,6 @@ function displayValue(value: string) {
 export function getCoverageCodeTableColumns({
   onView,
   onEdit,
-  onDelete,
 }: CoverageCodeTableColumnActions): ColumnDef<CoverageCode>[] {
   const columns: ColumnDef<CoverageCode>[] = [
     {
@@ -73,24 +71,6 @@ export function getCoverageCodeTableColumns({
           onClick={() => onEdit(row.original)}
         >
           <Pencil className="size-4" />
-        </Button>
-      ),
-    })
-  }
-
-  if (onDelete) {
-    columns.push({
-      id: 'delete',
-      header: tableCopy.columns.delete,
-      cell: ({ row }) => (
-        <Button
-          type="button"
-          variant="destructive"
-          size="icon-sm"
-          aria-label={tableCopy.deleteAria(row.original.code)}
-          onClick={() => onDelete(row.original)}
-        >
-          <Trash2 className="size-4" />
         </Button>
       ),
     })

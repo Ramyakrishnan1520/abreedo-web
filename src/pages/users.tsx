@@ -20,22 +20,19 @@ export function UsersPage() {
         onEdit: (user: User) => {
           console.log('Edit user', user.id)
         },
-        onDelete: (user: User) => {
-          console.log('Delete user', user.id)
-        },
       }),
     [],
   )
 
   return (
     <main className="page-wrap py-8">
-      <div className="mb-6">
+      <div className="mb-5">
         <p className="island-kicker">Users</p>
         <h1 className="display-title mt-3 text-4xl font-bold text-slate-900">
           Users table
         </h1>
         <p className="mt-3 max-w-2xl text-slate-600">
-          Manage admin portal users with quick edit and delete actions.
+          Manage admin portal users with quick edit actions.
         </p>
       </div>
 

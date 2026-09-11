@@ -1,4 +1,4 @@
-import { Eye, Pencil, Trash2 } from 'lucide-react'
+import { Eye, Pencil } from 'lucide-react'
 
 import { Button } from '#/components/ui/button.tsx'
 import { TERMINATION_CODE_CONTENT } from '#/utils/termination-code-content.ts'
@@ -9,7 +9,6 @@ import type { TerminationCode } from '#/types/termination-code.ts'
 interface TerminationCodeTableColumnActions {
   onView?: (item: TerminationCode) => void
   onEdit?: (item: TerminationCode) => void
-  onDelete?: (item: TerminationCode) => void
 }
 
 const { table: tableCopy } = TERMINATION_CODE_CONTENT
@@ -48,7 +47,6 @@ function formatCobraTerm(
 export function getTerminationCodeTableColumns({
   onView,
   onEdit,
-  onDelete,
 }: TerminationCodeTableColumnActions): ColumnDef<TerminationCode>[] {
   const columns: ColumnDef<TerminationCode>[] = [
     {
@@ -62,6 +60,12 @@ export function getTerminationCodeTableColumns({
       cell: ({ row }) => displayValue(row.original.name),
     },
     {
+      accessorKey: 'actionCode',
+      header: tableCopy.columns.cobraNotice,
+      cell: ({ row }) =>
+        formatCobraNotice(row.original.actionCode, row.original.cobraNotice),
+    },
+    {
       accessorKey: 'cobraTerm',
       header: tableCopy.columns.cobraTerm,
       cell: ({ row }) =>
@@ -71,13 +75,6 @@ export function getTerminationCodeTableColumns({
           row.original.actionCode,
           row.original.cobraNotice,
         ),
-
-    },
-    {
-      accessorKey: 'actionCode',
-      header: tableCopy.columns.cobraNotice,
-      cell: ({ row }) =>
-        formatCobraNotice(row.original.actionCode, row.original.cobraNotice),
     },
   ]
 
@@ -112,24 +109,6 @@ export function getTerminationCodeTableColumns({
           onClick={() => onEdit(row.original)}
         >
           <Pencil className="size-4" />
-        </Button>
-      ),
-    })
-  }
-
-  if (onDelete) {
-    columns.push({
-      id: 'delete',
-      header: tableCopy.columns.delete,
-      cell: ({ row }) => (
-        <Button
-          type="button"
-          variant="destructive"
-          size="icon-sm"
-          aria-label={tableCopy.deleteAria(row.original.code || row.original.name)}
-          onClick={() => onDelete(row.original)}
-        >
-          <Trash2 className="size-4" />
         </Button>
       ),
     })
