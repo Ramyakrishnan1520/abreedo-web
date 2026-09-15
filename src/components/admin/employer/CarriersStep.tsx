@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { ChevronRight, Info, Loader2, Search } from 'lucide-react'
+import { Info, Loader2, Search } from 'lucide-react'
 import { useFormContext } from 'react-hook-form'
 
 import { Badge } from '#/components/ui/badge.tsx'
@@ -50,7 +50,11 @@ function CarrierListItem({
           size="sm"
           onClick={onAction}
           disabled={disabled}
-          className="h-8 shrink-0 border-slate-200 text-xs font-semibold"
+          className={cn(
+            'h-8 shrink-0 border-slate-200 text-xs font-semibold cursor-pointer',
+            actionLabel === copy.actionRemove &&
+              'hover:border-red-200 hover:bg-red-50 hover:text-red-600',
+          )}
         >
           {actionLabel}
         </Button>
@@ -133,6 +137,15 @@ export function CarriersStep() {
     }
 
     form.setValue('carrierIds', [...new Set([...current, carrierId])], {
+      shouldDirty: true,
+      shouldValidate: true,
+    })
+  }
+
+  const removeCarrier = (carrierId: string) => {
+    const current = form.getValues('carrierIds') ?? []
+    const updated = current.filter((id) => id !== carrierId)
+    form.setValue('carrierIds', updated, {
       shouldDirty: true,
       shouldValidate: true,
     })
@@ -261,6 +274,8 @@ export function CarriersStep() {
                       <CarrierListItem
                         key={carrier.id}
                         name={carrier.name}
+                        actionLabel={copy.actionRemove}
+                        onAction={() => removeCarrier(carrier.id)}
                       />
                     ))
                   )}
@@ -270,11 +285,6 @@ export function CarriersStep() {
           </Card>
         </div>
       )}
-
-      <div className="flex flex-wrap items-center gap-2 rounded-lg border border-dashed border-slate-200 bg-slate-50/50 px-4 py-3 text-xs text-slate-600">
-        <ChevronRight className="size-4 text-tan-dark" aria-hidden />
-        {copy.hintLeft}
-      </div>
     </div>
   )
 }

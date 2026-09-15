@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useFormContext } from 'react-hook-form'
 
 import {
@@ -60,17 +60,6 @@ export function GeneralStep({ mode }: GeneralStepProps = {}) {
         .map((pc) => ({ value: pc.id, label: pc.name })),
     [parentCompanies],
   )
-
-  // Auto-select first parent company if not selected yet (only in create mode)
-  useEffect(() => {
-    if (isEditMode) return
-    const currentId = form.getValues('parentCompanyId')
-    if (!currentId && parentCompanyOptions.length > 0) {
-      form.setValue('parentCompanyId', parentCompanyOptions[0].value, {
-        shouldValidate: true,
-      })
-    }
-  }, [form, parentCompanyOptions, isEditMode])
 
   const { data: states = [], isLoading: isLoadingStates, isError: isStatesError } =
     useGetStates()

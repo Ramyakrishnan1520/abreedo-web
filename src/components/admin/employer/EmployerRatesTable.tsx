@@ -41,9 +41,9 @@ export function formatEmployerRateDate(dateStr: string | null | undefined): stri
 export function formatEmployerRateCurrency(
   value: number | string | null | undefined,
 ): string {
-  if (value === null || value === undefined || value === '') return '$0.00'
+  if (value === null || value === undefined || value === '') return '0.00'
   const num = Number(value)
-  return isNaN(num) ? '$0.00' : `$${num.toFixed(2)}`
+  return isNaN(num) ? '0.00' : num.toFixed(2)
 }
 
 export interface EmployerRatesTableProps {

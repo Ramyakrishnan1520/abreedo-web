@@ -156,7 +156,8 @@ export function RateStep({ mode = 'create' }: EmployerRateStepProps = {}) {
     const parsedRates: Partial<Record<RateTierKey, number>> = {}
     for (const tier of RATE_TIERS) {
       const rawVal = rateDraft[tier.key]
-      const num = rawVal.trim() === '' ? NaN : Number(rawVal)
+      const cleanVal = rawVal.replace(/^\$/, '').trim()
+      const num = cleanVal === '' ? NaN : Number(cleanVal)
       if (isNaN(num) || num < 0) {
         newErrors[tier.key] = tier.errorMsg
       } else {
@@ -368,6 +369,7 @@ export function RateStep({ mode = 'create' }: EmployerRateStepProps = {}) {
                         }))
                       }
                     }}
+                    onWheel={(e) => e.currentTarget.blur()}
                   />
                   {errors[tier.key] ? (
                     <p className="text-xs font-medium text-destructive">
