@@ -5,6 +5,10 @@ import { ReviewStep as CommonReviewStep } from '#/components/admin/common/Review
 import { useParentCompany } from '#/hooks/parent-company/useParentCompany.ts'
 import { useGetStates } from '#/hooks/carrier/useGetStates.ts'
 import { EMPLOYER_CONTENT } from '#/utils/employer-content.ts'
+import {
+  buildEmployerGeneralReviewSections,
+  buildEmployerPlanReviewSections,
+} from '#/utils/buildEmployerReviewSections.ts'
 import { resolveSelectedCarrierOptions } from '#/utils/resolveSelectedCarrierOptions.ts'
 
 import type { EmployerFormValues } from '#/components/admin/employer/employer.schema.ts'
@@ -60,273 +64,66 @@ export function ReviewStep({ mode = 'create' }: EmployerReviewStepProps = {}) {
     [parentCompanyCarriers, values.carrierIds, values.linkedCarriers],
   )
 
-  const { sections: sectionTitles, fields } = copy
-
-  const allSections: ReviewSectionConfig[] = useMemo(
-    () => [
-      {
-        id: 'general',
-        title: sectionTitles.general,
-        items: [
-          { type: 'text', label: fields.name, value: values.name },
-          {
-            type: 'text',
-            label: fields.parentCompany,
-            value: parentCompanyName,
-          },
-        ],
-      },
-      {
-        id: 'address',
-        title: sectionTitles.primaryAddress,
-        items: [
-          { type: 'text', label: fields.address1, value: values.address1 },
-          { type: 'text', label: fields.address2, value: values.address2 },
-          { type: 'text', label: fields.city, value: values.city },
-          { type: 'text', label: fields.state, value: stateName },
-          { type: 'text', label: fields.zip, value: values.zip },
-        ],
-      },
-      {
-        id: 'contact',
-        title: sectionTitles.contact,
-        items: [
-          {
-            type: 'text',
-            label: fields.contactFirstName,
-            value: values.contactFirst,
-          },
-          {
-            type: 'text',
-            label: fields.contactLastName,
-            value: values.contactLast,
-          },
-          {
-            type: 'text',
-            label: fields.contactTitle,
-            value: values.contactTitle,
-          },
-          { type: 'text', label: fields.phone, value: values.phone },
-          { type: 'text', label: fields.fax, value: values.fax },
-          { type: 'text', label: fields.email, value: values.email },
-        ],
-      },
-      {
-        id: 'configuration',
-        title: sectionTitles.configuration,
-        items: [
-          {
-            type: 'text',
-            label: fields.groupNumber,
-            value: values.groupNumber,
-          },
-          {
-            type: 'text',
-            label: fields.policyNumber,
-            value: values.policyNumber,
-          },
-          {
-            type: 'text',
-            label: fields.tpacNumber,
-            value: values.tpacNumber,
-          },
-          {
-            type: 'text',
-            label: fields.monthlyAdminFee,
-            value:
-              values.monthlyAdminFee !== undefined
-                ? `$${values.monthlyAdminFee}`
-                : undefined,
-          },
-          {
-            type: 'text',
-            label: fields.status,
-            value: values.status === 1 ? copy.yes : copy.no,
-          },
-          {
-            type: 'text',
-            label: fields.isPaper,
-            value: values.isPaper ? copy.yes : copy.no,
-          },
-          {
-            type: 'text',
-            label: fields.allowCobra,
-            value: values.allowCobra ? copy.yes : copy.no,
-          },
-          {
-            type: 'text',
-            label: fields.isPano,
-            value: values.isPano ? copy.yes : copy.no,
-          },
-          {
-            type: 'text',
-            label: fields.renewalDate,
-            value: values.renewalDate,
-          },
-          {
-            type: 'text',
-            label: fields.initialNotificationStartOn,
-            value: values.initialNotificationStartOn,
-          },
-        ],
-      },
-      {
-        id: 'carriers',
-        title: sectionTitles.carriers,
-        items: [
-          {
-            type: 'badges',
-            items: selectedCarrierNames,
-            emptyMessage: copy.noCarriersSelected,
-          },
-        ],
-      },
-      {
-        id: 'notes',
-        title: sectionTitles.notes,
-        items: [
-          {
-            type: 'text',
-            label: fields.notesTitle,
-            value: values.notesTitle,
-          },
-          {
-            type: 'multiline',
-            label: fields.notes,
-            value: values.notes,
-          },
-        ],
-      },
-      {
-        id: 'plan',
-        title: sectionTitles.plan,
-        items: [
-          {
-            type: 'text',
-            label: fields.plan,
-            value: values.planName || values.planId,
-          },
-          {
-            type: 'text',
-            label: fields.planGroupNumber,
-            value: values.cgnGroupNumber,
-          },
-          {
-            type: 'text',
-            label: fields.billerAccountNumber,
-            value: values.billerAccountNumber,
-          },
-          {
-            type: 'text',
-            label: fields.customerNumber,
-            value: values.cgnCustomerNumber,
-          },
-          {
-            type: 'text',
-            label: fields.brokerCode,
-            value: values.brokerCodeName || values.brokerCodeId,
-          },
-          {
-            type: 'text',
-            label: fields.isActive,
-            value: values.isActive ? copy.yes : copy.no,
-          },
-        ],
-      },
-      {
-        id: 'rates',
-        title: sectionTitles.rates,
-        items:
-          values.planRates && values.planRates.length > 0
-            ? values.planRates.flatMap((rate, index) => [
-                {
-                  type: 'subheading' as const,
-                  title: `RATE ${index + 1}`,
-                },
-                {
-                  type: 'row' as const,
-                  label: fields.effectiveDate,
-                  value: rate.effectiveDate ? rate.effectiveDate.split('T')[0] : copy.emptyValue,
-                },
-                {
-                  type: 'row' as const,
-                  label: fields.individual,
-                  value:
-                    rate.individual !== undefined && rate.individual !== null
-                      ? String(rate.individual)
-                      : copy.emptyValue,
-                },
-                {
-                  type: 'row' as const,
-                  label: fields.parentChild,
-                  value:
-                    rate.parentChild !== undefined && rate.parentChild !== null
-                      ? String(rate.parentChild)
-                      : copy.emptyValue,
-                },
-                {
-                  type: 'row' as const,
-                  label: fields.parentChildren,
-                  value:
-                    rate.parentChildren !== undefined && rate.parentChildren !== null
-                      ? String(rate.parentChildren)
-                      : copy.emptyValue,
-                },
-                {
-                  type: 'row' as const,
-                  label: fields.memberSpouse,
-                  value:
-                    rate.husbandWife !== undefined && rate.husbandWife !== null
-                      ? String(rate.husbandWife)
-                      : copy.emptyValue,
-                },
-                {
-                  type: 'row' as const,
-                  label: fields.family,
-                  value:
-                    rate.family !== undefined && rate.family !== null
-                      ? String(rate.family)
-                      : copy.emptyValue,
-                },
-              ])
-            : [
-                {
-                  type: 'text' as const,
-                  label: 'Rates',
-                  value: copy.noRatesConfigured,
-                },
-              ],
-      },
-    ],
-    [sectionTitles, fields, values, parentCompanyName, selectedCarrierNames, stateName],
+  const generalSections: ReviewSectionConfig[] = useMemo(
+    () =>
+      buildEmployerGeneralReviewSections(values, {
+        parentCompanyName,
+        stateName,
+        selectedCarrierNames,
+      }),
+    [values, parentCompanyName, stateName, selectedCarrierNames],
   )
 
-  const sections = useMemo(() => {
-    if (mode === 'edit-general') {
-      return allSections.filter((s) =>
-        [
-          'general',
-          'address',
-          'contact',
-          'configuration',
-          'carriers',
-          'notes',
-        ].includes(s.id),
-      )
+  const planSections: ReviewSectionConfig[] = useMemo(() => {
+    if (mode === 'edit-plan' || (!values.plans || values.plans.length === 0)) {
+      if (values.planId || values.cgnGroupNumber) {
+        return buildEmployerPlanReviewSections([
+          {
+            planId: values.planId,
+            planName: values.planName,
+            cgnGroupNumber: values.cgnGroupNumber,
+            billerAccountNumber: values.billerAccountNumber,
+            cgnCustomerNumber: values.cgnCustomerNumber,
+            brokerCodeId: values.brokerCodeId,
+            brokerCodeName: values.brokerCodeName,
+            isActive: values.isActive,
+            rates: values.planRates ?? [],
+          },
+        ])
+      }
+      return buildEmployerPlanReviewSections([])
     }
-    if (mode === 'edit-plan') {
-      return allSections.filter((s) => ['plan', 'rates'].includes(s.id))
-    }
-    return allSections
-  }, [allSections, mode])
+
+    return buildEmployerPlanReviewSections(values.plans)
+  }, [mode, values])
+
+  const showGeneral = mode === 'create' || mode === 'edit-general'
+  const showPlan = mode === 'create' || mode === 'edit-plan' || mode === 'add-plan'
 
   return (
-    <CommonReviewStep
-      copy={{
-        emptyValue: '—',
-      }}
-      sections={sections}
-      layout="cards"
-    />
+    <div className="space-y-6">
+      {showGeneral ? (
+        <CommonReviewStep
+          copy={{ emptyValue: copy.emptyValue }}
+          sections={generalSections}
+          layout="cards"
+        />
+      ) : null}
+
+      {showPlan ? (
+        <div className="space-y-3">
+          <h4 className="text-xs font-bold uppercase tracking-wider text-tan-dark">
+            {copy.sections.plansAndRates}
+          </h4>
+          <CommonReviewStep
+            copy={{ emptyValue: copy.emptyValue }}
+            sections={planSections}
+            layout="accordion"
+            defaultOpenSection={planSections[0]?.id}
+          />
+        </div>
+      ) : null}
+    </div>
   )
 }
+

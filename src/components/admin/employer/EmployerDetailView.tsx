@@ -1,7 +1,6 @@
-import { useMemo, useState } from 'react'
-import { AlertCircle, ArrowLeft, Building2, Loader2 } from 'lucide-react'
+import { useMemo } from 'react'
+import { AlertCircle, ArrowLeft, Building2, FileText, Loader2, NotebookPen } from 'lucide-react'
 
-import { DeleteConfirmBanner } from '#/components/admin/common/DeleteConfirmBanner.tsx'
 import { DetailViewActionsBar } from '#/components/admin/common/DetailViewActionsBar.tsx'
 import { ReviewStep } from '#/components/admin/common/ReviewSection'
 import { Badge } from '#/components/ui/badge.tsx'
@@ -12,12 +11,22 @@ import {
   CardHeader,
   CardTitle,
 } from '#/components/ui/card.tsx'
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '#/components/ui/tabs.tsx'
 import { useAvailableCarriers } from '#/hooks/parent-company/useAvailableCarriers.ts'
-import { useDeleteEmployer } from '#/hooks/employer/useDeleteEmployer.ts'
 import { useEmployer } from '#/hooks/employer/useEmployerById.ts'
+import { useEmployerPlans } from '#/hooks/employer/useEmployerPlans.ts'
 import { useGetStates } from '#/hooks/carrier/useGetStates.ts'
 import { useParentCompanies } from '#/hooks/parent-company/useParentCompanies.ts'
 import { EMPLOYER_CONTENT } from '#/utils/employer-content.ts'
+import {
+  buildEmployerGeneralReviewSections,
+  buildEmployerPlanReviewSections,
+} from '#/utils/buildEmployerReviewSections.ts'
 import { mapEmployerDetailToFormValues } from '#/utils/mapEmployerDetailToFormValues.ts'
 import { resolveSelectedCarrierOptions } from '#/utils/resolveSelectedCarrierOptions.ts'
 import { resolveOptionLabel } from '#/utils/resolveOptionLabel.ts'
@@ -30,7 +39,7 @@ interface EmployerDetailViewProps {
   onBack: () => void
   onEditGeneral: () => void
   onEditPlan: () => void
-  onDeleteSuccess: () => void
+  onDeleteSuccess?: () => void
 }
 
 const copy = EMPLOYER_CONTENT.pages.edit
@@ -41,14 +50,12 @@ export function EmployerDetailView({
   onBack,
   onEditGeneral,
   onEditPlan,
-  onDeleteSuccess,
 }: EmployerDetailViewProps) {
-  const [showConfirmDelete, setShowConfirmDelete] = useState(false)
   const { data: employerDetail, isLoading, isError } = useEmployer(employerId)
+  const { data: employerPlansResponse } = useEmployerPlans(employerId)
   const { data: states = [] } = useGetStates()
   const { data: parentCompanies = [] } = useParentCompanies()
   const { carriers } = useAvailableCarriers()
-  const { mutate: deleteEmployer, isPending: isDeleting } = useDeleteEmployer()
 
   const values = useMemo(
     () => (employerDetail ? mapEmployerDetailToFormValues(employerDetail) : null),
@@ -81,294 +88,39 @@ export function EmployerDetailView({
     [carriers, values],
   )
 
-  const sections: ReviewSectionConfig[] = useMemo(
+  const generalSections: ReviewSectionConfig[] = useMemo(
     () =>
-      values
-        ? [
-          {
-            id: 'general',
-            title: reviewCopy.sections.general,
-            items: [
-              {
-                type: 'text',
-                label: reviewCopy.fields.name,
-                value: values.name,
-              },
-              {
-                type: 'text',
-                label: reviewCopy.fields.parentCompany,
-                value: parentCompanyName,
-              },
-            ],
-          },
-          {
-            id: 'address',
-            title: reviewCopy.sections.primaryAddress,
-            items: [
-              {
-                type: 'text',
-                label: reviewCopy.fields.address1,
-                value: values.address1,
-              },
-              {
-                type: 'text',
-                label: reviewCopy.fields.address2,
-                value: values.address2,
-              },
-              {
-                type: 'text',
-                label: reviewCopy.fields.city,
-                value: values.city,
-              },
-              {
-                type: 'text',
-                label: reviewCopy.fields.state,
-                value: stateName,
-              },
-              {
-                type: 'text',
-                label: reviewCopy.fields.zip,
-                value: values.zip,
-              },
-            ],
-          },
-          {
-            id: 'contact',
-            title: reviewCopy.sections.contact,
-            items: [
-              {
-                type: 'text',
-                label: reviewCopy.fields.contactFirstName,
-                value: values.contactFirst,
-              },
-              {
-                type: 'text',
-                label: reviewCopy.fields.contactLastName,
-                value: values.contactLast,
-              },
-              {
-                type: 'text',
-                label: reviewCopy.fields.contactTitle,
-                value: values.contactTitle,
-              },
-              {
-                type: 'text',
-                label: reviewCopy.fields.phone,
-                value: values.phone,
-              },
-              {
-                type: 'text',
-                label: reviewCopy.fields.fax,
-                value: values.fax,
-              },
-              {
-                type: 'text',
-                label: reviewCopy.fields.email,
-                value: values.email,
-              },
-            ],
-          },
-          {
-            id: 'configuration',
-            title: reviewCopy.sections.configuration,
-            items: [
-              {
-                type: 'text',
-                label: reviewCopy.fields.groupNumber,
-                value: values.groupNumber,
-              },
-              {
-                type: 'text',
-                label: reviewCopy.fields.policyNumber,
-                value: values.policyNumber,
-              },
-              {
-                type: 'text',
-                label: reviewCopy.fields.tpacNumber,
-                value: values.tpacNumber,
-              },
-              {
-                type: 'text',
-                label: reviewCopy.fields.monthlyAdminFee,
-                value:
-                  values.monthlyAdminFee !== undefined
-                    ? `$${values.monthlyAdminFee}`
-                    : undefined,
-              },
-              {
-                type: 'text',
-                label: reviewCopy.fields.status,
-                value:
-                  values.status === 1 ? reviewCopy.yes : reviewCopy.no,
-              },
-              {
-                type: 'text',
-                label: reviewCopy.fields.isPaper,
-                value: values.isPaper ? reviewCopy.yes : reviewCopy.no,
-              },
-              {
-                type: 'text',
-                label: reviewCopy.fields.allowCobra,
-                value: values.allowCobra ? reviewCopy.yes : reviewCopy.no,
-              },
-              {
-                type: 'text',
-                label: reviewCopy.fields.isPano,
-                value: values.isPano ? reviewCopy.yes : reviewCopy.no,
-              },
-              {
-                type: 'text',
-                label: reviewCopy.fields.renewalDate,
-                value: values.renewalDate,
-              },
-              {
-                type: 'text',
-                label: reviewCopy.fields.initialNotificationStartOn,
-                value: values.initialNotificationStartOn,
-              },
-            ],
-          },
-          {
-            id: 'carriers',
-            title: reviewCopy.sections.carriers,
-            items: [
-              {
-                type: 'badges',
-                items: selectedCarrierNames,
-                emptyMessage: reviewCopy.noCarriersSelected,
-              },
-            ],
-          },
-          {
-            id: 'notes',
-            title: reviewCopy.sections.notes,
-            items: [
-              {
-                type: 'text',
-                label: reviewCopy.fields.notesTitle,
-                value: values.notesTitle,
-              },
-              {
-                type: 'multiline',
-                value: values.notes,
-              },
-            ],
-          },
-          {
-            id: 'plan',
-            title: reviewCopy.sections.plan,
-            items: [
-              {
-                type: 'text',
-                label: reviewCopy.fields.plan,
-                value: values.planName || values.planId,
-              },
-              {
-                type: 'text',
-                label: reviewCopy.fields.planGroupNumber,
-                value: values.cgnGroupNumber,
-              },
-              {
-                type: 'text',
-                label: reviewCopy.fields.billerAccountNumber,
-                value: values.billerAccountNumber,
-              },
-              {
-                type: 'text',
-                label: reviewCopy.fields.customerNumber,
-                value: values.cgnCustomerNumber,
-              },
-              {
-                type: 'text',
-                label: reviewCopy.fields.brokerCode,
-                value: values.brokerCodeName || values.brokerCodeId,
-              },
-              {
-                type: 'text',
-                label: reviewCopy.fields.isActive,
-                value: values.isActive ? reviewCopy.yes : reviewCopy.no,
-              },
-            ],
-          },
-          {
-            id: 'rates',
-            title: reviewCopy.sections.rates,
-            items:
-              values.planRates && values.planRates.length > 0
-                ? values.planRates.flatMap((rate, index) => [
-                    {
-                      type: 'subheading' as const,
-                      title: `RATE ${index + 1}`,
-                    },
-                    {
-                      type: 'row' as const,
-                      label: reviewCopy.fields.effectiveDate,
-                      value: rate.effectiveDate ? rate.effectiveDate.split('T')[0] : reviewCopy.emptyValue,
-                    },
-                    {
-                      type: 'row' as const,
-                      label: reviewCopy.fields.individual,
-                      value:
-                        rate.individual !== undefined && rate.individual !== null
-                          ? String(rate.individual)
-                          : reviewCopy.emptyValue,
-                    },
-                    {
-                      type: 'row' as const,
-                      label: reviewCopy.fields.parentChild,
-                      value:
-                        rate.parentChild !== undefined && rate.parentChild !== null
-                          ? String(rate.parentChild)
-                          : reviewCopy.emptyValue,
-                    },
-                    {
-                      type: 'row' as const,
-                      label: reviewCopy.fields.parentChildren,
-                      value:
-                        rate.parentChildren !== undefined && rate.parentChildren !== null
-                          ? String(rate.parentChildren)
-                          : reviewCopy.emptyValue,
-                    },
-                    {
-                      type: 'row' as const,
-                      label: reviewCopy.fields.memberSpouse,
-                      value:
-                        rate.husbandWife !== undefined && rate.husbandWife !== null
-                          ? String(rate.husbandWife)
-                          : reviewCopy.emptyValue,
-                    },
-                    {
-                      type: 'row' as const,
-                      label: reviewCopy.fields.family,
-                      value:
-                        rate.family !== undefined && rate.family !== null
-                          ? String(rate.family)
-                          : reviewCopy.emptyValue,
-                    },
-                  ])
-                : [
-                    {
-                      type: 'text' as const,
-                      label: 'Rates',
-                      value: reviewCopy.noRatesConfigured,
-                    },
-                  ],
-          },
-        ]
-        : [],
+      buildEmployerGeneralReviewSections(values, {
+        parentCompanyName,
+        stateName,
+        selectedCarrierNames,
+      }),
     [values, parentCompanyName, stateName, selectedCarrierNames],
   )
 
-  const handleDelete = () => {
-    deleteEmployer(employerId, {
-      onSuccess: () => {
-        onDeleteSuccess()
-      },
-      onError: () => {
-        setShowConfirmDelete(false)
-      },
-    })
-  }
+  const planSections: ReviewSectionConfig[] = useMemo(() => {
+    const plans =
+      employerPlansResponse?.items && employerPlansResponse.items.length > 0
+        ? employerPlansResponse.items
+        : values?.planName || values?.planId
+          ? [
+            {
+              carrierGroupNumberId: '',
+              planId: values.planId || '',
+              planName: values.planName,
+              cgnGroupNumber: values.cgnGroupNumber,
+              brokerCodeId: values.brokerCodeId,
+              brokerCodeName: values.brokerCodeName,
+              billerAccountNumber: values.billerAccountNumber,
+              cgnCustomerNumber: values.cgnCustomerNumber,
+              isActive: values.isActive,
+              planRates: values.planRates ?? [],
+            },
+          ]
+          : []
+
+    return buildEmployerPlanReviewSections(plans)
+  }, [employerPlansResponse?.items, values])
 
   if (isLoading) {
     return (
@@ -435,41 +187,62 @@ export function EmployerDetailView({
             </div>
           </div>
         </CardHeader>
-        <CardContent className="space-y-5 pt-6">
-          <ReviewStep
-            copy={{ emptyValue: '—' }}
-            sections={sections}
-            layout="cards"
-            defaultOpenSection="general"
-          />
+        <CardContent className="space-y-6 pt-6">
+          <Tabs defaultValue="general" className="w-full space-y-2">
+            <div className="flex justify-center pb-2">
+              <TabsList className="h-auto items-center gap-1 rounded-2xl border border-tan-accent/40 bg-tan-subtle p-1.5 px-5 shadow-2xs">
+                <TabsTrigger
+                  value="general"
+                  className="group flex items-center gap-2 rounded-xl px-8 py-2 text-sm font-semibold text-slate-600 transition-all hover:bg-white/60 hover:text-slate-900 data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-xs"
+                >
+                  <FileText className="size-4.5 text-slate-400 transition-colors group-data-[state=active]:text-tan-dark" />
+                  <span>{copy.tabs?.general ?? 'General'}</span>
+                </TabsTrigger>
 
-          {/* Delete Confirmation Banner */}
-          {showConfirmDelete ? (
-            <DeleteConfirmBanner
-              title={copy.confirmDeleteTitle}
-              prompt={copy.confirmDeletePrompt}
-              cancelLabel={copy.cancel}
-              confirmLabel={copy.confirmDelete}
-              isDeleting={isDeleting}
-              onCancel={() => setShowConfirmDelete(false)}
-              onConfirm={handleDelete}
-            />
-          ) : null}
+                <TabsTrigger
+                  value="plan"
+                  className="group flex items-center gap-2 rounded-xl px-8 py-2 text-sm font-semibold text-slate-600 transition-all hover:bg-white/60 hover:text-slate-900 data-[state=active]:bg-white data-[state=active]:text-slate-900 data-[state=active]:shadow-xs"
+                >
+                  <NotebookPen className="size-4.5 text-slate-400 transition-colors group-data-[state=active]:text-tan-dark" />
+                  <span>{copy.tabs?.plan ?? 'Plan'}</span>
+                </TabsTrigger>
+              </TabsList>
+            </div>
 
-          {/* Integrated Actions Bar */}
-          <DetailViewActionsBar
-            idPrefix="employer-view"
-            deleteLabel={copy.deleteButton}
-            backLabel={copy.backButton}
-            editLabel={copy.editGeneralButton}
-            secondaryEditLabel={copy.editPlanButton}
-            isDeleting={isDeleting}
-            isDeleteDisabled={showConfirmDelete}
-            onDelete={() => setShowConfirmDelete(true)}
-            onBack={onBack}
-            onEdit={onEditGeneral}
-            onSecondaryEdit={onEditPlan}
-          />
+            <TabsContent value="general" className="space-y-5">
+              <ReviewStep
+                copy={{ emptyValue: reviewCopy.emptyValue }}
+                sections={generalSections}
+                layout="cards"
+                defaultOpenSection="general"
+              />
+
+              <DetailViewActionsBar
+                idPrefix="employer-general-view"
+                backLabel={copy.backButton}
+                editLabel={copy.editGeneralButton}
+                onBack={onBack}
+                onEdit={onEditGeneral}
+              />
+            </TabsContent>
+
+            <TabsContent value="plan" className="space-y-5">
+              <ReviewStep
+                copy={{ emptyValue: reviewCopy.emptyValue }}
+                sections={planSections}
+                layout="accordion"
+                defaultOpenSection={planSections[0]?.id}
+              />
+
+              <DetailViewActionsBar
+                idPrefix="employer-plan-view"
+                backLabel={copy.backButton}
+                editLabel={copy.editPlanButton}
+                onBack={onBack}
+                onEdit={onEditPlan}
+              />
+            </TabsContent>
+          </Tabs>
         </CardContent>
       </Card>
     </div>

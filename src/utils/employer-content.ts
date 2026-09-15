@@ -60,6 +60,10 @@ export const EMPLOYER_CONTENT = {
       viewTitle: 'Employer Information',
       viewDescription:
         'View complete details for the selected employer record.',
+      tabs: {
+        general: 'General',
+        plan: 'Plan',
+      },
       deleteButton: 'Delete',
       backButton: 'Back',
       editButton: 'Edit',
@@ -73,6 +77,42 @@ export const EMPLOYER_CONTENT = {
       errors: {
         listLoad: 'Failed to load employers. Please try again.',
         detailLoad: 'Failed to load employer details. Please try again.',
+      },
+    },
+    plansList: {
+      kicker: 'Administration',
+      title: 'Employer Plans',
+      description: 'Manage plans and rates configured for this employer group.',
+      addPlanButton: 'Add Plan',
+      backButton: 'Back',
+      emptyValue: '-',
+      columns: {
+        plan: 'PLAN NAME',
+        coverageCode: 'COVERAGE CODE',
+        option: 'OPTION',
+        groupNumber: 'GROUP NUMBER',
+        action: 'ACTION',
+      },
+      editAction: 'Edit',
+      editAria: (name: string) => `Edit plan ${name}`,
+      emptyTable: 'No plans found for this employer. Click Add Plan above to add one.',
+      loading: 'Loading employer plans...',
+      error: 'Failed to load employer plans. Please try again.',
+      retry: 'Retry',
+      modal: {
+        titleAdd: 'Add Employer Plan',
+        titleEdit: 'Edit Employer Plan',
+        descriptionAdd:
+          'Configure a plan, group numbers, and rates for this employer group.',
+        descriptionEdit:
+          'Update plan details, group numbers, and rates for this employer group.',
+        tabs: {
+          planDetails: 'Plan Details',
+          rates: 'Rates',
+        },
+        saveButton: 'Save Plan',
+        savingButton: 'Saving...',
+        cancelButton: 'Cancel',
       },
     },
   },
@@ -103,7 +143,8 @@ export const EMPLOYER_CONTENT = {
       create: 'Create Employer',
       edit: 'Edit Employer',
       editGeneral: 'Edit Employer (General)',
-      editPlan: 'Edit Employer (Plan & Rates)',
+      editPlan: 'Edit Employer Plan',
+      addPlan: 'Add Employer Plan',
     },
     saveLabels: {
       create: 'Save',
@@ -264,6 +305,11 @@ export const EMPLOYER_CONTENT = {
   rateStep: {
     heading: 'RATES',
     description: 'Configure effective date and rate tiers for this employer plan.',
+    selectPlanLabel: 'Plan',
+    selectPlanPlaceholder: 'Select a plan...',
+    selectPlanHint: 'Choose a plan to view and add its rate tiers.',
+    noPlanSelectedHint: 'Please select a plan from the dropdown above to configure its rates.',
+    ratesForPlanHeading: 'Rates for Selected Plan',
     effectiveDateLabel: 'Effective Date',
     effectiveDatePlaceholder: 'Pick a date',
     individualLabel: 'Individual',
@@ -291,7 +337,8 @@ export const EMPLOYER_CONTENT = {
       action: 'ACTION',
     },
     deleteAria: 'Delete rate',
-    emptyTable: 'No rates added yet. Select an effective date and enter rates above.',
+    emptyTable: 'No rates added for this plan yet. Select an effective date and enter rates above.',
+    allPlansMustHaveRates: 'Every added plan must have at least one rate configured.',
   },
   reviewStep: {
     heading: 'Review & Save',
@@ -308,6 +355,7 @@ export const EMPLOYER_CONTENT = {
       notes: 'Administrative Notes',
       plan: 'Plan Details',
       rates: 'Plan Rates',
+      plansAndRates: 'Plans & Rates',
     },
     fields: {
       name: 'Employer Name',
@@ -349,6 +397,7 @@ export const EMPLOYER_CONTENT = {
       family: 'Family',
     },
     noCarriersSelected: 'No carriers selected.',
+    noPlansConfigured: 'No plans configured.',
     noRatesConfigured: 'No rates configured.',
   },
   toasts: {
@@ -356,6 +405,8 @@ export const EMPLOYER_CONTENT = {
     createError: 'Failed to create employer. Please try again.',
     updateSuccess: 'Employer updated successfully!',
     updateError: 'Failed to update employer. Please try again.',
+    createPlanSuccess: 'Employer plan added successfully!',
+    createPlanError: 'Failed to add employer plan. Please try again.',
     updatePlanSuccess: 'Employer plan updated successfully!',
     updatePlanError: 'Failed to update employer plan. Please try again.',
     deleteSuccess: 'Employer deleted successfully!',

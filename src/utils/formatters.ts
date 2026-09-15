@@ -10,3 +10,10 @@ export function formatPhoneNumber(value: string | null | undefined): string {
   if (digits.length <= 6) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`
   return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6, 10)}`
 }
+
+export function formatEffectiveDate(value?: string | null): string {
+  if (!value || !value.trim()) return ''
+  const dateOnly = value.split('T')[0]?.trim()
+  if (!dateOnly) return ''
+  return `${dateOnly}T00:00:00`
+}

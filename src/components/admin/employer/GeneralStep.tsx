@@ -22,10 +22,16 @@ import { useLoadMoreIntersection } from '#/hooks/use-load-more-intersection.ts'
 import { EMPLOYER_CONTENT } from '#/utils/employer-content.ts'
 
 import type { EmployerFormValues } from '#/components/admin/employer/employer.schema.ts'
+import type { EmployerFormMode } from '#/utils/getEmployerStepValidationFields.ts'
 
 const copy = EMPLOYER_CONTENT.generalStep
 
-export function GeneralStep() {
+export interface GeneralStepProps {
+  mode?: EmployerFormMode
+}
+
+export function GeneralStep({ mode }: GeneralStepProps = {}) {
+  const isEditMode = mode === 'edit-general'
   const form = useFormContext<EmployerFormValues>()
   const {
     parentCompanies = [],
@@ -55,15 +61,16 @@ export function GeneralStep() {
     [parentCompanies],
   )
 
-  // Auto-select first parent company if not selected yet
+  // Auto-select first parent company if not selected yet (only in create mode)
   useEffect(() => {
+    if (isEditMode) return
     const currentId = form.getValues('parentCompanyId')
     if (!currentId && parentCompanyOptions.length > 0) {
       form.setValue('parentCompanyId', parentCompanyOptions[0].value, {
         shouldValidate: true,
       })
     }
-  }, [form, parentCompanyOptions])
+  }, [form, parentCompanyOptions, isEditMode])
 
   const { data: states = [], isLoading: isLoadingStates, isError: isStatesError } =
     useGetStates()
@@ -133,6 +140,7 @@ export function GeneralStep() {
                   loadMoreRef={parentCompanyLoadMoreRef}
                   isFetchingNextPage={isFetchingNextParentCompaniesPage}
                   triggerClassName={FORM_INPUT_CLASS}
+                  disabled={isEditMode}
                 />
 
               </FormControl>

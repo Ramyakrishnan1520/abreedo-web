@@ -15,6 +15,7 @@ import { RateStep } from '#/components/admin/employer/RateStep.tsx'
 import { ReviewStep } from '#/components/admin/employer/ReviewStep.tsx'
 import { Stepper } from '#/components/admin/common/Stepper'
 import { FormNavigationActions } from '#/components/admin/common/FormNavigationActions.tsx'
+import { cn } from '#/lib/utils.ts'
 import {
   EMPLOYER_DEFAULT_VALUES,
   EMPLOYER_GENERAL_STEPS,
@@ -22,24 +23,27 @@ import {
   EMPLOYER_STEPS,
 } from '#/components/admin/employer/employer-steps.ts'
 import {
+  employerAddPlanSchema,
   employerGeneralEditSchema,
   employerPlanEditSchema,
   employerSchema,
   type EmployerFormValues,
 } from '#/components/admin/employer/employer.schema.ts'
 import { useCreateEmployer } from '#/hooks/employer/useCreateEmployer.ts'
+import { useCreateEmployerPlan } from '#/hooks/employer/useCreateEmployerPlan.ts'
 import { useUpdateEmployer } from '#/hooks/employer/useUpdateEmployer.ts'
 import { useUpdateEmployerPlan } from '#/hooks/employer/useUpdateEmployerPlan.ts'
 import { EMPLOYER_CONTENT } from '#/utils/employer-content.ts'
 import {
+  mapFormToAddPlansPayload,
+  mapFormToCreateEmployerPayload,
+  mapFormToGeneralUpsertPayload,
+  mapFormToPlanUpdatePayload,
+} from '#/utils/mapEmployerFormToPayloads.ts'
+import {
   getEmployerStepValidationFields,
   type EmployerFormMode,
 } from '#/utils/getEmployerStepValidationFields.ts'
-
-import type {
-  EmployerPlanUpdateRequest,
-  EmployerUpsertRequest,
-} from '#/types/employer.ts'
 
 const { form: formCopy } = EMPLOYER_CONTENT
 
@@ -53,6 +57,7 @@ interface EmployerFormProps {
   onBack?: () => void
   onSuccess?: () => void
   title?: string
+  className?: string
 }
 
 const CREATE_STEP_COMPONENTS = [
@@ -89,36 +94,47 @@ export function EmployerForm({
   onBack,
   onSuccess,
   title,
+  className,
 }: EmployerFormProps) {
   const [currentStep, setCurrentStep] = useState(0)
   const { mutate: createEmployer, isPending: isCreating } = useCreateEmployer()
+  const { mutate: createEmployerPlan, isPending: isCreatingPlan } =
+    useCreateEmployerPlan()
   const { mutate: updateEmployer, isPending: isUpdatingGeneral } =
     useUpdateEmployer()
   const { mutate: updateEmployerPlan, isPending: isUpdatingPlan } =
     useUpdateEmployerPlan()
-  const isPending = isCreating || isUpdatingGeneral || isUpdatingPlan
+  const isPending =
+    isCreating || isCreatingPlan || isUpdatingGeneral || isUpdatingPlan
 
   const normalizedMode: EmployerFormMode =
     mode === 'edit' ? 'edit-general' : mode
 
   const isEditMode =
-    normalizedMode === 'edit-general' || normalizedMode === 'edit-plan'
+    normalizedMode === 'edit-general' ||
+    normalizedMode === 'edit-plan' ||
+    normalizedMode === 'add-plan'
 
   const stepComponents = useMemo(() => {
     if (normalizedMode === 'edit-general') return GENERAL_EDIT_STEP_COMPONENTS
-    if (normalizedMode === 'edit-plan') return PLAN_EDIT_STEP_COMPONENTS
+    if (normalizedMode === 'edit-plan' || normalizedMode === 'add-plan') {
+      return PLAN_EDIT_STEP_COMPONENTS
+    }
     return CREATE_STEP_COMPONENTS
   }, [normalizedMode])
 
   const steps = useMemo(() => {
     if (normalizedMode === 'edit-general') return EMPLOYER_GENERAL_STEPS
-    if (normalizedMode === 'edit-plan') return EMPLOYER_PLAN_STEPS
+    if (normalizedMode === 'edit-plan' || normalizedMode === 'add-plan') {
+      return EMPLOYER_PLAN_STEPS
+    }
     return EMPLOYER_STEPS
   }, [normalizedMode])
 
   const schema = useMemo(() => {
     if (normalizedMode === 'edit-general') return employerGeneralEditSchema
     if (normalizedMode === 'edit-plan') return employerPlanEditSchema
+    if (normalizedMode === 'add-plan') return employerAddPlanSchema
     return employerSchema
   }, [normalizedMode])
 
@@ -126,11 +142,12 @@ export function EmployerForm({
     if (title) return title
     if (normalizedMode === 'edit-general') return formCopy.titles.editGeneral
     if (normalizedMode === 'edit-plan') return formCopy.titles.editPlan
+    if (normalizedMode === 'add-plan') return formCopy.titles.addPlan
     return formCopy.titles.create
   }, [normalizedMode, title])
 
   const form = useForm<EmployerFormValues>({
-    resolver: zodResolver(schema) as Resolver<EmployerFormValues>,
+    resolver: zodResolver(schema) as unknown as Resolver<EmployerFormValues>,
     defaultValues: {
       ...EMPLOYER_DEFAULT_VALUES,
       ...defaultValues,
@@ -165,6 +182,49 @@ export function EmployerForm({
   }
 
   const handleNext = async () => {
+    // Step validation for Plan Step in multi-plan mode
+    const isMultiPlanStep =
+      (normalizedMode === 'add-plan' && currentStep === 0) ||
+      (normalizedMode === 'create' && currentStep === 5)
+
+    if (isMultiPlanStep) {
+      const plans = form.getValues('plans') ?? []
+      if (plans.length === 0) {
+        form.setError('plans', {
+          message: EMPLOYER_CONTENT.validation.planRequiresAtLeastOne,
+        })
+        return
+      }
+      form.clearErrors('plans')
+      setCurrentStep((step) => step + 1)
+      return
+    }
+
+    // Step validation for Rate Step in multi-plan mode
+    const isMultiRateStep =
+      (normalizedMode === 'add-plan' && currentStep === 1) ||
+      (normalizedMode === 'create' && currentStep === 6)
+
+    if (isMultiRateStep) {
+      const plans = form.getValues('plans') ?? []
+      if (plans.length === 0) {
+        form.setError('plans', {
+          message: EMPLOYER_CONTENT.validation.planRequiresAtLeastOne,
+        })
+        return
+      }
+      const missingRates = plans.some((p) => !p.rates || p.rates.length === 0)
+      if (missingRates) {
+        form.setError('plans', {
+          message: EMPLOYER_CONTENT.validation.rateRequiresAtLeastOne,
+        })
+        return
+      }
+      form.clearErrors('plans')
+      setCurrentStep((step) => step + 1)
+      return
+    }
+
     const fields = getEmployerStepValidationFields(currentStep, normalizedMode)
     const isValid = await form.trigger(fields)
 
@@ -176,26 +236,21 @@ export function EmployerForm({
   }
 
   const onSubmit = (data: EmployerFormValues) => {
-    if (normalizedMode === 'edit-plan' && employerId) {
-      const planPayload: EmployerPlanUpdateRequest = {
-        planId: data.planId,
-        cgnGroupNumber: data.cgnGroupNumber || null,
-        brokerCodeId: data.brokerCodeId || null,
-        billerAccountNumber: data.billerAccountNumber || null,
-        cgnCustomerNumber: data.cgnCustomerNumber || null,
-        isActive: data.isActive ?? true,
-        planRates: (data.planRates ?? []).map((rate) => ({
-          effectiveDate: rate.effectiveDate
-            ? new Date(rate.effectiveDate).toISOString()
-            : '',
-          individual: rate.individual ?? 0,
-          family: rate.family ?? 0,
-          husbandWife: rate.husbandWife ?? 0,
-          parentChild: rate.parentChild ?? 0,
-          parentChildren: rate.parentChildren ?? 0,
-        })),
-      }
+    if (normalizedMode === 'add-plan' && employerId) {
+      const createPlansPayload = mapFormToAddPlansPayload(data)
+      createEmployerPlan(
+        { id: employerId, data: createPlansPayload },
+        {
+          onSuccess: () => {
+            onSuccess?.()
+          },
+        },
+      )
+      return
+    }
 
+    if (normalizedMode === 'edit-plan' && employerId) {
+      const planPayload = mapFormToPlanUpdatePayload(data)
       updateEmployerPlan(
         { id: employerId, data: planPayload },
         {
@@ -208,38 +263,7 @@ export function EmployerForm({
     }
 
     if (normalizedMode === 'edit-general' && employerId) {
-      const generalPayload: EmployerUpsertRequest = {
-        name: data.name,
-        parentCompanyId: data.parentCompanyId || null,
-        address1: data.address1,
-        address2: data.address2 || null,
-        city: data.city,
-        state: data.state || null,
-        zip: data.zip,
-
-        contactFirst: data.contactFirst,
-        contactLast: data.contactLast,
-        title: data.contactTitle || null,
-        phone: data.phone || null,
-        fax: data.fax || null,
-        email: data.email || null,
-
-        carrierIds: data.carrierIds,
-
-        groupNumber: data.groupNumber,
-        policyNumber: data.policyNumber || null,
-        tpacNumber: data.tpacNumber || null,
-        monthlyAdminFee: data.monthlyAdminFee ?? null,
-        status: data.status,
-        isPaper: data.isPaper,
-        allowCobra: data.allowCobra,
-        isPano: data.isPano,
-        renewalDate: data.renewalDate || null,
-        initialNotificationStartOn: data.initialNotificationStartOn || null,
-
-        notes: data.notes || null,
-      }
-
+      const generalPayload = mapFormToGeneralUpsertPayload(data)
       updateEmployer(
         { id: employerId, data: generalPayload },
         {
@@ -251,58 +275,7 @@ export function EmployerForm({
       return
     }
 
-    const createPayload: EmployerUpsertRequest = {
-      name: data.name,
-      parentCompanyId: data.parentCompanyId || null,
-      address1: data.address1,
-      address2: data.address2 || null,
-      city: data.city,
-      state: data.state || null,
-      zip: data.zip,
-
-      contactFirst: data.contactFirst,
-      contactLast: data.contactLast,
-      title: data.contactTitle || null,
-      phone: data.phone || null,
-      fax: data.fax || null,
-      email: data.email || null,
-
-      carrierIds: data.carrierIds,
-
-      groupNumber: data.groupNumber,
-      policyNumber: data.policyNumber || null,
-      tpacNumber: data.tpacNumber || null,
-      monthlyAdminFee: data.monthlyAdminFee ?? null,
-      status: data.status,
-      isPaper: data.isPaper,
-      allowCobra: data.allowCobra,
-      isPano: data.isPano,
-      renewalDate: data.renewalDate || null,
-      initialNotificationStartOn: data.initialNotificationStartOn || null,
-
-      notes: data.notes || null,
-
-      planId: data.planId || null,
-      cgnGroupNumber: data.cgnGroupNumber || null,
-      billerAccountNumber: data.billerAccountNumber || null,
-      cgnCustomerNumber: data.cgnCustomerNumber || null,
-      brokerCodeId: data.brokerCodeId || null,
-      isActive: data.isActive ?? true,
-      planRates:
-        data.planRates && data.planRates.length > 0
-          ? data.planRates.map((rate) => ({
-              effectiveDate: rate.effectiveDate
-                ? new Date(rate.effectiveDate).toISOString()
-                : '',
-              individual: rate.individual ?? 0,
-              family: rate.family ?? 0,
-              husbandWife: rate.husbandWife ?? 0,
-              parentChild: rate.parentChild ?? 0,
-              parentChildren: rate.parentChildren ?? 0,
-            }))
-          : null,
-    }
-
+    const createPayload = mapFormToCreateEmployerPayload(data)
     createEmployer(createPayload, {
       onSuccess: () => {
         onSuccess?.()
@@ -323,9 +296,14 @@ export function EmployerForm({
     : formCopy.saveLabels.create
 
   return (
-    <div className="flex min-h-[calc(100vh-8rem)] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xs">
+    <div
+      className={cn(
+        'flex min-h-[calc(100vh-8rem)] flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-xs',
+        className,
+      )}
+    >
       {/* Header with Kicker & Stepper */}
-      <div className="border-b border-slate-200 bg-sidebar px-6 py-5">
+      <div className="border-b border-slate-200 bg-sidebar px-6 py-5 pr-12 sm:pr-14">
         <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-xs font-semibold uppercase tracking-wider text-tan-accent">
@@ -355,7 +333,7 @@ export function EmployerForm({
             {isLastStep ? (
               <ReviewStep mode={normalizedMode} />
             ) : (
-              <StepComponent />
+              <StepComponent mode={normalizedMode} />
             )}
 
             {Object.keys(form.formState.errors).length > 0 &&

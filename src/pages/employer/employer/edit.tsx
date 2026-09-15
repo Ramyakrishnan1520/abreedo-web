@@ -3,6 +3,7 @@ import { AlertCircle } from 'lucide-react'
 
 import { EmployerDetailView } from '#/components/admin/employer/EmployerDetailView.tsx'
 import { EmployerForm } from '#/components/admin/employer/EmployerForm.tsx'
+import { EmployerPlansList } from '#/components/admin/employer/EmployerPlansList.tsx'
 import { getEmployerTableColumns } from '#/components/admin/employer/employer-table-columns.tsx'
 import { EmployerTableFilters } from '#/components/admin/employer/employer-table-filters.tsx'
 import { ReusableTable } from '#/components/table/index.ts'
@@ -19,7 +20,7 @@ import type { Employer } from '#/types/employer.ts'
 
 const copy = EMPLOYER_CONTENT.pages.edit
 
-type ViewMode = 'table' | 'view' | 'edit-general' | 'edit-plan'
+type ViewMode = 'table' | 'view' | 'edit-general' | 'plans-list'
 
 export function EditEmployerPage() {
   const [viewMode, setViewMode] = useState<ViewMode>('table')
@@ -105,7 +106,7 @@ export function EditEmployerPage() {
   }
 
   const handleEditPlanFromView = () => {
-    setViewMode('edit-plan')
+    setViewMode('plans-list')
   }
 
   const initialValues = employerDetail
@@ -180,9 +181,25 @@ export function EditEmployerPage() {
         />
       ) : null}
 
-      {/* Multi-Step Edit Form */}
-      {(viewMode === 'edit-general' || viewMode === 'edit-plan') &&
-      selectedEmployerId ? (
+      {/* Employer Plans List View */}
+      {viewMode === 'plans-list' && selectedEmployerId ? (
+        <EmployerPlansList
+          employerId={selectedEmployerId}
+          employerName={employerDetail?.name || ''}
+          parentCompanyName={employerDetail?.parentCompanyName || ''}
+          parentCompanyId={employerDetail?.parentCompanyId || undefined}
+          carrierIds={employerDetail?.carrierIds ?? undefined}
+          employerGroupId={
+            employerDetail?.employerGroupId ||
+            employerDetail?.groupId ||
+            selectedEmployerId
+          }
+          onBack={() => setViewMode('view')}
+        />
+      ) : null}
+
+      {/* General Multi-Step Edit Form */}
+      {viewMode === 'edit-general' && selectedEmployerId ? (
         isLoadingDetail ? (
           <Card className="border-slate-200 shadow-xs">
             <CardContent className="flex items-center justify-center gap-3 py-16 text-sm text-slate-600">
@@ -209,8 +226,8 @@ export function EditEmployerPage() {
           </Card>
         ) : initialValues ? (
           <EmployerForm
-            key={`${selectedEmployerId}-${viewMode}`}
-            mode={viewMode}
+            key={`${selectedEmployerId}-edit-general`}
+            mode="edit-general"
             employerId={selectedEmployerId}
             initialValues={initialValues}
             onBack={() => setViewMode('view')}

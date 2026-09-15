@@ -40,6 +40,20 @@ export interface EmployerPlanUpdateRequest {
   planRates: EmployerPlanRatePayload[]
 }
 
+export interface EmployerPlanPayloadItem {
+  planId: string
+  cgnGroupNumber?: string | null
+  brokerCodeId?: string | null
+  billerAccountNumber?: string | null
+  cgnCustomerNumber?: string | null
+  isActive?: boolean
+  planRates: EmployerPlanRatePayload[]
+}
+
+export interface EmployerPlansCreateRequest {
+  plans: EmployerPlanPayloadItem[]
+}
+
 export interface EmployerApiItem {
   employerId: string
   id?: string
@@ -82,8 +96,58 @@ export interface EmployerApiItem {
   brokerCodeName?: string | null
   billerAccountNumber?: string | null
   cgnCustomerNumber?: string | null
+  employerGroupId?: string | null
+  groupId?: string | null
   isActive?: boolean | null
   planRates?: PlanRateItem[] | null
+}
+
+export interface CarrierGroupNumberItem {
+  id?: string
+  carrierGroupNumberId?: string
+  planId?: string
+  planName?: string
+  name?: string
+  coverageCode?: string
+  coverageCodeTitle?: string
+  coverageCodeName?: string
+  option?: string
+  groupNumber?: string
+  cgnGroupNumber?: string
+  billerAccountNumber?: string
+  customerNumber?: string
+  cgnCustomerNumber?: string
+  brokerCodeId?: string
+  brokerCodeName?: string
+  isActive?: boolean | null
+  groupId?: string | null
+  employerGroupId?: string | null
+  planRates?: PlanRateItem[] | null
+}
+
+export interface EmployerPlanItem {
+  id?: string
+  carrierGroupNumberId?: string
+  planId?: string
+  planName?: string
+  name?: string
+  cgnGroupNumber?: string
+  groupNumber?: string
+  billerAccountNumber?: string | null
+  cgnCustomerNumber?: string | null
+  customerNumber?: string | null
+  brokerCodeId?: string | null
+  brokerCodeName?: string | null
+  isActive?: boolean | null
+  planRates?: PlanRateItem[] | null
+}
+
+export interface EmployerPlansResponse {
+  items: EmployerPlanItem[]
+  page?: number
+  pageSize?: number
+  totalCount?: number
+  totalPages?: number
 }
 
 export interface EmployerUpsertRequest {

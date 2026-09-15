@@ -13,7 +13,18 @@ import { EMPLOYER_CONTENT } from '#/utils/employer-content.ts'
 
 const { validation: v } = EMPLOYER_CONTENT
 
-export const employerSchema = z.object({
+export const planRateItemSchema = z.object({
+  id: z.string().optional(),
+  planRateId: z.string().optional(),
+  effectiveDate: requiredTextSchema(v.effectiveDateRequired),
+  individual: z.number({ message: v.individualRequired }),
+  parentChild: z.number({ message: v.parentChildRequired }),
+  parentChildren: z.number({ message: v.parentChildrenRequired }),
+  husbandWife: z.number({ message: v.memberSpouseRequired }),
+  family: z.number({ message: v.familyRequired }),
+})
+
+export const employerGeneralSchema = z.object({
   // General Step
   name: requiredTextSchema(v.nameRequired, {
     max: 100,
@@ -22,7 +33,6 @@ export const employerSchema = z.object({
   parentCompanyId: requiredTextSchema(v.parentCompanyRequired),
   parentCompanyName: optionalTextSchema(),
   address1: requiredTextSchema(v.address1Required, {
-
     max: 200,
     maxMessage: v.addressMax,
   }),
@@ -103,8 +113,10 @@ export const employerSchema = z.object({
     maxMessage: v.notesTitleMax,
   }),
   notes: optionalNotesSchema({ max: 2000, maxMessage: v.notesMax }),
+})
 
-  // Plan Step
+export const configuredEmployerPlanSchema = z.object({
+  id: z.string().optional(),
   planId: requiredTextSchema(v.planRequired),
   planName: optionalTextSchema(),
   cgnGroupNumber: requiredTextSchema(v.cgnGroupNumberRequired, {
@@ -120,55 +132,61 @@ export const employerSchema = z.object({
   brokerCodeId: optionalTextSchema(),
   brokerCodeName: optionalTextSchema(),
   isActive: z.boolean().optional(),
-
-  // Rate Step
-  planRates: z
-    .array(
-      z.object({
-        id: z.string().optional(),
-        planRateId: z.string().optional(),
-        effectiveDate: requiredTextSchema(v.effectiveDateRequired),
-        individual: z.number({ message: v.individualRequired }),
-        parentChild: z.number({ message: v.parentChildRequired }),
-        parentChildren: z.number({ message: v.parentChildrenRequired }),
-        husbandWife: z.number({ message: v.memberSpouseRequired }),
-        family: z.number({ message: v.familyRequired }),
-      }),
-    )
-    .min(1, v.rateRequiresAtLeastOne),
+  rates: z.array(planRateItemSchema).default([]),
 })
 
-export const employerGeneralEditSchema = employerSchema.extend({
+export type ConfiguredEmployerPlan = z.infer<typeof configuredEmployerPlanSchema>
+
+export const employerMultiPlanSchema = z.object({
+  plans: z
+    .array(configuredEmployerPlanSchema)
+    .min(1, v.planRequiresAtLeastOne)
+    .refine((plans) => plans.every((p) => p.rates && p.rates.length > 0), {
+      message: v.rateRequiresAtLeastOne,
+    }),
   planId: optionalTextSchema(),
+  planName: optionalTextSchema(),
   cgnGroupNumber: optionalTextSchema(),
   billerAccountNumber: optionalTextSchema(),
-  planRates: z
-    .array(
-      z.object({
-        id: z.string().optional(),
-        planRateId: z.string().optional(),
-        effectiveDate: optionalTextSchema(),
-        individual: z.number().nullable().optional(),
-        parentChild: z.number().nullable().optional(),
-        parentChildren: z.number().nullable().optional(),
-        husbandWife: z.number().nullable().optional(),
-        family: z.number().nullable().optional(),
-      }),
-    )
-    .optional(),
+  cgnCustomerNumber: optionalTextSchema(),
+  brokerCodeId: optionalTextSchema(),
+  brokerCodeName: optionalTextSchema(),
+  isActive: z.boolean().optional(),
+  planRates: z.array(planRateItemSchema).optional(),
 })
 
-export const employerPlanEditSchema = employerSchema.extend({
-  name: optionalTextSchema(),
-  parentCompanyId: optionalTextSchema(),
-  address1: optionalTextSchema(),
-  city: optionalTextSchema(),
-  zip: optionalTextSchema(),
-  contactFirst: optionalTextSchema(),
-  contactLast: optionalTextSchema(),
-  groupNumber: optionalTextSchema(),
+export const employerSinglePlanEditSchema = z.object({
+  planId: requiredTextSchema(v.planRequired),
+  planName: optionalTextSchema(),
+  cgnGroupNumber: requiredTextSchema(v.cgnGroupNumberRequired, {
+    max: 100,
+  }),
+  billerAccountNumber: requiredTextSchema(v.billerAccountNumberRequired, {
+    max: 100,
+  }),
+  cgnCustomerNumber: optionalTextSchema({
+    max: 10,
+    maxMessage: v.cgnCustomerNumberMax,
+  }),
+  brokerCodeId: optionalTextSchema(),
+  brokerCodeName: optionalTextSchema(),
+  isActive: z.boolean().optional(),
+  planRates: z.array(planRateItemSchema).min(1, v.rateRequiresAtLeastOne),
+  plans: z.array(configuredEmployerPlanSchema).optional(),
 })
 
-export type EmployerFormValues = z.infer<typeof employerSchema>
-export type PlanRateFormItem = NonNullable<EmployerFormValues['planRates']>[number]
+export const employerPlanSchema = employerMultiPlanSchema
+export const employerAddPlanSchema = employerMultiPlanSchema
+export const employerPlanEditSchema = employerSinglePlanEditSchema
+
+export const employerCreateSchema = employerGeneralSchema.merge(employerMultiPlanSchema)
+
+// Aliases for backward compatibility and mode-specific resolvers
+export const employerSchema = employerCreateSchema
+export const employerGeneralEditSchema = employerGeneralSchema
+
+export type EmployerGeneralSchemaValues = z.infer<typeof employerGeneralSchema>
+export type EmployerPlanSchemaValues = z.infer<typeof employerPlanSchema>
+export type EmployerFormValues = z.infer<typeof employerCreateSchema>
+export type PlanRateFormItem = z.infer<typeof planRateItemSchema>
 
