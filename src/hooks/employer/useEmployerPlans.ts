@@ -29,6 +29,7 @@ export function useEmployerPlans(
       }
       return getEmployerPlansApi(employerId, carrierGroupNumberId)
     },
+    staleTime: 1000 * 60 * 5, // 5 minutes
     enabled: Boolean(employerId),
   })
 }

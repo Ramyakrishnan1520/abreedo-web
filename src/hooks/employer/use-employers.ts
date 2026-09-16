@@ -24,6 +24,7 @@ export function useEmployers(
       req.pageSize,
       search ?? '',
     ],
+    staleTime: 1000 * 60 * 5, // 5 minutes
     queryFn: () => getEmployersApi(req, parentCompanyId, search),
   })
 }

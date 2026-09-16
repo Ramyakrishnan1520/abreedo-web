@@ -24,10 +24,11 @@ import {
 } from '#/components/admin/employer/employer-steps.ts'
 import {
   employerAddPlanSchema,
+  employerCreateSchema,
   employerGeneralEditSchema,
   employerPlanEditSchema,
-  employerSchema,
   type EmployerFormValues,
+  type ConfiguredEmployerPlan,
 } from '#/components/admin/employer/employer.schema.ts'
 import { useCreateEmployer } from '#/hooks/employer/useCreateEmployer.ts'
 import { useCreateEmployerPlan } from '#/hooks/employer/useCreateEmployerPlan.ts'
@@ -56,6 +57,7 @@ interface EmployerFormProps {
   initialValues?: Partial<EmployerFormValues>
   onBack?: () => void
   onSuccess?: () => void
+  onSavePlans?: (plans: ConfiguredEmployerPlan[]) => void
   title?: string
   className?: string
 }
@@ -67,7 +69,6 @@ const CREATE_STEP_COMPONENTS = [
   CarriersStep,
   NotesStep,
   PlanStep,
-  RateStep,
   ReviewStep,
 ] as const
 
@@ -93,6 +94,7 @@ export function EmployerForm({
   initialValues,
   onBack,
   onSuccess,
+  onSavePlans,
   title,
   className,
 }: EmployerFormProps) {
@@ -109,42 +111,39 @@ export function EmployerForm({
 
   const normalizedMode: EmployerFormMode =
     mode === 'edit' ? 'edit-general' : mode
-
   const isEditMode =
-    normalizedMode === 'edit-general' ||
-    normalizedMode === 'edit-plan' ||
-    normalizedMode === 'add-plan'
-
-  const stepComponents = useMemo(() => {
-    if (normalizedMode === 'edit-general') return GENERAL_EDIT_STEP_COMPONENTS
-    if (normalizedMode === 'edit-plan' || normalizedMode === 'add-plan') {
-      return PLAN_EDIT_STEP_COMPONENTS
-    }
-    return CREATE_STEP_COMPONENTS
-  }, [normalizedMode])
+    normalizedMode === 'edit-general' || normalizedMode === 'edit-plan'
 
   const steps = useMemo(() => {
-    if (normalizedMode === 'edit-general') return EMPLOYER_GENERAL_STEPS
-    if (normalizedMode === 'edit-plan' || normalizedMode === 'add-plan') {
-      return EMPLOYER_PLAN_STEPS
+    switch (normalizedMode) {
+      case 'edit-general':
+        return EMPLOYER_GENERAL_STEPS
+      case 'edit-plan':
+      case 'add-plan':
+        return EMPLOYER_PLAN_STEPS
+      default:
+        return EMPLOYER_STEPS
     }
-    return EMPLOYER_STEPS
+  }, [normalizedMode])
+
+  const stepComponents = useMemo(() => {
+    switch (normalizedMode) {
+      case 'edit-general':
+        return GENERAL_EDIT_STEP_COMPONENTS
+      case 'edit-plan':
+      case 'add-plan':
+        return PLAN_EDIT_STEP_COMPONENTS
+      default:
+        return CREATE_STEP_COMPONENTS
+    }
   }, [normalizedMode])
 
   const schema = useMemo(() => {
     if (normalizedMode === 'edit-general') return employerGeneralEditSchema
     if (normalizedMode === 'edit-plan') return employerPlanEditSchema
     if (normalizedMode === 'add-plan') return employerAddPlanSchema
-    return employerSchema
+    return employerCreateSchema
   }, [normalizedMode])
-
-  const resolvedTitle = useMemo(() => {
-    if (title) return title
-    if (normalizedMode === 'edit-general') return formCopy.titles.editGeneral
-    if (normalizedMode === 'edit-plan') return formCopy.titles.editPlan
-    if (normalizedMode === 'add-plan') return formCopy.titles.addPlan
-    return formCopy.titles.create
-  }, [normalizedMode, title])
 
   const form = useForm<EmployerFormValues>({
     resolver: zodResolver(schema) as unknown as Resolver<EmployerFormValues>,
@@ -153,19 +152,32 @@ export function EmployerForm({
       ...defaultValues,
       ...initialValues,
     },
-    mode: 'onSubmit',
-    reValidateMode: 'onSubmit',
+    mode: 'onTouched',
   })
 
   useEffect(() => {
-    if (isEditMode && initialValues) {
+    if (initialValues) {
       form.reset({
         ...EMPLOYER_DEFAULT_VALUES,
+        ...defaultValues,
         ...initialValues,
       })
-      setCurrentStep(0)
     }
-  }, [form, initialValues, isEditMode])
+  }, [initialValues, defaultValues, form])
+
+  const resolvedTitle = useMemo(() => {
+    if (title) return title
+    switch (normalizedMode) {
+      case 'edit-general':
+        return formCopy.titles.editGeneral
+      case 'edit-plan':
+        return formCopy.titles.editPlan
+      case 'add-plan':
+        return formCopy.titles.addPlan
+      default:
+        return formCopy.titles.create
+    }
+  }, [title, normalizedMode])
 
   const isFirstStep = currentStep === 0
   const isLastStep = currentStep === steps.length - 1
@@ -182,12 +194,29 @@ export function EmployerForm({
   }
 
   const handleNext = async () => {
-    // Step validation for Plan Step in multi-plan mode
-    const isMultiPlanStep =
-      (normalizedMode === 'add-plan' && currentStep === 0) ||
-      (normalizedMode === 'create' && currentStep === 5)
+    // Step validation for Plan Step in Create mode (index 5)
+    if (normalizedMode === 'create' && currentStep === 5) {
+      const plans = form.getValues('plans') ?? []
+      if (plans.length === 0) {
+        form.setError('plans', {
+          message: EMPLOYER_CONTENT.validation.planRequiresAtLeastOne,
+        })
+        return
+      }
+      const missingRates = plans.some((p) => !p.rates || p.rates.length === 0)
+      if (missingRates) {
+        form.setError('plans', {
+          message: EMPLOYER_CONTENT.validation.rateRequiresAtLeastOne,
+        })
+        return
+      }
+      form.clearErrors('plans')
+      setCurrentStep((step) => step + 1)
+      return
+    }
 
-    if (isMultiPlanStep) {
+    // Step validation for Plan Step in Add-Plan mode (index 0)
+    if (normalizedMode === 'add-plan' && currentStep === 0) {
       const plans = form.getValues('plans') ?? []
       if (plans.length === 0) {
         form.setError('plans', {
@@ -200,12 +229,8 @@ export function EmployerForm({
       return
     }
 
-    // Step validation for Rate Step in multi-plan mode
-    const isMultiRateStep =
-      (normalizedMode === 'add-plan' && currentStep === 1) ||
-      (normalizedMode === 'create' && currentStep === 6)
-
-    if (isMultiRateStep) {
+    // Step validation for Rate Step in Add-Plan mode (index 1)
+    if (normalizedMode === 'add-plan' && currentStep === 1) {
       const plans = form.getValues('plans') ?? []
       if (plans.length === 0) {
         form.setError('plans', {
@@ -236,30 +261,44 @@ export function EmployerForm({
   }
 
   const onSubmit = (data: EmployerFormValues) => {
-    if (normalizedMode === 'add-plan' && employerId) {
-      const createPlansPayload = mapFormToAddPlansPayload(data)
-      createEmployerPlan(
-        { id: employerId, data: createPlansPayload },
-        {
-          onSuccess: () => {
-            onSuccess?.()
+    if (normalizedMode === 'add-plan') {
+      if (onSavePlans) {
+        onSavePlans(data.plans ?? [])
+        onSuccess?.()
+        return
+      }
+      if (employerId) {
+        const createPlansPayload = mapFormToAddPlansPayload(data)
+        createEmployerPlan(
+          { id: employerId, data: createPlansPayload },
+          {
+            onSuccess: () => {
+              onSuccess?.()
+            },
           },
-        },
-      )
-      return
+        )
+        return
+      }
     }
 
-    if (normalizedMode === 'edit-plan' && employerId) {
-      const planPayload = mapFormToPlanUpdatePayload(data)
-      updateEmployerPlan(
-        { id: employerId, data: planPayload },
-        {
-          onSuccess: () => {
-            onSuccess?.()
+    if (normalizedMode === 'edit-plan') {
+      if (onSavePlans) {
+        onSavePlans(data.plans ?? [])
+        onSuccess?.()
+        return
+      }
+      if (employerId) {
+        const planPayload = mapFormToPlanUpdatePayload(data)
+        updateEmployerPlan(
+          { id: employerId, data: planPayload },
+          {
+            onSuccess: () => {
+              onSuccess?.()
+            },
           },
-        },
-      )
-      return
+        )
+        return
+      }
     }
 
     if (normalizedMode === 'edit-general' && employerId) {

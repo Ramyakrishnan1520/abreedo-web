@@ -3,10 +3,14 @@ import {
   AlertCircle,
   ArrowLeft,
   Building2,
+  ChevronRight,
   Pencil,
   Plus,
 } from 'lucide-react'
 
+import { EmployerForm } from '#/components/admin/employer/EmployerForm.tsx'
+import { EmployerRatesTable } from '#/components/admin/employer/EmployerRatesTable.tsx'
+import { ReusableTable } from '#/components/table/index.ts'
 import { Badge } from '#/components/ui/badge.tsx'
 import { Button } from '#/components/ui/button.tsx'
 import {
@@ -21,17 +25,17 @@ import {
   DialogDescription,
   DialogTitle,
 } from '#/components/ui/dialog.tsx'
-import { EmployerForm } from '#/components/admin/employer/EmployerForm.tsx'
-import { ReusableTable } from '#/components/table/index.ts'
 import { useCarrierGroupNumbers } from '#/hooks/employer/useCarrierGroupNumbers.ts'
 import { useEmployer } from '#/hooks/employer/useEmployerById.ts'
 import { useEmployerPlans } from '#/hooks/employer/useEmployerPlans.ts'
+import { cn } from '#/lib/utils.ts'
 import { EMPLOYER_CONTENT } from '#/utils/employer-content.ts'
 import { mapCarrierGroupNumberToFormValues } from '#/utils/mapCarrierGroupNumberToFormValues.ts'
 import { mapEmployerDetailToFormValues } from '#/utils/mapEmployerDetailToFormValues.ts'
 
-import type { ColumnDef, PaginationState } from '@tanstack/react-table'
-import type { CarrierGroupNumberItem } from '#/types/employer.ts'
+import type { ConfiguredEmployerPlan } from '#/components/admin/employer/employer.schema.ts'
+import type { ColumnDef, ExpandedState, OnChangeFn, PaginationState } from '@tanstack/react-table'
+import type { CarrierGroupNumberItem, PlanRateItem } from '#/types/employer.ts'
 
 interface EmployerPlansListProps {
   employerId: string
@@ -44,6 +48,7 @@ interface EmployerPlansListProps {
 }
 
 const copy = EMPLOYER_CONTENT.pages.plansList
+const planStepCopy = EMPLOYER_CONTENT.planStep
 const { form: formCopy } = EMPLOYER_CONTENT
 
 export function EmployerPlansList({
@@ -57,6 +62,25 @@ export function EmployerPlansList({
     pageIndex: 0,
     pageSize: 10,
   })
+
+  // Accordion row expansion state for ReusableTable
+  const [expanded, setExpanded] = useState<ExpandedState>({})
+
+  const handleExpandedChange: OnChangeFn<ExpandedState> = (updaterOrValue) => {
+    setExpanded((old) => {
+      const next =
+        typeof updaterOrValue === 'function' ? updaterOrValue(old) : updaterOrValue
+      if (typeof next === 'object' && next !== null) {
+        const keys = Object.keys(next).filter((k) => next[k])
+        if (keys.length > 1) {
+          const lastKey = keys[keys.length - 1]
+          return lastKey ? { [lastKey]: true } : {}
+        }
+        return next
+      }
+      return next
+    })
+  }
 
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -76,7 +100,9 @@ export function EmployerPlansList({
     pageSize: pagination.pageSize,
   })
 
+  // Fetch full employer details and configured employer plans (with rates)
   const { data: employerDetail } = useEmployer(employerId)
+  const { data: allEmployerPlansResponse } = useEmployerPlans(employerId)
 
   const selectedCgnId =
     selectedPlanForModal?.carrierGroupNumberId || selectedPlanForModal?.id
@@ -107,6 +133,32 @@ export function EmployerPlansList({
 
   const displayGroupNumber = (item: CarrierGroupNumberItem) =>
     item.groupNumber || item.cgnGroupNumber || emptyValue
+
+  /**
+   * Resolves configured rate tiers for a plan row strictly using its planId
+   */
+  const getRatesForPlan = (planId?: string): PlanRateItem[] => {
+    if (!planId) return []
+
+    // Match by planId in employer's configured plans
+    const matchedPlan = allEmployerPlansResponse?.items?.find(
+      (p) => p.planId === planId,
+    )
+    if (matchedPlan?.planRates && matchedPlan.planRates.length > 0) {
+      return matchedPlan.planRates
+    }
+
+    // Fallback: match by planId on employerDetail root
+    if (
+      employerDetail?.planId === planId &&
+      employerDetail?.planRates &&
+      employerDetail.planRates.length > 0
+    ) {
+      return employerDetail.planRates
+    }
+
+    return []
+  }
 
   const handleOpenAdd = () => {
     setModalMode('add')
@@ -155,9 +207,23 @@ export function EmployerPlansList({
 
     const planItem = detailedPlan || selectedPlanForModal
     if (planItem) {
+      const mapped = mapCarrierGroupNumberToFormValues(planItem)
+      const configuredPlanItem: ConfiguredEmployerPlan = {
+        id: planItem.carrierGroupNumberId || planItem.id || 'single-plan',
+        planId: mapped.planId || '',
+        planName: mapped.planName || '',
+        cgnGroupNumber: mapped.cgnGroupNumber || '',
+        billerAccountNumber: mapped.billerAccountNumber || '',
+        cgnCustomerNumber: mapped.cgnCustomerNumber || '',
+        brokerCodeId: mapped.brokerCodeId || '',
+        brokerCodeName: mapped.brokerCodeName || '',
+        isActive: mapped.isActive ?? true,
+        rates: mapped.planRates ?? [],
+      }
       return {
         ...initialValues,
-        ...mapCarrierGroupNumberToFormValues(planItem),
+        ...mapped,
+        plans: [configuredPlanItem],
         existingPlanIds,
       }
     }
@@ -170,6 +236,33 @@ export function EmployerPlansList({
 
   const columns = useMemo<ColumnDef<CarrierGroupNumberItem>[]>(
     () => [
+      {
+        id: 'expander',
+        header: () => <span className="w-10" />,
+        cell: ({ row }) => (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              row.toggleExpanded()
+            }}
+            className="inline-flex size-6 items-center justify-center rounded-md text-slate-400 hover:bg-slate-200/60 hover:text-slate-700 transition-transform cursor-pointer"
+            aria-expanded={row.getIsExpanded()}
+            aria-label={
+              row.getIsExpanded()
+                ? planStepCopy.collapseRatesAria
+                : planStepCopy.expandRatesAria
+            }
+          >
+            <ChevronRight
+              className={cn(
+                'size-4 transition-transform duration-200',
+                row.getIsExpanded() && 'rotate-90 text-tan-dark',
+              )}
+            />
+          </button>
+        ),
+      },
       {
         accessorKey: 'planName',
         header: copy.columns.plan,
@@ -208,20 +301,25 @@ export function EmployerPlansList({
       },
       {
         id: 'action',
-        header: copy.columns.action,
+        header: () => <span className="block text-right">{copy.columns.action}</span>,
         cell: ({ row }) => {
           const planName = displayPlanName(row.original)
           return (
-            <Button
-              type="button"
-              variant="outline"
-              size="icon-sm"
-              aria-label={copy.editAria(planName)}
-              onClick={() => handleOpenEdit(row.original)}
-              className="text-slate-600 hover:text-slate-900 cursor-pointer"
-            >
-              <Pencil className="size-3.5" />
-            </Button>
+            <div className="flex justify-end">
+              <Button
+                type="button"
+                variant="outline"
+                size="icon-sm"
+                aria-label={copy.editAria(planName)}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  handleOpenEdit(row.original)
+                }}
+                className="text-slate-600 hover:text-slate-900 cursor-pointer"
+              >
+                <Pencil className="size-3.5" />
+              </Button>
+            </div>
           )
         },
       },
@@ -296,15 +394,39 @@ export function EmployerPlansList({
             </div>
           ) : null}
 
-          {/* ReusableTable with full pagination controls */}
+          {/* ReusableTable with expandable rows and accordion rates support */}
           <ReusableTable
             data={plans}
             columns={columns}
             loading={isLoading}
             pagination={pagination}
-            onPaginationChange={setPagination}
+            onPaginationChange={(updater) => {
+              setExpanded({})
+              setPagination(updater)
+            }}
             pageCount={plansResult?.totalPages}
             rowCount={plansResult?.totalCount}
+            expanded={expanded}
+            onExpandedChange={handleExpandedChange}
+            onRowClick={(row) => row.toggleExpanded()}
+            renderExpandedRow={(row) => {
+              const rates = getRatesForPlan(row.original.planId)
+
+              return (
+                <div className="p-3 pl-12 sm:pl-14">
+                  {rates.length > 0 ? (
+                    <EmployerRatesTable
+                      rates={rates}
+                      className="border-slate-200/80 bg-white shadow-none"
+                    />
+                  ) : (
+                    <p className="py-2 text-xs italic text-slate-400">
+                      {planStepCopy.noRatesForPlan}
+                    </p>
+                  )}
+                </div>
+              )
+            }}
           />
 
           {/* Bottom Actions Bar */}
@@ -348,7 +470,7 @@ export function EmployerPlansList({
           ) : (
             <div className="flex flex-1 min-h-0 flex-col overflow-hidden">
               <EmployerForm
-                key={`${employerId}-${modalMode}-${selectedCgnId || 'new'}`}
+                key={`${employerId}-${modalMode}-${selectedCgnId || 'new'}-${detailedPlan?.planId || selectedPlanForModal?.planId || 'item'}`}
                 mode={modalMode === 'add' ? 'add-plan' : 'edit-plan'}
                 employerId={employerId}
                 initialValues={modalInitialValues}

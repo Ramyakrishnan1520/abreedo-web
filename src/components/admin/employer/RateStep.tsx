@@ -84,6 +84,13 @@ export interface EmployerRateStepProps {
   mode?: EmployerFormMode
 }
 
+export interface RateWithPlanInfo extends PlanRateFormItem {
+  planIndex: number
+  planId: string
+  planName: string
+  rateIndexInPlan: number
+}
+
 export function RateStep({ mode = 'create' }: EmployerRateStepProps = {}) {
   const form = useFormContext<EmployerFormValues>()
   const isSinglePlanEdit = mode === 'edit-plan'
@@ -91,29 +98,29 @@ export function RateStep({ mode = 'create' }: EmployerRateStepProps = {}) {
   const plans = form.watch('plans') ?? []
   const singlePlanRates = form.watch('planRates') ?? []
 
-  // Selected plan index for multi-plan mode
+  // Selected plan index for adding rates
   const [selectedPlanIndex, setSelectedPlanIndex] = useState<number>(0)
 
   // Rate inputs draft
   const [effectiveDate, setEffectiveDate] = useState<string>('')
   const [rateDraft, setRateDraft] = useState<RateTierDraft>(INITIAL_RATE_TIER_DRAFT)
 
-  const [editingRateIndex, setEditingRateIndex] = useState<number | null>(null)
+  // Track the rate being edited across all plans
+  const [editingRateInfo, setEditingRateInfo] = useState<{
+    planIndex: number
+    rateIndexInPlan: number
+    globalIndex: number
+  } | null>(null)
+
   const [errors, setErrors] = useState<
     { effectiveDate?: string } & Partial<Record<RateTierKey, string>>
   >({})
 
-  const isEditing = editingRateIndex !== null
+  const isEditing = editingRateInfo !== null
   const hasEffectiveDate = Boolean(effectiveDate.trim())
 
   // Safe clamped index to prevent out-of-bounds on plan deletions
   const safePlanIndex = Math.min(selectedPlanIndex, Math.max(0, plans.length - 1))
-
-  // Current active rates
-  const currentPlan = !isSinglePlanEdit && plans.length > 0 ? plans[safePlanIndex] : null
-  const currentRates: PlanRateFormItem[] = isSinglePlanEdit
-    ? singlePlanRates
-    : currentPlan?.rates ?? []
 
   // Plan selector options for multi-plan mode
   const planSelectOptions = useMemo(
@@ -135,13 +142,42 @@ export function RateStep({ mode = 'create' }: EmployerRateStepProps = {}) {
       : `Plan ${safePlanIndex + 1} (${p.cgnGroupNumber || 'No Group'})`
   }, [plans, safePlanIndex])
 
+  // Flattened array of all rates across all plans with plan name metadata
+  const allRatesWithPlan = useMemo<RateWithPlanInfo[]>(() => {
+    if (isSinglePlanEdit) {
+      const pName = plans[0]?.planName || form.watch('planName') || ''
+      const pId = plans[0]?.planId || form.watch('planId') || ''
+      return singlePlanRates.map((r, rateIdx) => ({
+        ...r,
+        planIndex: 0,
+        planId: pId,
+        planName: pName,
+        rateIndexInPlan: rateIdx,
+      }))
+    }
+
+    return plans.flatMap((plan, planIdx) => {
+      const planName =
+        plan.planName ||
+        (plan.cgnGroupNumber ? `Plan (${plan.cgnGroupNumber})` : `Plan ${planIdx + 1}`)
+      const rates = plan.rates ?? []
+      return rates.map((rate, rateIdx) => ({
+        ...rate,
+        planIndex: planIdx,
+        planId: plan.planId,
+        planName,
+        rateIndexInPlan: rateIdx,
+      }))
+    })
+  }, [plans, singlePlanRates, isSinglePlanEdit, form])
+
   const handlePlanChange = (val: string) => {
     const idx = Number(val)
     if (!isNaN(idx) && idx >= 0 && idx < plans.length) {
       setSelectedPlanIndex(idx)
       setEffectiveDate('')
       setRateDraft(INITIAL_RATE_TIER_DRAFT)
-      setEditingRateIndex(null)
+      setEditingRateInfo(null)
       setErrors({})
     }
   }
@@ -172,9 +208,16 @@ export function RateStep({ mode = 'create' }: EmployerRateStepProps = {}) {
 
     setErrors({})
 
+    const targetPlanIndex = editingRateInfo ? editingRateInfo.planIndex : safePlanIndex
+    const currentPlanRates = plans[targetPlanIndex]?.rates ?? []
+
     const newRateItem: PlanRateFormItem = {
-      id: isEditing ? currentRates[editingRateIndex]?.id : undefined,
-      planRateId: isEditing ? currentRates[editingRateIndex]?.planRateId : undefined,
+      id: editingRateInfo
+        ? currentPlanRates[editingRateInfo.rateIndexInPlan]?.id
+        : undefined,
+      planRateId: editingRateInfo
+        ? currentPlanRates[editingRateInfo.rateIndexInPlan]?.planRateId
+        : undefined,
       effectiveDate,
       individual: parsedRates.individual ?? 0,
       parentChild: parsedRates.parentChild ?? 0,
@@ -186,33 +229,39 @@ export function RateStep({ mode = 'create' }: EmployerRateStepProps = {}) {
     if (isSinglePlanEdit) {
       // Single plan mode
       let updatedRates: PlanRateFormItem[]
-      if (isEditing) {
+      if (editingRateInfo) {
         updatedRates = singlePlanRates.map((r, i) =>
-          i === editingRateIndex ? newRateItem : r,
+          i === editingRateInfo.rateIndexInPlan ? newRateItem : r,
         )
-        setEditingRateIndex(null)
+        setEditingRateInfo(null)
       } else {
         updatedRates = [...singlePlanRates, newRateItem]
       }
       form.setValue('planRates', updatedRates, { shouldValidate: true })
-      form.clearErrors(['planRates'])
+      if (plans.length > 0) {
+        const updatedPlans = plans.map((p, idx) =>
+          idx === 0 ? { ...p, rates: updatedRates } : p,
+        )
+        form.setValue('plans', updatedPlans, { shouldValidate: true })
+      }
+      form.clearErrors(['planRates', 'plans'])
     } else {
-      // Multi-plan mode: update selected plan's rates
-      const planToUpdate = plans[safePlanIndex]
+      // Multi-plan mode: update target plan's rates
+      const planToUpdate = plans[targetPlanIndex]
       if (!planToUpdate) return
 
       let updatedPlanRates: PlanRateFormItem[]
-      if (isEditing) {
+      if (editingRateInfo) {
         updatedPlanRates = (planToUpdate.rates ?? []).map((r, i) =>
-          i === editingRateIndex ? newRateItem : r,
+          i === editingRateInfo.rateIndexInPlan ? newRateItem : r,
         )
-        setEditingRateIndex(null)
+        setEditingRateInfo(null)
       } else {
         updatedPlanRates = [...(planToUpdate.rates ?? []), newRateItem]
       }
 
       const updatedPlans = plans.map((p, idx) =>
-        idx === safePlanIndex ? { ...p, rates: updatedPlanRates } : p,
+        idx === targetPlanIndex ? { ...p, rates: updatedPlanRates } : p,
       )
 
       form.setValue('plans', updatedPlans, { shouldValidate: true })
@@ -224,8 +273,13 @@ export function RateStep({ mode = 'create' }: EmployerRateStepProps = {}) {
     setRateDraft(INITIAL_RATE_TIER_DRAFT)
   }
 
-  const handleEditRateRow = (rate: PlanRateFormItem, index: number) => {
-    setEditingRateIndex(index)
+  const handleEditRateRow = (rate: RateWithPlanInfo, globalIndex: number) => {
+    setEditingRateInfo({
+      planIndex: rate.planIndex,
+      rateIndexInPlan: rate.rateIndexInPlan,
+      globalIndex,
+    })
+    setSelectedPlanIndex(rate.planIndex)
     setEffectiveDate(rate.effectiveDate ? rate.effectiveDate.split('T')[0] : '')
     setRateDraft({
       individual:
@@ -252,23 +306,36 @@ export function RateStep({ mode = 'create' }: EmployerRateStepProps = {}) {
     setErrors({})
   }
 
-  const handleDeleteRateRow = (index: number, e: React.MouseEvent) => {
+  const handleDeleteRateRow = (globalIndex: number, e: React.MouseEvent) => {
     e.stopPropagation()
+    const target = allRatesWithPlan[globalIndex]
+    if (!target) return
+
     if (isSinglePlanEdit) {
-      const updated = singlePlanRates.filter((_, i) => i !== index)
-      form.setValue('planRates', updated, { shouldValidate: true })
+      const updated = singlePlanRates.filter((_, i) => i !== target.rateIndexInPlan)
+      form.setValue('planRates', updated, { shouldValidate: false })
+      form.clearErrors(['planRates', 'plans'])
+      if (plans.length > 0) {
+        const updatedPlans = plans.map((p, idx) =>
+          idx === 0 ? { ...p, rates: updated } : p,
+        )
+        form.setValue('plans', updatedPlans, { shouldValidate: false })
+      }
     } else {
-      const planToUpdate = plans[safePlanIndex]
+      const planToUpdate = plans[target.planIndex]
       if (!planToUpdate) return
-      const updatedRates = (planToUpdate.rates ?? []).filter((_, i) => i !== index)
-      const updatedPlans = plans.map((p, idx) =>
-        idx === safePlanIndex ? { ...p, rates: updatedRates } : p,
+      const updatedRates = (planToUpdate.rates ?? []).filter(
+        (_, i) => i !== target.rateIndexInPlan,
       )
-      form.setValue('plans', updatedPlans, { shouldValidate: true })
+      const updatedPlans = plans.map((p, idx) =>
+        idx === target.planIndex ? { ...p, rates: updatedRates } : p,
+      )
+      form.setValue('plans', updatedPlans, { shouldValidate: false })
+      form.clearErrors(['plans', 'planRates'])
     }
 
-    if (editingRateIndex === index) {
-      setEditingRateIndex(null)
+    if (editingRateInfo?.globalIndex === globalIndex) {
+      setEditingRateInfo(null)
       setEffectiveDate('')
       setRateDraft(INITIAL_RATE_TIER_DRAFT)
       setErrors({})
@@ -278,7 +345,7 @@ export function RateStep({ mode = 'create' }: EmployerRateStepProps = {}) {
   const handleCancelEdit = () => {
     setEffectiveDate('')
     setRateDraft(INITIAL_RATE_TIER_DRAFT)
-    setEditingRateIndex(null)
+    setEditingRateInfo(null)
     setErrors({})
   }
 
@@ -292,8 +359,8 @@ export function RateStep({ mode = 'create' }: EmployerRateStepProps = {}) {
     <div className="space-y-8">
       {/* Rate Form Fields */}
       <div className="space-y-6">
-        {/* Multi-Plan Selector */}
-        {!isSinglePlanEdit && plans.length > 0 ? (
+        {/* Multi-Plan Selector (only when multiple plans are present) */}
+        {!isSinglePlanEdit && plans.length > 1 ? (
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-start sm:gap-4">
             <label htmlFor="rate-plan-select" className={REQUIRED_LABEL_CLASS}>
               {copy.selectPlanLabel}
@@ -421,11 +488,9 @@ export function RateStep({ mode = 'create' }: EmployerRateStepProps = {}) {
 
         <div className="flex items-center justify-between">
           <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-700">
-            {!isSinglePlanEdit && currentPlan
-              ? `${copy.addedRatesHeading} (${currentPlan.planName || 'Selected Plan'})`
-              : copy.addedRatesHeading}
+            {copy.addedRatesHeading}
           </h2>
-          {currentRates.length > 0 ? (
+          {allRatesWithPlan.length > 0 ? (
             <span className="text-xs text-slate-500">
               {copy.clickRowToEditHint}
             </span>
@@ -433,8 +498,9 @@ export function RateStep({ mode = 'create' }: EmployerRateStepProps = {}) {
         </div>
 
         <EmployerRatesTable
-          rates={currentRates}
-          selectedIndex={editingRateIndex}
+          rates={allRatesWithPlan}
+          showPlanName={!isSinglePlanEdit}
+          selectedIndex={editingRateInfo?.globalIndex ?? null}
           onRowClick={handleEditRateRow}
           onDelete={handleDeleteRateRow}
         />
@@ -442,3 +508,4 @@ export function RateStep({ mode = 'create' }: EmployerRateStepProps = {}) {
     </div>
   )
 }
+

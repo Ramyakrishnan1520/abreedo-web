@@ -13,6 +13,7 @@ import { cn } from '#/lib/utils.ts'
 import { EMPLOYER_CONTENT } from '#/utils/employer-content.ts'
 
 import type { PlanRateFormItem } from '#/components/admin/employer/employer.schema.ts'
+import type { PlanRateItem } from '#/types/employer.ts'
 
 const copy = EMPLOYER_CONTENT.rateStep
 
@@ -46,21 +47,27 @@ export function formatEmployerRateCurrency(
   return isNaN(num) ? '0.00' : num.toFixed(2)
 }
 
-export interface EmployerRatesTableProps {
-  rates: PlanRateFormItem[]
+export interface EmployerRatesTableProps<
+  T extends (PlanRateFormItem | PlanRateItem) & { planName?: string } = (PlanRateFormItem | PlanRateItem) & { planName?: string },
+> {
+  rates: T[]
+  showPlanName?: boolean
   selectedIndex?: number | null
-  onRowClick?: (rate: PlanRateFormItem, index: number) => void
+  onRowClick?: (rate: T, index: number) => void
   onDelete?: (index: number, e: React.MouseEvent) => void
   className?: string
 }
 
-export function EmployerRatesTable({
+export function EmployerRatesTable<
+  T extends (PlanRateFormItem | PlanRateItem) & { planName?: string } = (PlanRateFormItem | PlanRateItem) & { planName?: string },
+>({
   rates,
+  showPlanName = false,
   selectedIndex = null,
   onRowClick,
   onDelete,
   className,
-}: EmployerRatesTableProps) {
+}: EmployerRatesTableProps<T>) {
   const showAction = Boolean(onDelete)
   const isClickable = Boolean(onRowClick)
 
@@ -83,6 +90,11 @@ export function EmployerRatesTable({
         <Table className="w-full text-left text-sm text-slate-700">
           <TableHeader>
             <TableRow className="border-b border-slate-200 bg-slate-50/75">
+              {showPlanName ? (
+                <TableHead className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-600">
+                  {copy.tableColumns.plan}
+                </TableHead>
+              ) : null}
               <TableHead className="px-4 py-3 text-[11px] font-semibold uppercase tracking-wider text-slate-600">
                 {copy.tableColumns.effectiveDate}
               </TableHead>
@@ -123,6 +135,11 @@ export function EmployerRatesTable({
                       'bg-tan-light/30 ring-1 ring-tan-accent/40 hover:bg-tan-light/40',
                   )}
                 >
+                  {showPlanName ? (
+                    <TableCell className="px-4 py-3.5 font-medium text-slate-900">
+                      {rate.planName || '-'}
+                    </TableCell>
+                  ) : null}
                   <TableCell className="px-4 py-3.5 font-medium text-slate-900">
                     {formatEmployerRateDate(rate.effectiveDate)}
                   </TableCell>
@@ -154,7 +171,7 @@ export function EmployerRatesTable({
                           e.stopPropagation()
                           onDelete?.(index, e)
                         }}
-                        className="text-slate-400 hover:bg-red-50 hover:text-red-600"
+                        className="text-slate-400 hover:bg-red-50 hover:text-red-600 cursor-pointer"
                         aria-label={copy.deleteAria}
                       >
                         <Trash2 className="size-4" />

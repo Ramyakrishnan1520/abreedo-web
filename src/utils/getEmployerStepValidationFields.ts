@@ -65,9 +65,7 @@ export function getEmployerStepValidationFields(
       return []
     case 5:
       return ['plans']
-    case 6:
-      return ['plans']
-    case 7: // Review
+    case 6: // Review
       return []
     default:
       return []
