@@ -11,6 +11,7 @@ import { Card, CardContent } from '#/components/ui/card.tsx'
 import { useDebouncedValue } from '#/hooks/common/use-debounced-value.ts'
 import { useCarriers } from '#/hooks/carrier/use-carriers.ts'
 import { useCarrier } from '#/hooks/carrier/useCarrierById.ts'
+import { Route } from '#/routes/_authenticated/admin/parent-setup/carriers/edit.tsx'
 import { CARRIER_CONTENT } from '#/utils/carrier-content.ts'
 import { mapCarrierDetailToFormValues } from '#/utils/mapCarrierDetailToFormValues.ts'
 
@@ -22,10 +23,12 @@ const copy = CARRIER_CONTENT.pages.edit
 type ViewMode = 'table' | 'view' | 'edit'
 
 export function EditCarrierPage() {
-  const [viewMode, setViewMode] = useState<ViewMode>('table')
-  const [selectedCarrierId, setSelectedCarrierId] = useState<string | null>(
-    null,
-  )
+  const { carrierId, mode } = Route.useSearch()
+  const navigate = Route.useNavigate()
+
+  const viewMode: ViewMode = (mode as ViewMode) || 'table'
+  const selectedCarrierId = carrierId ?? null
+
   const [searchTerm, setSearchTerm] = useState('')
   const activeSearch = useDebouncedValue(searchTerm)
 
@@ -81,24 +84,43 @@ export function EditCarrierPage() {
     () =>
       getCarrierTableColumns({
         onView: (carrier: Carrier) => {
-          setSelectedCarrierId(String(carrier.id))
-          setViewMode('view')
+          void navigate({
+            search: (prev) => ({
+              ...prev,
+              carrierId: String(carrier.id),
+              mode: 'view',
+            }),
+          })
         },
         onEdit: (carrier: Carrier) => {
-          setSelectedCarrierId(String(carrier.id))
-          setViewMode('edit')
+          void navigate({
+            search: (prev) => ({
+              ...prev,
+              carrierId: String(carrier.id),
+              mode: 'edit',
+            }),
+          })
         },
       }),
-    [],
+    [navigate],
   )
 
   const handleBackToTable = () => {
-    setViewMode('table')
-    setSelectedCarrierId(null)
+    void navigate({
+      search: () => ({
+        carrierId: undefined,
+        mode: 'table',
+      }),
+    })
   }
 
   const handleEditFromView = () => {
-    setViewMode('edit')
+    void navigate({
+      search: (prev) => ({
+        ...prev,
+        mode: 'edit',
+      }),
+    })
   }
 
   const initialValues =

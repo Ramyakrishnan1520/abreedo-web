@@ -11,6 +11,7 @@ import { Card, CardContent } from '#/components/ui/card.tsx'
 import { useDebouncedValue } from '#/hooks/common/use-debounced-value.ts'
 import { useCoverageCodes } from '#/hooks/coverage-code/use-coverage-codes.ts'
 import { useCoverageCodeById } from '#/hooks/coverage-code/useCoverageCodeById.ts'
+import { Route } from '#/routes/_authenticated/admin/parent-setup/coverage-codes/edit.tsx'
 import { COVERAGE_CODE_CONTENT } from '#/utils/coverage-code-content.ts'
 import { mapCoverageCodeDetailToFormValues } from '#/utils/mapCoverageCodeDetailToFormValues.ts'
 
@@ -22,10 +23,12 @@ const copy = COVERAGE_CODE_CONTENT.pages.edit
 type ViewMode = 'table' | 'view' | 'edit'
 
 export function EditCoverageCodePage() {
-  const [viewMode, setViewMode] = useState<ViewMode>('table')
-  const [selectedCoverageCodeId, setSelectedCoverageCodeId] = useState<
-    string | null
-  >(null)
+  const { coverageCodeId, mode } = Route.useSearch()
+  const navigate = Route.useNavigate()
+
+  const viewMode: ViewMode = (mode as ViewMode) || 'table'
+  const selectedCoverageCodeId = coverageCodeId ?? null
+
   const [searchTerm, setSearchTerm] = useState('')
   const activeSearch = useDebouncedValue(searchTerm)
 
@@ -81,24 +84,43 @@ export function EditCoverageCodePage() {
     () =>
       getCoverageCodeTableColumns({
         onView: (coverageCode: CoverageCode) => {
-          setSelectedCoverageCodeId(String(coverageCode.id))
-          setViewMode('view')
+          void navigate({
+            search: (prev) => ({
+              ...prev,
+              coverageCodeId: String(coverageCode.id),
+              mode: 'view',
+            }),
+          })
         },
         onEdit: (coverageCode: CoverageCode) => {
-          setSelectedCoverageCodeId(String(coverageCode.id))
-          setViewMode('edit')
+          void navigate({
+            search: (prev) => ({
+              ...prev,
+              coverageCodeId: String(coverageCode.id),
+              mode: 'edit',
+            }),
+          })
         },
       }),
-    [],
+    [navigate],
   )
 
   const handleBackToTable = () => {
-    setViewMode('table')
-    setSelectedCoverageCodeId(null)
+    void navigate({
+      search: () => ({
+        coverageCodeId: undefined,
+        mode: 'table',
+      }),
+    })
   }
 
   const handleEditFromView = () => {
-    setViewMode('edit')
+    void navigate({
+      search: (prev) => ({
+        ...prev,
+        mode: 'edit',
+      }),
+    })
   }
 
   const initialValues =
