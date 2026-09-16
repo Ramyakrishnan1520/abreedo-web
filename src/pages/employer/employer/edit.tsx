@@ -3,6 +3,7 @@ import { AlertCircle } from 'lucide-react'
 
 import { EmployerDetailView } from '#/components/admin/employer/EmployerDetailView.tsx'
 import { EmployerForm } from '#/components/admin/employer/EmployerForm.tsx'
+import { EmployerPlansList } from '#/components/admin/employer/EmployerPlansList.tsx'
 import { getEmployerTableColumns } from '#/components/admin/employer/employer-table-columns.tsx'
 import { EmployerTableFilters } from '#/components/admin/employer/employer-table-filters.tsx'
 import { ReusableTable } from '#/components/table/index.ts'
@@ -11,6 +12,7 @@ import { Card, CardContent } from '#/components/ui/card.tsx'
 import { useDebouncedValue } from '#/hooks/common/use-debounced-value.ts'
 import { useEmployers } from '#/hooks/employer/use-employers.ts'
 import { useEmployer } from '#/hooks/employer/useEmployerById.ts'
+import { Route } from '#/routes/_authenticated/admin/employers/employer/edit.tsx'
 import { EMPLOYER_CONTENT } from '#/utils/employer-content.ts'
 import { mapEmployerDetailToFormValues } from '#/utils/mapEmployerDetailToFormValues.ts'
 
@@ -19,13 +21,15 @@ import type { Employer } from '#/types/employer.ts'
 
 const copy = EMPLOYER_CONTENT.pages.edit
 
-type ViewMode = 'table' | 'view' | 'edit-general' | 'edit-plan'
+type ViewMode = 'table' | 'view' | 'edit-general' | 'plans-list'
 
 export function EditEmployerPage() {
-  const [viewMode, setViewMode] = useState<ViewMode>('table')
-  const [selectedEmployerId, setSelectedEmployerId] = useState<string | null>(
-    null,
-  )
+  const { employerId, mode } = Route.useSearch()
+  const navigate = Route.useNavigate()
+
+  const viewMode: ViewMode = (mode as ViewMode) || 'table'
+  const selectedEmployerId = employerId ?? null
+
   const [parentCompanyId, setParentCompanyId] = useState<string | undefined>()
   const [searchTerm, setSearchTerm] = useState('')
   const activeSearch = useDebouncedValue(searchTerm)
@@ -88,24 +92,52 @@ export function EditEmployerPage() {
     () =>
       getEmployerTableColumns({
         onView: (employer: Employer) => {
-          setSelectedEmployerId(String(employer.id))
-          setViewMode('view')
+          void navigate({
+            search: (prev) => ({
+              ...prev,
+              employerId: String(employer.id),
+              mode: 'view',
+            }),
+          })
         },
       }),
-    [],
+    [navigate],
   )
 
   const handleBackToTable = () => {
-    setViewMode('table')
-    setSelectedEmployerId(null)
+    void navigate({
+      search: () => ({
+        employerId: undefined,
+        mode: 'table',
+      }),
+    })
+  }
+
+  const handleBackToView = () => {
+    void navigate({
+      search: (prev) => ({
+        ...prev,
+        mode: 'view',
+      }),
+    })
   }
 
   const handleEditGeneralFromView = () => {
-    setViewMode('edit-general')
+    void navigate({
+      search: (prev) => ({
+        ...prev,
+        mode: 'edit-general',
+      }),
+    })
   }
 
   const handleEditPlanFromView = () => {
-    setViewMode('edit-plan')
+    void navigate({
+      search: (prev) => ({
+        ...prev,
+        mode: 'plans-list',
+      }),
+    })
   }
 
   const initialValues = employerDetail
@@ -180,9 +212,25 @@ export function EditEmployerPage() {
         />
       ) : null}
 
-      {/* Multi-Step Edit Form */}
-      {(viewMode === 'edit-general' || viewMode === 'edit-plan') &&
-      selectedEmployerId ? (
+      {/* Employer Plans List View */}
+      {viewMode === 'plans-list' && selectedEmployerId ? (
+        <EmployerPlansList
+          employerId={selectedEmployerId}
+          employerName={employerDetail?.name || ''}
+          parentCompanyName={employerDetail?.parentCompanyName || ''}
+          parentCompanyId={employerDetail?.parentCompanyId || undefined}
+          carrierIds={employerDetail?.carrierIds ?? undefined}
+          employerGroupId={
+            employerDetail?.employerGroupId ||
+            employerDetail?.groupId ||
+            selectedEmployerId
+          }
+          onBack={handleBackToView}
+        />
+      ) : null}
+
+      {/* General Multi-Step Edit Form */}
+      {viewMode === 'edit-general' && selectedEmployerId ? (
         isLoadingDetail ? (
           <Card className="border-slate-200 shadow-xs">
             <CardContent className="flex items-center justify-center gap-3 py-16 text-sm text-slate-600">
@@ -209,11 +257,11 @@ export function EditEmployerPage() {
           </Card>
         ) : initialValues ? (
           <EmployerForm
-            key={`${selectedEmployerId}-${viewMode}`}
-            mode={viewMode}
+            key={`${selectedEmployerId}-edit-general`}
+            mode="edit-general"
             employerId={selectedEmployerId}
             initialValues={initialValues}
-            onBack={() => setViewMode('view')}
+            onBack={handleBackToView}
             onSuccess={handleBackToTable}
           />
         ) : null

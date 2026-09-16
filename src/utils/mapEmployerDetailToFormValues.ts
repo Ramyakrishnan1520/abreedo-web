@@ -1,3 +1,4 @@
+import { formatPhoneNumber } from '#/utils/formatters.ts'
 import type { EmployerApiItem } from '#/types/employer.ts'
 import type { EmployerFormValues } from '#/components/admin/employer/employer.schema.ts'
 
@@ -23,6 +24,7 @@ export function mapEmployerDetailToFormValues(
     parentCompanyId: detail.parentCompanyId ?? '',
     parentCompanyName: detail.parentCompanyName ?? '',
     address1: detail.address1 ?? '',
+    plans: [],
 
     address2: detail.address2 ?? '',
     city: detail.city ?? '',
@@ -32,8 +34,8 @@ export function mapEmployerDetailToFormValues(
     contactFirst: detail.contactFirst ?? '',
     contactLast: detail.contactLast ?? '',
     contactTitle: detail.title ?? '',
-    phone: detail.phone ?? '',
-    fax: detail.fax ?? '',
+    phone: formatPhoneNumber(detail.phone),
+    fax: formatPhoneNumber(detail.fax),
     email: detail.email ?? '',
 
     carrierIds,

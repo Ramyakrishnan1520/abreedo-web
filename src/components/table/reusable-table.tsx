@@ -1,10 +1,13 @@
+import { Fragment } from 'react'
 import {
   flexRender,
   getCoreRowModel,
+  getExpandedRowModel,
   getPaginationRowModel,
   useReactTable,
 } from '@tanstack/react-table'
 
+import { cn } from '#/lib/utils.ts'
 import { TableLoading } from './table-loading.tsx'
 import { TablePagination } from './table-pagination.tsx'
 
@@ -18,6 +21,12 @@ export function ReusableTable<TData>({
   onPaginationChange,
   pageCount,
   rowCount,
+  expanded,
+  onExpandedChange,
+  getRowCanExpand,
+  renderExpandedRow,
+  onRowClick,
+  getRowId,
 }: ReusableTableProps<TData>) {
   const usesServerPagination = pageCount !== undefined || rowCount !== undefined
 
@@ -26,8 +35,10 @@ export function ReusableTable<TData>({
     columns,
     state: {
       pagination,
+      ...(expanded !== undefined ? { expanded } : {}),
     },
     onPaginationChange,
+    onExpandedChange,
     pageCount,
     rowCount,
     manualPagination: usesServerPagination,
@@ -35,6 +46,9 @@ export function ReusableTable<TData>({
     getPaginationRowModel: usesServerPagination
       ? undefined
       : getPaginationRowModel(),
+    getExpandedRowModel: renderExpandedRow ? getExpandedRowModel() : undefined,
+    getRowCanExpand,
+    getRowId,
   })
 
   const visibleColumns = Math.max(table.getVisibleLeafColumns().length, 1)
@@ -68,24 +82,41 @@ export function ReusableTable<TData>({
             {loading ? (
               <TableLoading colSpan={visibleColumns} />
             ) : rows.length > 0 ? (
-              rows.map((row) => (
-                <tr
-                  key={row.id}
-                  className="border-b border-slate-100 transition-colors last:border-b-0 hover:bg-slate-50/60"
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <td
-                      key={cell.id}
-                      className="px-4 py-3.5 align-middle text-sm text-slate-600"
-                    >
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
+              rows.map((row) => {
+                const isExpanded = row.getIsExpanded()
+
+                return (
+                  <Fragment key={row.id}>
+                    <tr
+                      onClick={(e) => onRowClick?.(row, e)}
+                      className={cn(
+                        'border-b border-slate-100 transition-colors last:border-b-0 hover:bg-slate-50/60',
+                        isExpanded && 'bg-slate-50/50',
+                        onRowClick && 'cursor-pointer',
                       )}
-                    </td>
-                  ))}
-                </tr>
-              ))
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <td
+                          key={cell.id}
+                          className="px-4 py-3.5 align-middle text-sm text-slate-600"
+                        >
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          )}
+                        </td>
+                      ))}
+                    </tr>
+                    {isExpanded && renderExpandedRow ? (
+                      <tr className="bg-slate-50/50 border-b border-slate-200">
+                        <td colSpan={visibleColumns} className="p-0">
+                          {renderExpandedRow(row)}
+                        </td>
+                      </tr>
+                    ) : null}
+                  </Fragment>
+                )
+              })
             ) : (
               <tr>
                 <td

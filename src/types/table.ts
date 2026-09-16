@@ -1,7 +1,10 @@
+import type { ReactNode } from 'react'
 import type {
   ColumnDef,
+  ExpandedState,
   OnChangeFn,
   PaginationState,
+  Row,
   Table,
 } from '@tanstack/react-table'
 
@@ -13,6 +16,12 @@ export interface ReusableTableProps<TData> {
   onPaginationChange: OnChangeFn<PaginationState>
   pageCount?: number
   rowCount?: number
+  expanded?: ExpandedState
+  onExpandedChange?: OnChangeFn<ExpandedState>
+  getRowCanExpand?: (row: Row<TData>) => boolean
+  renderExpandedRow?: (row: Row<TData>) => ReactNode
+  onRowClick?: (row: Row<TData>, event: React.MouseEvent) => void
+  getRowId?: (originalRow: TData, index: number, parent?: Row<TData>) => string
 }
 
 export interface TablePaginationProps<TData> {

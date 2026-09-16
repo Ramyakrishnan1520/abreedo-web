@@ -11,6 +11,7 @@ import { Card, CardContent } from '#/components/ui/card.tsx'
 import { useDebouncedValue } from '#/hooks/common/use-debounced-value.ts'
 import { useParentCompanies } from '#/hooks/parent-company/use-parent-companies.ts'
 import { useParentCompany } from '#/hooks/parent-company/useParentCompany.ts'
+import { Route } from '#/routes/_authenticated/admin/parent-setup/parent-company/edit.tsx'
 import { PARENT_COMPANY_CONTENT } from '#/utils/parent-company-content.ts'
 import { mapParentCompanyDetailToFormValues } from '#/utils/mapParentCompanyDetailToFormValues.ts'
 
@@ -22,10 +23,12 @@ const copy = PARENT_COMPANY_CONTENT.pages.edit
 type ViewMode = 'table' | 'view' | 'edit'
 
 export function EditParentCompanyPage() {
-  const [viewMode, setViewMode] = useState<ViewMode>('table')
-  const [selectedParentCompanyId, setSelectedParentCompanyId] = useState<
-    string | null
-  >(null)
+  const { parentCompanyId, mode } = Route.useSearch()
+  const navigate = Route.useNavigate()
+
+  const viewMode: ViewMode = (mode as ViewMode) || 'table'
+  const selectedParentCompanyId = parentCompanyId ?? null
+
   const [searchTerm, setSearchTerm] = useState('')
   const activeSearch = useDebouncedValue(searchTerm)
 
@@ -79,24 +82,43 @@ export function EditParentCompanyPage() {
     () =>
       getParentCompanyTableColumns({
         onView: (company: ParentCompany) => {
-          setSelectedParentCompanyId(String(company.id))
-          setViewMode('view')
+          void navigate({
+            search: (prev) => ({
+              ...prev,
+              parentCompanyId: String(company.id),
+              mode: 'view',
+            }),
+          })
         },
         onEdit: (company: ParentCompany) => {
-          setSelectedParentCompanyId(String(company.id))
-          setViewMode('edit')
+          void navigate({
+            search: (prev) => ({
+              ...prev,
+              parentCompanyId: String(company.id),
+              mode: 'edit',
+            }),
+          })
         },
       }),
-    [],
+    [navigate],
   )
 
   const handleBackToTable = () => {
-    setViewMode('table')
-    setSelectedParentCompanyId(null)
+    void navigate({
+      search: () => ({
+        parentCompanyId: undefined,
+        mode: 'table',
+      }),
+    })
   }
 
   const handleEditFromView = () => {
-    setViewMode('edit')
+    void navigate({
+      search: (prev) => ({
+        ...prev,
+        mode: 'edit',
+      }),
+    })
   }
 
   const initialValues = parentCompanyDetail

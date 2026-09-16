@@ -11,6 +11,7 @@ import { Card, CardContent } from '#/components/ui/card.tsx'
 import { useDebouncedValue } from '#/hooks/common/use-debounced-value.ts'
 import { usePlans } from '#/hooks/plan/use-plans.ts'
 import { usePlan } from '#/hooks/plan/usePlanById.ts'
+import { Route } from '#/routes/_authenticated/admin/parent-setup/plans/edit.tsx'
 import { PLAN_CONTENT } from '#/utils/plan-content.ts'
 import { mapPlanDetailToFormValues } from '#/utils/mapPlanDetailToFormValues.ts'
 
@@ -22,8 +23,12 @@ const copy = PLAN_CONTENT.pages.edit
 type ViewMode = 'table' | 'view' | 'edit'
 
 export function EditPlanPage() {
-  const [viewMode, setViewMode] = useState<ViewMode>('table')
-  const [selectedPlanId, setSelectedPlanId] = useState<string | null>(null)
+  const { planId, mode } = Route.useSearch()
+  const navigate = Route.useNavigate()
+
+  const viewMode: ViewMode = (mode as ViewMode) || 'table'
+  const selectedPlanId = planId ?? null
+
   const [searchTerm, setSearchTerm] = useState('')
   const activeSearch = useDebouncedValue(searchTerm)
   const [parentCompanyId, setParentCompanyId] = useState<string | undefined>()
@@ -92,24 +97,43 @@ export function EditPlanPage() {
     () =>
       getPlanTableColumns({
         onView: (plan: Plan) => {
-          setSelectedPlanId(String(plan.id))
-          setViewMode('view')
+          void navigate({
+            search: (prev) => ({
+              ...prev,
+              planId: String(plan.id),
+              mode: 'view',
+            }),
+          })
         },
         onEdit: (plan: Plan) => {
-          setSelectedPlanId(String(plan.id))
-          setViewMode('edit')
+          void navigate({
+            search: (prev) => ({
+              ...prev,
+              planId: String(plan.id),
+              mode: 'edit',
+            }),
+          })
         },
       }),
-    [],
+    [navigate],
   )
 
   const handleBackToTable = () => {
-    setViewMode('table')
-    setSelectedPlanId(null)
+    void navigate({
+      search: () => ({
+        planId: undefined,
+        mode: 'table',
+      }),
+    })
   }
 
   const handleEditFromView = () => {
-    setViewMode('edit')
+    void navigate({
+      search: (prev) => ({
+        ...prev,
+        mode: 'edit',
+      }),
+    })
   }
 
   const initialValues =

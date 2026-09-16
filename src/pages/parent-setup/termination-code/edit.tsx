@@ -11,6 +11,7 @@ import { Card, CardContent } from '#/components/ui/card.tsx'
 import { useDebouncedValue } from '#/hooks/common/use-debounced-value.ts'
 import { useTerminationCodes } from '#/hooks/termination-code/use-termination-codes.ts'
 import { useTerminationCodeById } from '#/hooks/termination-code/useTerminationCodeById.ts'
+import { Route } from '#/routes/_authenticated/admin/parent-setup/termination-codes/edit.tsx'
 import { mapTerminationCodeDetailToFormValues } from '#/utils/mapTerminationCodeDetailToFormValues.ts'
 import { TERMINATION_CODE_CONTENT } from '#/utils/termination-code-content.ts'
 
@@ -22,10 +23,12 @@ const copy = TERMINATION_CODE_CONTENT.pages.edit
 type ViewMode = 'table' | 'view' | 'edit'
 
 export function EditTerminationCodePage() {
-  const [viewMode, setViewMode] = useState<ViewMode>('table')
-  const [selectedTerminationCodeId, setSelectedTerminationCodeId] = useState<
-    string | null
-  >(null)
+  const { terminationCodeId, mode } = Route.useSearch()
+  const navigate = Route.useNavigate()
+
+  const viewMode: ViewMode = (mode as ViewMode) || 'table'
+  const selectedTerminationCodeId = terminationCodeId ?? null
+
   const [searchTerm, setSearchTerm] = useState('')
   const activeSearch = useDebouncedValue(searchTerm)
 
@@ -81,24 +84,43 @@ export function EditTerminationCodePage() {
     () =>
       getTerminationCodeTableColumns({
         onView: (item: TerminationCode) => {
-          setSelectedTerminationCodeId(String(item.id))
-          setViewMode('view')
+          void navigate({
+            search: (prev) => ({
+              ...prev,
+              terminationCodeId: String(item.id),
+              mode: 'view',
+            }),
+          })
         },
         onEdit: (item: TerminationCode) => {
-          setSelectedTerminationCodeId(String(item.id))
-          setViewMode('edit')
+          void navigate({
+            search: (prev) => ({
+              ...prev,
+              terminationCodeId: String(item.id),
+              mode: 'edit',
+            }),
+          })
         },
       }),
-    [],
+    [navigate],
   )
 
   const handleBackToTable = () => {
-    setViewMode('table')
-    setSelectedTerminationCodeId(null)
+    void navigate({
+      search: () => ({
+        terminationCodeId: undefined,
+        mode: 'table',
+      }),
+    })
   }
 
   const handleEditFromView = () => {
-    setViewMode('edit')
+    void navigate({
+      search: (prev) => ({
+        ...prev,
+        mode: 'edit',
+      }),
+    })
   }
 
   const initialValues = detail

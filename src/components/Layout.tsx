@@ -22,24 +22,25 @@ export function Layout({ role, companyName = 'ABREEDO Benefits' }: LayoutProps) 
   }
 
   return (
-    <div className="flex min-h-svh flex-col">
+    <div className="fixed inset-0 flex flex-col overflow-hidden bg-background">
       <Header
         userName={user?.name ?? 'User'}
         companyName={companyName}
         role={role}
+        className="shrink-0"
       />
 
-      <div className="mx-auto grid w-full flex-1 grid-cols-1 md:grid-cols-[18rem_minmax(0,1fr)]">
+      <div className="flex flex-1 min-h-0 w-full overflow-hidden">
         <Sidebar
           role={role}
           onLogout={handleLogout}
-          className="min-h-full md:sticky md:top-20 md:h-[calc(100svh-5rem)] md:max-h-[calc(100svh-5rem)] md:self-start"
+          className="w-72 shrink-0 h-full min-h-0"
         />
 
-        <div className="min-w-0 px-4 py-6 md:px-8 md:py-8">
+        <main className="flex-1 min-h-0 min-w-0 overflow-y-auto px-4 py-6 md:px-8 md:py-8">
           <AdminBreadcrumb />
           <Outlet />
-        </div>
+        </main>
       </div>
     </div>
   )

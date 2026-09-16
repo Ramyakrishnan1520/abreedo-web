@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useFormContext } from 'react-hook-form'
 import { AlertCircle, Plus } from 'lucide-react'
 
+import { ConfigurableSelect } from '#/components/admin/common/ConfigurableSelect.tsx'
 import { DatePicker } from '#/components/admin/common/DatePicker.tsx'
 import { EmployerRatesTable } from '#/components/admin/employer/EmployerRatesTable.tsx'
 import {
@@ -16,68 +17,188 @@ import type {
   EmployerFormValues,
   PlanRateFormItem,
 } from '#/components/admin/employer/employer.schema.ts'
+import type { EmployerFormMode } from '#/utils/getEmployerStepValidationFields.ts'
 
 const copy = EMPLOYER_CONTENT.rateStep
+const { validation: v } = EMPLOYER_CONTENT
 
-export function RateStep() {
+interface RateTierDraft {
+  individual: string
+  parentChild: string
+  parentChildren: string
+  husbandWife: string
+  family: string
+}
+
+const INITIAL_RATE_TIER_DRAFT: RateTierDraft = {
+  individual: '',
+  parentChild: '',
+  parentChildren: '',
+  husbandWife: '',
+  family: '',
+}
+
+type RateTierKey = keyof RateTierDraft
+
+interface RateTierConfig {
+  key: RateTierKey
+  label: string
+  placeholder: string
+  errorMsg: string
+}
+
+const RATE_TIERS: RateTierConfig[] = [
+  {
+    key: 'individual',
+    label: copy.individualLabel,
+    placeholder: copy.individualPlaceholder,
+    errorMsg: v.individualRequired,
+  },
+  {
+    key: 'parentChild',
+    label: copy.parentChildLabel,
+    placeholder: copy.parentChildPlaceholder,
+    errorMsg: v.parentChildRequired,
+  },
+  {
+    key: 'parentChildren',
+    label: copy.parentChildrenLabel,
+    placeholder: copy.parentChildrenPlaceholder,
+    errorMsg: v.parentChildrenRequired,
+  },
+  {
+    key: 'husbandWife',
+    label: copy.memberSpouseLabel,
+    placeholder: copy.memberSpousePlaceholder,
+    errorMsg: v.memberSpouseRequired,
+  },
+  {
+    key: 'family',
+    label: copy.familyLabel,
+    placeholder: copy.familyPlaceholder,
+    errorMsg: v.familyRequired,
+  },
+]
+
+export interface EmployerRateStepProps {
+  mode?: EmployerFormMode
+}
+
+export interface RateWithPlanInfo extends PlanRateFormItem {
+  planIndex: number
+  planId: string
+  planName: string
+  rateIndexInPlan: number
+}
+
+export function RateStep({ mode = 'create' }: EmployerRateStepProps = {}) {
   const form = useFormContext<EmployerFormValues>()
-  const planRates = form.watch('planRates') ?? []
+  const isSinglePlanEdit = mode === 'edit-plan'
 
-  // Local state for the rate inputs
+  const plans = form.watch('plans') ?? []
+  const singlePlanRates = form.watch('planRates') ?? []
+
+  // Selected plan index for adding rates
+  const [selectedPlanIndex, setSelectedPlanIndex] = useState<number>(0)
+
+  // Rate inputs draft
   const [effectiveDate, setEffectiveDate] = useState<string>('')
-  const [individual, setIndividual] = useState<string>('')
-  const [parentChild, setParentChild] = useState<string>('')
-  const [parentChildren, setParentChildren] = useState<string>('')
-  const [husbandWife, setHusbandWife] = useState<string>('')
-  const [family, setFamily] = useState<string>('')
+  const [rateDraft, setRateDraft] = useState<RateTierDraft>(INITIAL_RATE_TIER_DRAFT)
 
-  const [editingIndex, setEditingIndex] = useState<number | null>(null)
-  const [errors, setErrors] = useState<{
-    effectiveDate?: string
-    individual?: string
-    parentChild?: string
-    parentChildren?: string
-    husbandWife?: string
-    family?: string
-  }>({})
+  // Track the rate being edited across all plans
+  const [editingRateInfo, setEditingRateInfo] = useState<{
+    planIndex: number
+    rateIndexInPlan: number
+    globalIndex: number
+  } | null>(null)
 
-  const isEditing = editingIndex !== null
+  const [errors, setErrors] = useState<
+    { effectiveDate?: string } & Partial<Record<RateTierKey, string>>
+  >({})
+
+  const isEditing = editingRateInfo !== null
   const hasEffectiveDate = Boolean(effectiveDate.trim())
 
+  // Safe clamped index to prevent out-of-bounds on plan deletions
+  const safePlanIndex = Math.min(selectedPlanIndex, Math.max(0, plans.length - 1))
+
+  // Plan selector options for multi-plan mode
+  const planSelectOptions = useMemo(
+    () =>
+      plans.map((p, idx) => ({
+        value: String(idx),
+        label: p.planName
+          ? `${p.planName} (${p.cgnGroupNumber || 'Group ' + (idx + 1)})`
+          : `Plan ${idx + 1} (${p.cgnGroupNumber || 'No Group'})`,
+      })),
+    [plans],
+  )
+
+  const selectedPlanSelectLabel = useMemo(() => {
+    if (plans.length === 0 || safePlanIndex >= plans.length) return ''
+    const p = plans[safePlanIndex]
+    return p.planName
+      ? `${p.planName} (${p.cgnGroupNumber || 'Group ' + (safePlanIndex + 1)})`
+      : `Plan ${safePlanIndex + 1} (${p.cgnGroupNumber || 'No Group'})`
+  }, [plans, safePlanIndex])
+
+  // Flattened array of all rates across all plans with plan name metadata
+  const allRatesWithPlan = useMemo<RateWithPlanInfo[]>(() => {
+    if (isSinglePlanEdit) {
+      const pName = plans[0]?.planName || form.watch('planName') || ''
+      const pId = plans[0]?.planId || form.watch('planId') || ''
+      return singlePlanRates.map((r, rateIdx) => ({
+        ...r,
+        planIndex: 0,
+        planId: pId,
+        planName: pName,
+        rateIndexInPlan: rateIdx,
+      }))
+    }
+
+    return plans.flatMap((plan, planIdx) => {
+      const planName =
+        plan.planName ||
+        (plan.cgnGroupNumber ? `Plan (${plan.cgnGroupNumber})` : `Plan ${planIdx + 1}`)
+      const rates = plan.rates ?? []
+      return rates.map((rate, rateIdx) => ({
+        ...rate,
+        planIndex: planIdx,
+        planId: plan.planId,
+        planName,
+        rateIndexInPlan: rateIdx,
+      }))
+    })
+  }, [plans, singlePlanRates, isSinglePlanEdit, form])
+
+  const handlePlanChange = (val: string) => {
+    const idx = Number(val)
+    if (!isNaN(idx) && idx >= 0 && idx < plans.length) {
+      setSelectedPlanIndex(idx)
+      setEffectiveDate('')
+      setRateDraft(INITIAL_RATE_TIER_DRAFT)
+      setEditingRateInfo(null)
+      setErrors({})
+    }
+  }
+
   const handleAddOrUpdateRate = () => {
-    const newErrors: {
-      effectiveDate?: string
-      individual?: string
-      parentChild?: string
-      parentChildren?: string
-      husbandWife?: string
-      family?: string
-    } = {}
+    const newErrors: { effectiveDate?: string } & Partial<Record<RateTierKey, string>> = {}
 
     if (!effectiveDate.trim()) {
-      newErrors.effectiveDate = EMPLOYER_CONTENT.validation.effectiveDateRequired
+      newErrors.effectiveDate = v.effectiveDateRequired
     }
 
-    const numInd = individual.trim() === '' ? NaN : Number(individual)
-    const numPC = parentChild.trim() === '' ? NaN : Number(parentChild)
-    const numPCC = parentChildren.trim() === '' ? NaN : Number(parentChildren)
-    const numHW = husbandWife.trim() === '' ? NaN : Number(husbandWife)
-    const numFam = family.trim() === '' ? NaN : Number(family)
-
-    if (isNaN(numInd) || numInd < 0) {
-      newErrors.individual = EMPLOYER_CONTENT.validation.individualRequired
-    }
-    if (isNaN(numPC) || numPC < 0) {
-      newErrors.parentChild = EMPLOYER_CONTENT.validation.parentChildRequired
-    }
-    if (isNaN(numPCC) || numPCC < 0) {
-      newErrors.parentChildren = EMPLOYER_CONTENT.validation.parentChildrenRequired
-    }
-    if (isNaN(numHW) || numHW < 0) {
-      newErrors.husbandWife = EMPLOYER_CONTENT.validation.memberSpouseRequired
-    }
-    if (isNaN(numFam) || numFam < 0) {
-      newErrors.family = EMPLOYER_CONTENT.validation.familyRequired
+    const parsedRates: Partial<Record<RateTierKey, number>> = {}
+    for (const tier of RATE_TIERS) {
+      const rawVal = rateDraft[tier.key]
+      const cleanVal = rawVal.replace(/^\$/, '').trim()
+      const num = cleanVal === '' ? NaN : Number(cleanVal)
+      if (isNaN(num) || num < 0) {
+        newErrors[tier.key] = tier.errorMsg
+      } else {
+        parsedRates[tier.key] = num
+      }
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -87,64 +208,177 @@ export function RateStep() {
 
     setErrors({})
 
+    const targetPlanIndex = editingRateInfo ? editingRateInfo.planIndex : safePlanIndex
+    const currentPlanRates = plans[targetPlanIndex]?.rates ?? []
+
     const newRateItem: PlanRateFormItem = {
-      id: isEditing ? planRates[editingIndex]?.id : undefined,
-      planRateId: isEditing ? planRates[editingIndex]?.planRateId : undefined,
+      id: editingRateInfo
+        ? currentPlanRates[editingRateInfo.rateIndexInPlan]?.id
+        : undefined,
+      planRateId: editingRateInfo
+        ? currentPlanRates[editingRateInfo.rateIndexInPlan]?.planRateId
+        : undefined,
       effectiveDate,
-      individual: numInd,
-      parentChild: numPC,
-      parentChildren: numPCC,
-      husbandWife: numHW,
-      family: numFam,
+      individual: parsedRates.individual ?? 0,
+      parentChild: parsedRates.parentChild ?? 0,
+      parentChildren: parsedRates.parentChildren ?? 0,
+      husbandWife: parsedRates.husbandWife ?? 0,
+      family: parsedRates.family ?? 0,
     }
 
-    let updatedRates: PlanRateFormItem[]
-    if (isEditing && editingIndex !== null) {
-      updatedRates = [...planRates]
-      updatedRates[editingIndex] = newRateItem
+    if (isSinglePlanEdit) {
+      // Single plan mode
+      let updatedRates: PlanRateFormItem[]
+      if (editingRateInfo) {
+        updatedRates = singlePlanRates.map((r, i) =>
+          i === editingRateInfo.rateIndexInPlan ? newRateItem : r,
+        )
+        setEditingRateInfo(null)
+      } else {
+        updatedRates = [...singlePlanRates, newRateItem]
+      }
+      form.setValue('planRates', updatedRates, { shouldValidate: true })
+      if (plans.length > 0) {
+        const updatedPlans = plans.map((p, idx) =>
+          idx === 0 ? { ...p, rates: updatedRates } : p,
+        )
+        form.setValue('plans', updatedPlans, { shouldValidate: true })
+      }
+      form.clearErrors(['planRates', 'plans'])
     } else {
-      updatedRates = [...planRates, newRateItem]
+      // Multi-plan mode: update target plan's rates
+      const planToUpdate = plans[targetPlanIndex]
+      if (!planToUpdate) return
+
+      let updatedPlanRates: PlanRateFormItem[]
+      if (editingRateInfo) {
+        updatedPlanRates = (planToUpdate.rates ?? []).map((r, i) =>
+          i === editingRateInfo.rateIndexInPlan ? newRateItem : r,
+        )
+        setEditingRateInfo(null)
+      } else {
+        updatedPlanRates = [...(planToUpdate.rates ?? []), newRateItem]
+      }
+
+      const updatedPlans = plans.map((p, idx) =>
+        idx === targetPlanIndex ? { ...p, rates: updatedPlanRates } : p,
+      )
+
+      form.setValue('plans', updatedPlans, { shouldValidate: true })
+      form.clearErrors(['plans'])
     }
 
-    form.setValue('planRates', updatedRates, { shouldValidate: true })
-    form.clearErrors('planRates')
-
-    // Reset inputs
+    // Reset rate inputs
     setEffectiveDate('')
-    setIndividual('')
-    setParentChild('')
-    setParentChildren('')
-    setHusbandWife('')
-    setFamily('')
-    setEditingIndex(null)
+    setRateDraft(INITIAL_RATE_TIER_DRAFT)
   }
 
-  const handleRowClickToEdit = (rate: PlanRateFormItem, index: number) => {
+  const handleEditRateRow = (rate: RateWithPlanInfo, globalIndex: number) => {
+    setEditingRateInfo({
+      planIndex: rate.planIndex,
+      rateIndexInPlan: rate.rateIndexInPlan,
+      globalIndex,
+    })
+    setSelectedPlanIndex(rate.planIndex)
     setEffectiveDate(rate.effectiveDate ? rate.effectiveDate.split('T')[0] : '')
-    setIndividual(rate.individual !== undefined && rate.individual !== null ? String(rate.individual) : '')
-    setParentChild(rate.parentChild !== undefined && rate.parentChild !== null ? String(rate.parentChild) : '')
-    setParentChildren(rate.parentChildren !== undefined && rate.parentChildren !== null ? String(rate.parentChildren) : '')
-    setHusbandWife(rate.husbandWife !== undefined && rate.husbandWife !== null ? String(rate.husbandWife) : '')
-    setFamily(rate.family !== undefined && rate.family !== null ? String(rate.family) : '')
-    setEditingIndex(index)
+    setRateDraft({
+      individual:
+        rate.individual !== undefined && rate.individual !== null
+          ? String(rate.individual)
+          : '',
+      parentChild:
+        rate.parentChild !== undefined && rate.parentChild !== null
+          ? String(rate.parentChild)
+          : '',
+      parentChildren:
+        rate.parentChildren !== undefined && rate.parentChildren !== null
+          ? String(rate.parentChildren)
+          : '',
+      husbandWife:
+        rate.husbandWife !== undefined && rate.husbandWife !== null
+          ? String(rate.husbandWife)
+          : '',
+      family:
+        rate.family !== undefined && rate.family !== null
+          ? String(rate.family)
+          : '',
+    })
     setErrors({})
+  }
+
+  const handleDeleteRateRow = (globalIndex: number, e: React.MouseEvent) => {
+    e.stopPropagation()
+    const target = allRatesWithPlan[globalIndex]
+    if (!target) return
+
+    if (isSinglePlanEdit) {
+      const updated = singlePlanRates.filter((_, i) => i !== target.rateIndexInPlan)
+      form.setValue('planRates', updated, { shouldValidate: false })
+      form.clearErrors(['planRates', 'plans'])
+      if (plans.length > 0) {
+        const updatedPlans = plans.map((p, idx) =>
+          idx === 0 ? { ...p, rates: updated } : p,
+        )
+        form.setValue('plans', updatedPlans, { shouldValidate: false })
+      }
+    } else {
+      const planToUpdate = plans[target.planIndex]
+      if (!planToUpdate) return
+      const updatedRates = (planToUpdate.rates ?? []).filter(
+        (_, i) => i !== target.rateIndexInPlan,
+      )
+      const updatedPlans = plans.map((p, idx) =>
+        idx === target.planIndex ? { ...p, rates: updatedRates } : p,
+      )
+      form.setValue('plans', updatedPlans, { shouldValidate: false })
+      form.clearErrors(['plans', 'planRates'])
+    }
+
+    if (editingRateInfo?.globalIndex === globalIndex) {
+      setEditingRateInfo(null)
+      setEffectiveDate('')
+      setRateDraft(INITIAL_RATE_TIER_DRAFT)
+      setErrors({})
+    }
   }
 
   const handleCancelEdit = () => {
     setEffectiveDate('')
-    setIndividual('')
-    setParentChild('')
-    setParentChildren('')
-    setHusbandWife('')
-    setFamily('')
-    setEditingIndex(null)
+    setRateDraft(INITIAL_RATE_TIER_DRAFT)
+    setEditingRateInfo(null)
     setErrors({})
   }
 
+  // Check if any plan in multi-plan mode is missing rates
+  const plansMissingRates = useMemo(() => {
+    if (isSinglePlanEdit) return []
+    return plans.filter((p) => !p.rates || p.rates.length === 0)
+  }, [isSinglePlanEdit, plans])
+
   return (
     <div className="space-y-8">
-      {/* Rate Inputs */}
+      {/* Rate Form Fields */}
       <div className="space-y-6">
+        {/* Multi-Plan Selector (only when multiple plans are present) */}
+        {!isSinglePlanEdit && plans.length > 1 ? (
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-start sm:gap-4">
+            <label htmlFor="rate-plan-select" className={REQUIRED_LABEL_CLASS}>
+              {copy.selectPlanLabel}
+            </label>
+            <div className="space-y-1">
+              <ConfigurableSelect
+                id="rate-plan-select"
+                value={String(safePlanIndex)}
+                onValueChange={handlePlanChange}
+                options={planSelectOptions}
+                selectedLabel={selectedPlanSelectLabel}
+                placeholder={copy.selectPlanPlaceholder}
+                triggerClassName={FORM_INPUT_CLASS}
+              />
+            </div>
+          </div>
+        ) : null}
+
         {/* Effective Date */}
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-start sm:gap-4">
           <label htmlFor="rate-effective-date" className={REQUIRED_LABEL_CLASS}>
@@ -152,7 +386,6 @@ export function RateStep() {
           </label>
           <div className="space-y-1">
             <DatePicker
-              id="rate-effective-date"
               value={effectiveDate}
               onChange={(val) => {
                 setEffectiveDate(val)
@@ -161,156 +394,58 @@ export function RateStep() {
                 }
               }}
               placeholder={copy.effectiveDatePlaceholder}
-              className="w-full sm:w-full"
             />
             {errors.effectiveDate ? (
-              <p className="text-xs font-medium text-destructive">{errors.effectiveDate}</p>
+              <p className="text-xs font-medium text-destructive">
+                {errors.effectiveDate}
+              </p>
             ) : null}
           </div>
         </div>
 
-        {/* Numeric fields reveal once Effective Date is selected */}
+        {/* Rate Tier Fields reveal once an Effective Date is entered */}
         {hasEffectiveDate ? (
           <>
-            {/* Individual */}
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-start sm:gap-4">
-              <label htmlFor="rate-individual" className={REQUIRED_LABEL_CLASS}>
-                {copy.individualLabel}
-              </label>
-              <div className="space-y-1">
-                <Input
-                  id="rate-individual"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  placeholder={copy.individualPlaceholder}
-                  className={`${FORM_INPUT_CLASS} [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none`}
-                  value={individual}
-                  onWheel={(e) => e.currentTarget.blur()}
-                  onChange={(e) => {
-                    setIndividual(e.target.value)
-                    if (errors.individual) {
-                      setErrors((prev) => ({ ...prev, individual: undefined }))
-                    }
-                  }}
-                />
-                {errors.individual ? (
-                  <p className="text-xs font-medium text-destructive">{errors.individual}</p>
-                ) : null}
+            {RATE_TIERS.map((tier) => (
+              <div
+                key={tier.key}
+                className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-start sm:gap-4"
+              >
+                <label
+                  htmlFor={`rate-${tier.key}`}
+                  className={REQUIRED_LABEL_CLASS}
+                >
+                  {tier.label}
+                </label>
+                <div className="space-y-1">
+                  <Input
+                    id={`rate-${tier.key}`}
+                    type="number"
+                    step="0.01"
+                    min="0"
+                    placeholder={tier.placeholder}
+                    className={FORM_INPUT_CLASS}
+                    value={rateDraft[tier.key]}
+                    onChange={(e) => {
+                      const val = e.target.value
+                      setRateDraft((prev) => ({ ...prev, [tier.key]: val }))
+                      if (errors[tier.key]) {
+                        setErrors((prev) => ({
+                          ...prev,
+                          [tier.key]: undefined,
+                        }))
+                      }
+                    }}
+                    onWheel={(e) => e.currentTarget.blur()}
+                  />
+                  {errors[tier.key] ? (
+                    <p className="text-xs font-medium text-destructive">
+                      {errors[tier.key]}
+                    </p>
+                  ) : null}
+                </div>
               </div>
-            </div>
-
-            {/* Parent / Child */}
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-start sm:gap-4">
-              <label htmlFor="rate-parent-child" className={REQUIRED_LABEL_CLASS}>
-                {copy.parentChildLabel}
-              </label>
-              <div className="space-y-1">
-                <Input
-                  id="rate-parent-child"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  placeholder={copy.parentChildPlaceholder}
-                  className={`${FORM_INPUT_CLASS} [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none`}
-                  value={parentChild}
-                  onWheel={(e) => e.currentTarget.blur()}
-                  onChange={(e) => {
-                    setParentChild(e.target.value)
-                    if (errors.parentChild) {
-                      setErrors((prev) => ({ ...prev, parentChild: undefined }))
-                    }
-                  }}
-                />
-                {errors.parentChild ? (
-                  <p className="text-xs font-medium text-destructive">{errors.parentChild}</p>
-                ) : null}
-              </div>
-            </div>
-
-            {/* Parent / Children */}
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-start sm:gap-4">
-              <label htmlFor="rate-parent-children" className={REQUIRED_LABEL_CLASS}>
-                {copy.parentChildrenLabel}
-              </label>
-              <div className="space-y-1">
-                <Input
-                  id="rate-parent-children"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  placeholder={copy.parentChildrenPlaceholder}
-                  className={`${FORM_INPUT_CLASS} [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none`}
-                  value={parentChildren}
-                  onWheel={(e) => e.currentTarget.blur()}
-                  onChange={(e) => {
-                    setParentChildren(e.target.value)
-                    if (errors.parentChildren) {
-                      setErrors((prev) => ({ ...prev, parentChildren: undefined }))
-                    }
-                  }}
-                />
-                {errors.parentChildren ? (
-                  <p className="text-xs font-medium text-destructive">{errors.parentChildren}</p>
-                ) : null}
-              </div>
-            </div>
-
-            {/* Member Spouse */}
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-start sm:gap-4">
-              <label htmlFor="rate-member-spouse" className={REQUIRED_LABEL_CLASS}>
-                {copy.memberSpouseLabel}
-              </label>
-              <div className="space-y-1">
-                <Input
-                  id="rate-member-spouse"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  placeholder={copy.memberSpousePlaceholder}
-                  className={`${FORM_INPUT_CLASS} [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none`}
-                  value={husbandWife}
-                  onWheel={(e) => e.currentTarget.blur()}
-                  onChange={(e) => {
-                    setHusbandWife(e.target.value)
-                    if (errors.husbandWife) {
-                      setErrors((prev) => ({ ...prev, husbandWife: undefined }))
-                    }
-                  }}
-                />
-                {errors.husbandWife ? (
-                  <p className="text-xs font-medium text-destructive">{errors.husbandWife}</p>
-                ) : null}
-              </div>
-            </div>
-
-            {/* Family */}
-            <div className="grid grid-cols-1 gap-2 sm:grid-cols-[220px_1fr] sm:items-start sm:gap-4">
-              <label htmlFor="rate-family" className={REQUIRED_LABEL_CLASS}>
-                {copy.familyLabel}
-              </label>
-              <div className="space-y-1">
-                <Input
-                  id="rate-family"
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  placeholder={copy.familyPlaceholder}
-                  className={`${FORM_INPUT_CLASS} [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none`}
-                  value={family}
-                  onWheel={(e) => e.currentTarget.blur()}
-                  onChange={(e) => {
-                    setFamily(e.target.value)
-                    if (errors.family) {
-                      setErrors((prev) => ({ ...prev, family: undefined }))
-                    }
-                  }}
-                />
-                {errors.family ? (
-                  <p className="text-xs font-medium text-destructive">{errors.family}</p>
-                ) : null}
-              </div>
-            </div>
+            ))}
 
             {/* Action Buttons */}
             <div className="flex items-center justify-end gap-3 pt-2">
@@ -319,6 +454,7 @@ export function RateStep() {
                   type="button"
                   variant="outline"
                   onClick={handleCancelEdit}
+                  className="cursor-pointer"
                 >
                   {copy.cancelEditButton}
                 </Button>
@@ -327,7 +463,7 @@ export function RateStep() {
               <Button
                 type="button"
                 onClick={handleAddOrUpdateRate}
-                className="bg-[#94723C] hover:bg-[#805e2b] text-white cursor-pointer"
+                className="bg-tan-dark hover:bg-tan-dark/90 text-white cursor-pointer"
               >
                 <Plus className="size-4" />
                 {isEditing ? copy.updateButton : copy.addButton}
@@ -337,12 +473,16 @@ export function RateStep() {
         ) : null}
       </div>
 
-      {/* Added Rates Table (Matching provided design) */}
+      {/* Added Rates Summary Table */}
       <div className="space-y-3 pt-4 border-t border-slate-200">
-        {form.formState.errors.planRates?.message ? (
+        {plansMissingRates.length > 0 &&
+        (form.formState.errors.plans || form.formState.isSubmitted) ? (
           <div className="flex items-center gap-2 rounded-lg border border-red-200 bg-red-50/75 px-4 py-2.5 text-xs font-medium text-red-700">
             <AlertCircle className="size-4 shrink-0 text-red-600" />
-            <span>{form.formState.errors.planRates.message}</span>
+            <span>
+              {plansMissingRates.map((p) => p.planName || 'Plan').join(', ')} —{' '}
+              {copy.allPlansMustHaveRates}
+            </span>
           </div>
         ) : null}
 
@@ -350,7 +490,7 @@ export function RateStep() {
           <h2 className="text-xs font-semibold uppercase tracking-wider text-slate-700">
             {copy.addedRatesHeading}
           </h2>
-          {planRates.length > 0 ? (
+          {allRatesWithPlan.length > 0 ? (
             <span className="text-xs text-slate-500">
               {copy.clickRowToEditHint}
             </span>
@@ -358,11 +498,14 @@ export function RateStep() {
         </div>
 
         <EmployerRatesTable
-          rates={planRates}
-          selectedIndex={editingIndex}
-          onRowClick={handleRowClickToEdit}
+          rates={allRatesWithPlan}
+          showPlanName={!isSinglePlanEdit}
+          selectedIndex={editingRateInfo?.globalIndex ?? null}
+          onRowClick={handleEditRateRow}
+          onDelete={handleDeleteRateRow}
         />
       </div>
     </div>
   )
 }
+
