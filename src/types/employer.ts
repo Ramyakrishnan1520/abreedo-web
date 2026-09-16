@@ -180,13 +180,7 @@ export interface EmployerUpsertRequest {
   groupPlan?: string | null
   groupTypeId?: string | null
   groupNotes?: string | null
-  planId?: string | null
-  cgnGroupNumber?: string | null
-  billerAccountNumber?: string | null
-  cgnCustomerNumber?: string | null
-  brokerCodeId?: string | null
-  isActive?: boolean
-  planRates?: PlanRateItem[] | null
+  plans?: EmployerPlanPayloadItem[]
 }
 
 export type EmployerPaginatedListResponse = {

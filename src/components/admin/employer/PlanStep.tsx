@@ -79,18 +79,55 @@ export function PlanStep({ mode = 'create' }: EmployerPlanStepProps = {}) {
     root: brokerCodeSelectContent,
   })
 
+  // Track draft values for the input fields
+  const [draftPlanId, setDraftPlanId] = useState<string>('')
+  const [draftGroupNumber, setDraftGroupNumber] = useState<string>('')
+  const [draftBillerAccount, setDraftBillerAccount] = useState<string>('')
+  const [draftCustomerNumber, setDraftCustomerNumber] = useState<string>('')
+  const [draftBrokerCodeId, setDraftBrokerCodeId] = useState<string>('')
+  const [draftIsActive, setDraftIsActive] = useState<boolean>(true)
+
+  const [editingIndex, setEditingIndex] = useState<number | null>(null)
+  const [isEditingSinglePlan, setIsEditingSinglePlan] = useState<boolean>(false)
+
   const allPlans = useMemo(
     () => plansData?.pages.flatMap((page) => page.items) ?? [],
     [plansData],
   )
 
+  const availablePlans = useMemo(() => {
+    // Exclude plans already added in this form session (except the one currently being edited)
+    const addedPlanIdsInForm = plans
+      .map((p, idx) => (idx === editingIndex ? null : p.planId))
+      .filter((id): id is string => Boolean(id))
+
+    // Exclude plans already existing on the server for this employer (except current plan in single-plan edit mode)
+    const existingEmployerPlanIds = (values.existingPlanIds ?? []).filter((id) =>
+      isSinglePlanEdit ? id !== values.planId : true,
+    )
+
+    const excludedIds = new Set([
+      ...addedPlanIdsInForm,
+      ...existingEmployerPlanIds,
+    ])
+
+    return allPlans.filter((plan) => !excludedIds.has(plan.id))
+  }, [
+    allPlans,
+    plans,
+    editingIndex,
+    values.existingPlanIds,
+    isSinglePlanEdit,
+    values.planId,
+  ])
+
   const planOptions = useMemo(
     () =>
-      allPlans.map((plan) => ({
+      availablePlans.map((plan) => ({
         value: plan.id,
         label: plan.code ? `${plan.name} (${plan.code})` : plan.name,
       })),
-    [allPlans],
+    [availablePlans],
   )
 
   const allBrokerCodes = useMemo(
@@ -106,17 +143,6 @@ export function PlanStep({ mode = 'create' }: EmployerPlanStepProps = {}) {
       })),
     [allBrokerCodes],
   )
-
-  // Track draft values for the input fields
-  const [draftPlanId, setDraftPlanId] = useState<string>('')
-  const [draftGroupNumber, setDraftGroupNumber] = useState<string>('')
-  const [draftBillerAccount, setDraftBillerAccount] = useState<string>('')
-  const [draftCustomerNumber, setDraftCustomerNumber] = useState<string>('')
-  const [draftBrokerCodeId, setDraftBrokerCodeId] = useState<string>('')
-  const [draftIsActive, setDraftIsActive] = useState<boolean>(true)
-
-  const [editingIndex, setEditingIndex] = useState<number | null>(null)
-  const [isEditingSinglePlan, setIsEditingSinglePlan] = useState<boolean>(false)
 
   const [errors, setErrors] = useState<{
     planId?: string

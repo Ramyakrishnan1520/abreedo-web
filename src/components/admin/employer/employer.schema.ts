@@ -153,6 +153,7 @@ export const employerMultiPlanSchema = z.object({
   brokerCodeName: optionalTextSchema(),
   isActive: z.boolean().optional(),
   planRates: z.array(planRateItemSchema).optional(),
+  existingPlanIds: z.array(z.string()).optional(),
 })
 
 export const employerSinglePlanEditSchema = z.object({
@@ -173,6 +174,7 @@ export const employerSinglePlanEditSchema = z.object({
   isActive: z.boolean().optional(),
   planRates: z.array(planRateItemSchema).min(1, v.rateRequiresAtLeastOne),
   plans: z.array(configuredEmployerPlanSchema).optional(),
+  existingPlanIds: z.array(z.string()).optional(),
 })
 
 export const employerPlanSchema = employerMultiPlanSchema

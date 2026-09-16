@@ -122,27 +122,10 @@ export function mapFormToCreateEmployerPayload(
   data: EmployerFormValues,
 ): EmployerUpsertRequest {
   const generalPayload = mapFormToGeneralUpsertPayload(data)
-  const primaryPlan = data.plans && data.plans.length > 0 ? data.plans[0] : null
+  const plansPayload = mapFormToAddPlansPayload(data).plans
 
   return {
     ...generalPayload,
-    planId: (primaryPlan ? primaryPlan.planId : data.planId) || null,
-    cgnGroupNumber:
-      (primaryPlan ? primaryPlan.cgnGroupNumber : data.cgnGroupNumber) || null,
-    billerAccountNumber:
-      (primaryPlan
-        ? primaryPlan.billerAccountNumber
-        : data.billerAccountNumber) || null,
-    cgnCustomerNumber:
-      (primaryPlan
-        ? primaryPlan.cgnCustomerNumber
-        : data.cgnCustomerNumber) || null,
-    brokerCodeId:
-      (primaryPlan ? primaryPlan.brokerCodeId : data.brokerCodeId) || null,
-    isActive:
-      (primaryPlan ? primaryPlan.isActive : data.isActive) ?? true,
-    planRates: primaryPlan
-      ? mapPlanRatesToPayload(primaryPlan.rates)
-      : mapPlanRatesToPayload(data.planRates),
+    plans: plansPayload,
   }
 }

@@ -52,4 +52,5 @@ export const EMPLOYER_DEFAULT_VALUES: EmployerFormValues = {
 
   planRates: [],
   plans: [],
+  existingPlanIds: [],
 }

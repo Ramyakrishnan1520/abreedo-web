@@ -125,6 +125,14 @@ export function EmployerPlansList({
     return mapEmployerDetailToFormValues(employerDetail)
   }, [employerDetail])
 
+  const existingPlanIds = useMemo(
+    () =>
+      (plansResult?.items ?? [])
+        .map((item) => item.planId)
+        .filter((id): id is string => Boolean(id)),
+    [plansResult?.items],
+  )
+
   const modalInitialValues = useMemo(() => {
     if (!initialValues) return undefined
 
@@ -140,6 +148,8 @@ export function EmployerPlansList({
         brokerCodeName: '',
         isActive: true,
         planRates: [],
+        plans: [],
+        existingPlanIds,
       }
     }
 
@@ -148,11 +158,15 @@ export function EmployerPlansList({
       return {
         ...initialValues,
         ...mapCarrierGroupNumberToFormValues(planItem),
+        existingPlanIds,
       }
     }
 
-    return initialValues
-  }, [initialValues, modalMode, detailedPlan, selectedPlanForModal])
+    return {
+      ...initialValues,
+      existingPlanIds,
+    }
+  }, [initialValues, modalMode, detailedPlan, selectedPlanForModal, existingPlanIds])
 
   const columns = useMemo<ColumnDef<CarrierGroupNumberItem>[]>(
     () => [
